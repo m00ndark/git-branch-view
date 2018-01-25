@@ -1,0 +1,84 @@
+﻿namespace GitBranchView
+{
+	partial class FolderEntry
+	{
+		/// <summary> 
+		/// Required designer variable.
+		/// </summary>
+		private System.ComponentModel.IContainer components = null;
+
+		/// <summary> 
+		/// Clean up any resources being used.
+		/// </summary>
+		/// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
+		protected override void Dispose(bool disposing)
+		{
+			if (disposing && (components != null))
+			{
+				components.Dispose();
+			}
+			base.Dispose(disposing);
+		}
+
+		#region Component Designer generated code
+
+		/// <summary> 
+		/// Required method for Designer support - do not modify 
+		/// the contents of this method with the code editor.
+		/// </summary>
+		private void InitializeComponent()
+		{
+			this.linkLabelFolder = new System.Windows.Forms.LinkLabel();
+			this.labelBranch = new System.Windows.Forms.Label();
+			this.SuspendLayout();
+			// 
+			// linkLabelFolder
+			// 
+			this.linkLabelFolder.ActiveLinkColor = System.Drawing.SystemColors.HotTrack;
+			this.linkLabelFolder.AutoSize = true;
+			this.linkLabelFolder.DisabledLinkColor = System.Drawing.Color.Gray;
+			this.linkLabelFolder.LinkBehavior = System.Windows.Forms.LinkBehavior.HoverUnderline;
+			this.linkLabelFolder.LinkColor = System.Drawing.SystemColors.HotTrack;
+			this.linkLabelFolder.Location = new System.Drawing.Point(3, 3);
+			this.linkLabelFolder.Margin = new System.Windows.Forms.Padding(3, 0, 10, 0);
+			this.linkLabelFolder.Name = "linkLabelFolder";
+			this.linkLabelFolder.Size = new System.Drawing.Size(30, 13);
+			this.linkLabelFolder.TabIndex = 0;
+			this.linkLabelFolder.TabStop = true;
+			this.linkLabelFolder.Text = "Folder";
+			this.linkLabelFolder.VisitedLinkColor = System.Drawing.SystemColors.HotTrack;
+			this.linkLabelFolder.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.LinkLabelPath_LinkClicked);
+			// 
+			// labelBranch
+			// 
+			this.labelBranch.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+			this.labelBranch.AutoSize = true;
+			this.labelBranch.Location = new System.Drawing.Point(145, 3);
+			this.labelBranch.Name = "labelBranch";
+			this.labelBranch.Size = new System.Drawing.Size(43, 13);
+			this.labelBranch.TabIndex = 1;
+			this.labelBranch.Text = "Branch";
+			// 
+			// FolderEntry
+			// 
+			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+			this.AutoScrollMargin = new System.Drawing.Size(16, 0);
+			this.BackColor = System.Drawing.SystemColors.Window;
+			this.Controls.Add(this.labelBranch);
+			this.Controls.Add(this.linkLabelFolder);
+			this.Font = new System.Drawing.Font("Segoe UI", 8.25F);
+			this.Margin = new System.Windows.Forms.Padding(0);
+			this.Name = "FolderEntry";
+			this.Size = new System.Drawing.Size(366, 20);
+			this.ResumeLayout(false);
+			this.PerformLayout();
+
+		}
+
+		#endregion
+
+		private System.Windows.Forms.LinkLabel linkLabelFolder;
+		private System.Windows.Forms.Label labelBranch;
+	}
+}
