@@ -36,14 +36,16 @@
 			this.toolStripMenuItemSelectGitExePath = new System.Windows.Forms.ToolStripMenuItem();
 			this.toolStripMenuItemSelectLinkCommand = new System.Windows.Forms.ToolStripMenuItem();
 			this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
+			this.toolStripMenuItemCloseOnLostFocus = new System.Windows.Forms.ToolStripMenuItem();
+			this.toolStripMenuItemStartWithWindows = new System.Windows.Forms.ToolStripMenuItem();
+			this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
 			this.toolStripMenuItemExit = new System.Windows.Forms.ToolStripMenuItem();
 			this.labelRootPath = new System.Windows.Forms.Label();
 			this.flowLayoutPanel = new System.Windows.Forms.FlowLayoutPanel();
 			this.panelScroll = new System.Windows.Forms.Panel();
 			this.groupBoxSeparator = new System.Windows.Forms.GroupBox();
 			this.buttonRefresh = new System.Windows.Forms.Button();
-			this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
-			this.toolStripMenuItemStartWithWindows = new System.Windows.Forms.ToolStripMenuItem();
+			this.buttonClose = new System.Windows.Forms.Button();
 			this.contextMenuStrip.SuspendLayout();
 			this.panelScroll.SuspendLayout();
 			this.SuspendLayout();
@@ -63,6 +65,7 @@
             this.toolStripMenuItemSelectGitExePath,
             this.toolStripMenuItemSelectLinkCommand,
             this.toolStripSeparator1,
+            this.toolStripMenuItemCloseOnLostFocus,
             this.toolStripMenuItemStartWithWindows,
             this.toolStripSeparator2,
             this.toolStripMenuItemExit});
@@ -94,6 +97,25 @@
 			// 
 			this.toolStripSeparator1.Name = "toolStripSeparator1";
 			this.toolStripSeparator1.Size = new System.Drawing.Size(215, 6);
+			// 
+			// toolStripMenuItemCloseOnLostFocus
+			// 
+			this.toolStripMenuItemCloseOnLostFocus.Name = "toolStripMenuItemCloseOnLostFocus";
+			this.toolStripMenuItemCloseOnLostFocus.Size = new System.Drawing.Size(218, 22);
+			this.toolStripMenuItemCloseOnLostFocus.Text = "Close On Lost Focus";
+			this.toolStripMenuItemCloseOnLostFocus.Click += new System.EventHandler(this.ToolStripMenuItemCloseOnLostFocus_Click);
+			// 
+			// toolStripMenuItemStartWithWindows
+			// 
+			this.toolStripMenuItemStartWithWindows.Name = "toolStripMenuItemStartWithWindows";
+			this.toolStripMenuItemStartWithWindows.Size = new System.Drawing.Size(218, 22);
+			this.toolStripMenuItemStartWithWindows.Text = "Start With Windows";
+			this.toolStripMenuItemStartWithWindows.Click += new System.EventHandler(this.ToolStripMenuItemStartWithWindows_Click);
+			// 
+			// toolStripSeparator2
+			// 
+			this.toolStripSeparator2.Name = "toolStripSeparator2";
+			this.toolStripSeparator2.Size = new System.Drawing.Size(215, 6);
 			// 
 			// toolStripMenuItemExit
 			// 
@@ -150,25 +172,32 @@
 			this.buttonRefresh.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
 			this.buttonRefresh.BackColor = System.Drawing.SystemColors.Window;
 			this.buttonRefresh.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
+			this.buttonRefresh.FlatAppearance.BorderSize = 0;
+			this.buttonRefresh.FlatAppearance.MouseOverBackColor = System.Drawing.SystemColors.ButtonFace;
+			this.buttonRefresh.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
 			this.buttonRefresh.Image = global::GitBranchView.Properties.Resources.refresh;
-			this.buttonRefresh.Location = new System.Drawing.Point(229, -1);
+			this.buttonRefresh.Location = new System.Drawing.Point(206, -1);
 			this.buttonRefresh.Name = "buttonRefresh";
-			this.buttonRefresh.Size = new System.Drawing.Size(20, 20);
+			this.buttonRefresh.Size = new System.Drawing.Size(21, 21);
 			this.buttonRefresh.TabIndex = 5;
 			this.buttonRefresh.UseVisualStyleBackColor = true;
 			this.buttonRefresh.Click += new System.EventHandler(this.ButtonRefresh_Click);
 			// 
-			// toolStripSeparator2
+			// buttonClose
 			// 
-			this.toolStripSeparator2.Name = "toolStripSeparator2";
-			this.toolStripSeparator2.Size = new System.Drawing.Size(215, 6);
-			// 
-			// toolStripMenuItemStartWithWindows
-			// 
-			this.toolStripMenuItemStartWithWindows.Name = "toolStripMenuItemStartWithWindows";
-			this.toolStripMenuItemStartWithWindows.Size = new System.Drawing.Size(218, 22);
-			this.toolStripMenuItemStartWithWindows.Text = "Start With Windows";
-			this.toolStripMenuItemStartWithWindows.Click += new System.EventHandler(this.ToolStripMenuItemStartWithWindows_Click);
+			this.buttonClose.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+			this.buttonClose.BackColor = System.Drawing.SystemColors.Window;
+			this.buttonClose.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
+			this.buttonClose.FlatAppearance.BorderSize = 0;
+			this.buttonClose.FlatAppearance.MouseOverBackColor = System.Drawing.SystemColors.ButtonFace;
+			this.buttonClose.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+			this.buttonClose.Image = global::GitBranchView.Properties.Resources.close;
+			this.buttonClose.Location = new System.Drawing.Point(229, -1);
+			this.buttonClose.Name = "buttonClose";
+			this.buttonClose.Size = new System.Drawing.Size(21, 21);
+			this.buttonClose.TabIndex = 6;
+			this.buttonClose.UseVisualStyleBackColor = true;
+			this.buttonClose.Click += new System.EventHandler(this.ButtonClose_Click);
 			// 
 			// MainForm
 			// 
@@ -177,6 +206,7 @@
 			this.BackColor = System.Drawing.SystemColors.Window;
 			this.ClientSize = new System.Drawing.Size(254, 104);
 			this.ControlBox = false;
+			this.Controls.Add(this.buttonClose);
 			this.Controls.Add(this.buttonRefresh);
 			this.Controls.Add(this.panelScroll);
 			this.Controls.Add(this.groupBoxSeparator);
@@ -216,6 +246,8 @@
 		private System.Windows.Forms.Button buttonRefresh;
 		private System.Windows.Forms.ToolStripMenuItem toolStripMenuItemStartWithWindows;
 		private System.Windows.Forms.ToolStripSeparator toolStripSeparator2;
+		private System.Windows.Forms.Button buttonClose;
+		private System.Windows.Forms.ToolStripMenuItem toolStripMenuItemCloseOnLostFocus;
 	}
 }
 

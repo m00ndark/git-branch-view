@@ -31,6 +31,7 @@ namespace GitBranchView
 			toolStripMenuItemStartWithWindows.Checked = Settings.Default.StartWithWindows;
 
 			HideForm();
+			UpdateButtons();
 			UpdateFolders();
 		}
 
@@ -41,7 +42,7 @@ namespace GitBranchView
 
 		private void MainForm_Deactivate(object sender, EventArgs e)
 		{
-			if ((int) Opacity == 1)
+			if (Settings.Default.CloseOnLostFocus && (int) Opacity == 1)
 				HideForm();
 		}
 
@@ -104,6 +105,14 @@ namespace GitBranchView
 			}
 		}
 
+		private void ToolStripMenuItemCloseOnLostFocus_Click(object sender, EventArgs e)
+		{
+			Settings.Default.CloseOnLostFocus = !Settings.Default.CloseOnLostFocus;
+			Settings.Default.Save();
+			UpdateButtons();
+			toolStripMenuItemCloseOnLostFocus.Checked = Settings.Default.CloseOnLostFocus;
+		}
+
 		private void ToolStripMenuItemStartWithWindows_Click(object sender, EventArgs e)
 		{
 			Settings.Default.StartWithWindows = !Settings.Default.StartWithWindows;
@@ -120,6 +129,11 @@ namespace GitBranchView
 		private void ButtonRefresh_Click(object sender, EventArgs e)
 		{
 			UpdateFolders();
+		}
+
+		private void ButtonClose_Click(object sender, EventArgs e)
+		{
+			HideForm();
 		}
 
 		private void ShowForm()
@@ -139,6 +153,20 @@ namespace GitBranchView
 			Hide();
 			Opacity = 0;
 			_formClosedAt = DateTime.Now;
+		}
+
+		private void UpdateButtons()
+		{
+			if (Settings.Default.CloseOnLostFocus)
+			{
+				buttonClose.Visible = false;
+				buttonRefresh.Left = buttonClose.Left;
+			}
+			else
+			{
+				buttonClose.Visible = true;
+				buttonRefresh.Left = buttonClose.Left - 23;
+			}
 		}
 
 		private void UpdateFolders()

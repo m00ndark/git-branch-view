@@ -23,6 +23,9 @@ namespace GitBranchView
 		[DefaultValue("")]
 		public string RootPath { get; set; }
 
+		[DefaultValue(true)]
+		public bool CloseOnLostFocus { get; set; }
+
 		[DefaultValue(false)]
 		public bool StartWithWindows { get; set; }
 

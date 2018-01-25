@@ -120,6 +120,9 @@
     <EmbeddedResource Include="External\ToolComponents.Core.dll" />
     <EmbeddedResource Include="External\ToolComponents.Core.WinForms.dll" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\close.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <UsingTask TaskName="ToolComponents.PreBuild.PreBuildTask" AssemblyFile="$(PreBuildTaskAssemblyPath)" />
   <PropertyGroup>
