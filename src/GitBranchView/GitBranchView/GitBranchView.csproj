@@ -57,6 +57,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Extensions.cs" />
     <Compile Include="FolderEntry.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -122,6 +123,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\close.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\more.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <UsingTask TaskName="ToolComponents.PreBuild.PreBuildTask" AssemblyFile="$(PreBuildTaskAssemblyPath)" />

@@ -28,8 +28,11 @@
 		/// </summary>
 		private void InitializeComponent()
 		{
+			this.components = new System.ComponentModel.Container();
 			this.linkLabelFolder = new System.Windows.Forms.LinkLabel();
 			this.labelBranch = new System.Windows.Forms.Label();
+			this.buttonMore = new System.Windows.Forms.Button();
+			this.contextMenuStrip = new System.Windows.Forms.ContextMenuStrip(this.components);
 			this.SuspendLayout();
 			// 
 			// linkLabelFolder
@@ -39,10 +42,10 @@
 			this.linkLabelFolder.DisabledLinkColor = System.Drawing.Color.Gray;
 			this.linkLabelFolder.LinkBehavior = System.Windows.Forms.LinkBehavior.HoverUnderline;
 			this.linkLabelFolder.LinkColor = System.Drawing.SystemColors.HotTrack;
-			this.linkLabelFolder.Location = new System.Drawing.Point(3, 3);
+			this.linkLabelFolder.Location = new System.Drawing.Point(20, 3);
 			this.linkLabelFolder.Margin = new System.Windows.Forms.Padding(3, 0, 10, 0);
 			this.linkLabelFolder.Name = "linkLabelFolder";
-			this.linkLabelFolder.Size = new System.Drawing.Size(30, 13);
+			this.linkLabelFolder.Size = new System.Drawing.Size(40, 13);
 			this.linkLabelFolder.TabIndex = 0;
 			this.linkLabelFolder.TabStop = true;
 			this.linkLabelFolder.Text = "Folder";
@@ -59,18 +62,38 @@
 			this.labelBranch.TabIndex = 1;
 			this.labelBranch.Text = "Branch";
 			// 
+			// buttonMore
+			// 
+			this.buttonMore.BackColor = System.Drawing.SystemColors.Window;
+			this.buttonMore.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
+			this.buttonMore.FlatAppearance.BorderSize = 0;
+			this.buttonMore.FlatAppearance.MouseOverBackColor = System.Drawing.SystemColors.ButtonFace;
+			this.buttonMore.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+			this.buttonMore.Image = global::GitBranchView.Properties.Resources.more;
+			this.buttonMore.Location = new System.Drawing.Point(0, 0);
+			this.buttonMore.Name = "buttonMore";
+			this.buttonMore.Size = new System.Drawing.Size(21, 21);
+			this.buttonMore.TabIndex = 7;
+			this.buttonMore.UseVisualStyleBackColor = true;
+			this.buttonMore.Click += new System.EventHandler(this.ButtonMore_Click);
+			// 
+			// contextMenuStrip
+			// 
+			this.contextMenuStrip.Name = "contextMenuStrip";
+			// 
 			// FolderEntry
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.AutoScrollMargin = new System.Drawing.Size(16, 0);
 			this.BackColor = System.Drawing.SystemColors.Window;
+			this.Controls.Add(this.buttonMore);
 			this.Controls.Add(this.labelBranch);
 			this.Controls.Add(this.linkLabelFolder);
 			this.Font = new System.Drawing.Font("Segoe UI", 8.25F);
 			this.Margin = new System.Windows.Forms.Padding(0);
 			this.Name = "FolderEntry";
-			this.Size = new System.Drawing.Size(366, 20);
+			this.Size = new System.Drawing.Size(366, 21);
 			this.ResumeLayout(false);
 			this.PerformLayout();
 
@@ -80,5 +103,7 @@
 
 		private System.Windows.Forms.LinkLabel linkLabelFolder;
 		private System.Windows.Forms.Label labelBranch;
+		private System.Windows.Forms.Button buttonMore;
+		private System.Windows.Forms.ContextMenuStrip contextMenuStrip;
 	}
 }

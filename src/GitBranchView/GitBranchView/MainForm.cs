@@ -1,13 +1,11 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
-using System.Text;
+using System.Reflection;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using Microsoft.Win32;
@@ -23,11 +21,14 @@ namespace GitBranchView
 		public MainForm()
 		{
 			InitializeComponent();
+			contextMenuStrip.Renderer = new ToolStripMenuRenderer();
 			_formClosedAt = DateTime.MinValue;
 		}
 
 		private void MainForm_Load(object sender, EventArgs e)
 		{
+			toolStripMenuItemVersion.Text = Assembly.GetExecutingAssembly().GetBuildVersion();
+			toolStripMenuItemCloseOnLostFocus.Checked = Settings.Default.CloseOnLostFocus;
 			toolStripMenuItemStartWithWindows.Checked = Settings.Default.StartWithWindows;
 
 			HideForm();
@@ -299,6 +300,21 @@ namespace GitBranchView
 				key.SetValue(appName, $"\"{executablePath}\"", RegistryValueKind.String);
 
 			key.Close();
+		}
+
+		private class ToolStripMenuRenderer : ToolStripProfessionalRenderer
+		{
+			protected override void OnRenderMenuItemBackground(ToolStripItemRenderEventArgs e)
+			{
+				if (e.Item.Enabled)
+					base.OnRenderMenuItemBackground(e);
+			}
+
+			protected override void OnRenderButtonBackground(ToolStripItemRenderEventArgs e)
+			{
+				if (e.Item.Enabled)
+					base.OnRenderMenuItemBackground(e);
+			}
 		}
 	}
 }
