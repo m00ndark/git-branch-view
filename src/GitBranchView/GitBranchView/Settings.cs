@@ -69,14 +69,53 @@ namespace GitBranchView
 				? File.ReadAllText(_filePath, Encoding.UTF8)
 				: "{}";
 
-			return JsonConvert.DeserializeObject<Settings>(json, _serializerSettings);
+			return Deserialize(json) ?? Deserialize("{}");
 		}
 
 		public void Save()
 		{
-			System.IO.Directory.CreateDirectory(_path);
-			string json = JsonConvert.SerializeObject(this, Formatting.Indented, _serializerSettings);
-			File.WriteAllText(_filePath, json, Encoding.UTF8);
+			Directory.CreateDirectory(_path);
+
+			if (Exist && !Backup()) return;
+
+			try
+			{
+				File.WriteAllText(_filePath, Serialize(this), Encoding.UTF8);
+			}
+			catch
+			{
+				Restore();
+			}
 		}
+
+		private static bool Backup()
+		{
+			try
+			{
+				File.Copy(_filePath, _filePath + ".bak", true);
+				return true;
+			}
+			catch
+			{
+				return false;
+			}
+		}
+
+		private static bool Restore()
+		{
+			try
+			{
+				File.Copy(_filePath + ".bak", _filePath, true);
+				return true;
+			}
+			catch
+			{
+				return false;
+			}
+		}
+
+		private static Settings Deserialize(string json) => JsonConvert.DeserializeObject<Settings>(json, _serializerSettings);
+
+		private static string Serialize(Settings settings) => JsonConvert.SerializeObject(settings, Formatting.Indented, _serializerSettings);
 	}
 }
