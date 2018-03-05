@@ -33,6 +33,7 @@
 			this.labelBranch = new System.Windows.Forms.Label();
 			this.buttonMore = new System.Windows.Forms.Button();
 			this.contextMenuStrip = new System.Windows.Forms.ContextMenuStrip(this.components);
+			this.labelChanges = new System.Windows.Forms.Label();
 			this.SuspendLayout();
 			// 
 			// linkLabelFolder
@@ -80,6 +81,19 @@
 			// contextMenuStrip
 			// 
 			this.contextMenuStrip.Name = "contextMenuStrip";
+			this.contextMenuStrip.Size = new System.Drawing.Size(61, 4);
+			// 
+			// labelChanges
+			// 
+			this.labelChanges.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+			this.labelChanges.AutoSize = true;
+			this.labelChanges.BackColor = System.Drawing.SystemColors.Window;
+			this.labelChanges.ForeColor = System.Drawing.SystemColors.ControlText;
+			this.labelChanges.Location = new System.Drawing.Point(194, 3);
+			this.labelChanges.Name = "labelChanges";
+			this.labelChanges.Size = new System.Drawing.Size(52, 13);
+			this.labelChanges.TabIndex = 9;
+			this.labelChanges.Text = "Changes";
 			// 
 			// FolderEntry
 			// 
@@ -87,6 +101,7 @@
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.AutoScrollMargin = new System.Drawing.Size(16, 0);
 			this.BackColor = System.Drawing.SystemColors.Window;
+			this.Controls.Add(this.labelChanges);
 			this.Controls.Add(this.buttonMore);
 			this.Controls.Add(this.labelBranch);
 			this.Controls.Add(this.linkLabelFolder);
@@ -105,5 +120,6 @@
 		private System.Windows.Forms.Label labelBranch;
 		private System.Windows.Forms.Button buttonMore;
 		private System.Windows.Forms.ContextMenuStrip contextMenuStrip;
+		private System.Windows.Forms.Label labelChanges;
 	}
 }

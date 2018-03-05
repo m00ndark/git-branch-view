@@ -203,17 +203,17 @@ namespace GitBranchView
 
 			labelRootPath.Text = rootPath;
 
-			ConcurrentBag<(string Path, string Branch)> gitRepositories = new ConcurrentBag<(string Path, string Branch)>();
+			ConcurrentBag<(string Path, string Branch, int TrackedChanges, int UntrackedChanges)> gitRepositories = new ConcurrentBag<(string, string, int, int)>();
 
 			Parallel.ForEach(ScanFolder(rootPath), folder =>
 				{
-					if (TryGetGitBranch(folder, out string branch))
-						gitRepositories.Add((folder, branch));
+					if (TryGetGitBranch(folder, out string branch, out int trackedChanges, out int untrackedChanges))
+						gitRepositories.Add((folder, branch, trackedChanges, untrackedChanges));
 				});
 
 			List<FolderEntry> folderEntries = gitRepositories
 				.OrderBy(x => x.Path)
-				.Select(x => new FolderEntry(rootPath, x.Path, x.Branch))
+				.Select(x => new FolderEntry(rootPath, x.Path, x.Branch, x.TrackedChanges, x.UntrackedChanges))
 				.ToList();
 
 			UpdateSize(folderEntries.Select(x => x.Size).ToArray());
@@ -259,17 +259,31 @@ namespace GitBranchView
 			}
 		}
 
-		private static bool TryGetGitBranch(string path, out string branch)
+		private static bool TryGetGitBranch(string path, out string branch, out int trackedChanges, out int untrackedChanges)
 		{
 			Debug.WriteLine($"Querying: {path}");
-			branch = null;
+
+			(bool Success, string Output) result = ExecProcess(Settings.Default.GitPath, "rev-parse --abbrev-ref HEAD", path);
+			bool success = result.Success;
+			branch = success ? result.Output : null;
+
+			result = ExecProcess(Settings.Default.GitPath, "status --short", path);
+			string[] changes = result.Success ? result.Output.Split(new[] { '\n' }, StringSplitOptions.RemoveEmptyEntries) : null;
+			trackedChanges = changes?.Count(x => !x.StartsWith("??")) ?? -1;
+			untrackedChanges = changes?.Count(x => x.StartsWith("??")) ?? -1;
+
+			return success;
+		}
+
+		private static (bool Success, string Output) ExecProcess(string fileName, string args, string workingDir)
+		{
 			using (Process gitProcess = new Process
 				{
 					StartInfo =
 						{
-							FileName = Settings.Default.GitPath,
-							Arguments = "rev-parse --abbrev-ref HEAD",
-							WorkingDirectory = path,
+							FileName = fileName,
+							Arguments = args,
+							WorkingDirectory = workingDir,
 							CreateNoWindow = true,
 							RedirectStandardOutput = true,
 							UseShellExecute = false
@@ -278,11 +292,8 @@ namespace GitBranchView
 			{
 				gitProcess.Start();
 				gitProcess.WaitForExit();
-				if (gitProcess.ExitCode == 0)
-				{
-					branch = gitProcess.StandardOutput.ReadToEnd();
-				}
-				return gitProcess.ExitCode == 0;
+				bool success = gitProcess.ExitCode == 0;
+				return (success, success ? gitProcess.StandardOutput.ReadToEnd() : null);
 			}
 		}
 
