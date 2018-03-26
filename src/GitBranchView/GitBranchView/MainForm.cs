@@ -207,7 +207,7 @@ namespace GitBranchView
 
 			Parallel.ForEach(ScanFolder(rootPath), folder =>
 				{
-					if (TryGetGitBranch(folder, out string branch, out int trackedChanges, out int untrackedChanges))
+					if (Git.TryGetBranch(folder, out string branch, out int trackedChanges, out int untrackedChanges))
 						gitRepositories.Add((folder, branch, trackedChanges, untrackedChanges));
 				});
 
@@ -256,44 +256,6 @@ namespace GitBranchView
 					foreach (string validSubPath in ScanFolder(subPath))
 						yield return validSubPath;
 				}
-			}
-		}
-
-		private static bool TryGetGitBranch(string path, out string branch, out int trackedChanges, out int untrackedChanges)
-		{
-			Debug.WriteLine($"Querying: {path}");
-
-			(bool Success, string Output) result = ExecProcess(Settings.Default.GitPath, "rev-parse --abbrev-ref HEAD", path);
-			bool success = result.Success;
-			branch = success ? result.Output : null;
-
-			result = ExecProcess(Settings.Default.GitPath, "status --short", path);
-			string[] changes = result.Success ? result.Output.Split(new[] { '\n' }, StringSplitOptions.RemoveEmptyEntries) : null;
-			trackedChanges = changes?.Count(x => !x.StartsWith("??")) ?? -1;
-			untrackedChanges = changes?.Count(x => x.StartsWith("??")) ?? -1;
-
-			return success;
-		}
-
-		private static (bool Success, string Output) ExecProcess(string fileName, string args, string workingDir)
-		{
-			using (Process gitProcess = new Process
-				{
-					StartInfo =
-						{
-							FileName = fileName,
-							Arguments = args,
-							WorkingDirectory = workingDir,
-							CreateNoWindow = true,
-							RedirectStandardOutput = true,
-							UseShellExecute = false
-						}
-				})
-			{
-				gitProcess.Start();
-				gitProcess.WaitForExit();
-				bool success = gitProcess.ExitCode == 0;
-				return (success, success ? gitProcess.StandardOutput.ReadToEnd() : null);
 			}
 		}
 

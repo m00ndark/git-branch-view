@@ -66,6 +66,7 @@
     </Compile>
     <Compile Include="Generated\AssemblyResolver.cs" />
     <Compile Include="Generated\Startup.cs" />
+    <Compile Include="Git.cs" />
     <Compile Include="MainForm.cs">
       <SubType>Form</SubType>
     </Compile>
