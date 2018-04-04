@@ -35,12 +35,16 @@ namespace GitBranchView
 
 			if (TrackedChanges > 0 || UntrackedChanges > 0)
 			{
-				linkLabelFolder.Font = new Font(labelChanges.Font, FontStyle.Bold);
-				labelBranch.Font = new Font(labelChanges.Font, FontStyle.Bold);
+				linkLabelFolder.Font = new Font(linkLabelFolder.Font, FontStyle.Bold);
+				labelBranch.Font = new Font(labelBranch.Font, FontStyle.Bold);
 				labelChanges.Font = new Font(labelChanges.Font, FontStyle.Bold);
+				labelChanges.ForeColor = SystemColors.ControlText;
 			}
 			else
 			{
+				linkLabelFolder.Font = new Font(linkLabelFolder.Font, FontStyle.Regular);
+				labelBranch.Font = new Font(labelBranch.Font, FontStyle.Regular);
+				labelChanges.Font = new Font(labelChanges.Font, FontStyle.Regular);
 				labelChanges.ForeColor = SystemColors.ControlDark;
 			}
 
