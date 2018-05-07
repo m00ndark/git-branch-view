@@ -17,12 +17,14 @@ namespace GitBranchView
 		private const string WINDOWS_RUN_REGISTRY_KEY = @"SOFTWARE\Microsoft\Windows\CurrentVersion\Run";
 
 		private DateTime _formClosedAt;
+		private bool _keepOpenOnce;
 
 		public MainForm()
 		{
 			InitializeComponent();
 			contextMenuStrip.Renderer = new ToolStripMenuRenderer();
 			_formClosedAt = DateTime.MinValue;
+			_keepOpenOnce = false;
 		}
 
 		private void MainForm_Load(object sender, EventArgs e)
@@ -43,7 +45,7 @@ namespace GitBranchView
 
 		private void MainForm_Deactivate(object sender, EventArgs e)
 		{
-			if (Settings.Default.CloseOnLostFocus && (int) Opacity == 1)
+			if (Settings.Default.CloseOnLostFocus && !_keepOpenOnce && (int) Opacity == 1)
 				HideForm();
 		}
 
@@ -52,8 +54,16 @@ namespace GitBranchView
 			if (e.Button != MouseButtons.Left)
 				return;
 
-			if ((int) Opacity == 0 && _formClosedAt.AddMilliseconds(500) < DateTime.Now)
-				ShowForm();
+			if ((int) Opacity != 0 || _formClosedAt.AddMilliseconds(500) >= DateTime.Now)
+				return;
+
+			if (ModifierKeys == Keys.Control)
+			{
+				_keepOpenOnce = true;
+				UpdateButtons();
+			}
+
+			ShowForm();
 		}
 
 		private void ToolStripMenuItemSelectRootFolder_Click(object sender, EventArgs e)
@@ -134,6 +144,12 @@ namespace GitBranchView
 
 		private void ButtonClose_Click(object sender, EventArgs e)
 		{
+			if (_keepOpenOnce)
+			{
+				_keepOpenOnce = false;
+				UpdateButtons();
+			}
+
 			HideForm();
 		}
 
@@ -158,7 +174,7 @@ namespace GitBranchView
 
 		private void UpdateButtons()
 		{
-			if (Settings.Default.CloseOnLostFocus)
+			if (Settings.Default.CloseOnLostFocus && !_keepOpenOnce)
 			{
 				buttonClose.Visible = false;
 				buttonRefresh.Left = buttonClose.Left;

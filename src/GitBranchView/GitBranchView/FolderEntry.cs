@@ -119,6 +119,9 @@ namespace GitBranchView
 			string branch = "master";
 			string path = checkoutMasterMenuItem.Tag.ToString();
 
+			//if (MessageBox.Show(this, "Check out master branch?" + Environment.NewLine + path, "Confirmation", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.No)
+			//	return;
+
 			try
 			{
 				if (!Git.Checkout(path, branch))
