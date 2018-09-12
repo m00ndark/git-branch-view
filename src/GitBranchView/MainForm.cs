@@ -97,7 +97,7 @@ namespace GitBranchView
 			if (fileDialog.ShowDialog() != DialogResult.OK)
 				return;
 
-			Settings.Default.RootPath = fileDialog.FileName;
+			Settings.Default.GitPath = fileDialog.FileName;
 			Settings.Default.Save();
 
 			UpdateFolders();
