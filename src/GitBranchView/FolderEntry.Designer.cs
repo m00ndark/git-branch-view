@@ -57,6 +57,7 @@
 			// 
 			this.labelBranch.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
 			this.labelBranch.AutoSize = true;
+			this.labelBranch.Font = new System.Drawing.Font("Segoe UI", 8.25F);
 			this.labelBranch.Location = new System.Drawing.Point(145, 3);
 			this.labelBranch.Name = "labelBranch";
 			this.labelBranch.Size = new System.Drawing.Size(43, 13);
