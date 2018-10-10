@@ -32,6 +32,8 @@
 			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
 			this.notifyIcon = new System.Windows.Forms.NotifyIcon(this.components);
 			this.contextMenuStrip = new System.Windows.Forms.ContextMenuStrip(this.components);
+			this.toolStripMenuItemVersion = new System.Windows.Forms.ToolStripMenuItem();
+			this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
 			this.toolStripMenuItemSelectRootFolder = new System.Windows.Forms.ToolStripMenuItem();
 			this.toolStripMenuItemSelectGitExePath = new System.Windows.Forms.ToolStripMenuItem();
 			this.toolStripMenuItemSelectLinkCommand = new System.Windows.Forms.ToolStripMenuItem();
@@ -46,8 +48,6 @@
 			this.groupBoxSeparator = new System.Windows.Forms.GroupBox();
 			this.buttonRefresh = new System.Windows.Forms.Button();
 			this.buttonClose = new System.Windows.Forms.Button();
-			this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
-			this.toolStripMenuItemVersion = new System.Windows.Forms.ToolStripMenuItem();
 			this.contextMenuStrip.SuspendLayout();
 			this.panelScroll.SuspendLayout();
 			this.SuspendLayout();
@@ -74,7 +74,19 @@
             this.toolStripSeparator2,
             this.toolStripMenuItemExit});
 			this.contextMenuStrip.Name = "contextMenuStrip";
-			this.contextMenuStrip.Size = new System.Drawing.Size(219, 198);
+			this.contextMenuStrip.Size = new System.Drawing.Size(219, 176);
+			// 
+			// toolStripMenuItemVersion
+			// 
+			this.toolStripMenuItemVersion.Enabled = false;
+			this.toolStripMenuItemVersion.Name = "toolStripMenuItemVersion";
+			this.toolStripMenuItemVersion.Size = new System.Drawing.Size(218, 22);
+			this.toolStripMenuItemVersion.Text = "Version ...";
+			// 
+			// toolStripSeparator3
+			// 
+			this.toolStripSeparator3.Name = "toolStripSeparator3";
+			this.toolStripSeparator3.Size = new System.Drawing.Size(215, 6);
 			// 
 			// toolStripMenuItemSelectRootFolder
 			// 
@@ -202,18 +214,6 @@
 			this.buttonClose.TabIndex = 6;
 			this.buttonClose.UseVisualStyleBackColor = true;
 			this.buttonClose.Click += new System.EventHandler(this.ButtonClose_Click);
-			// 
-			// toolStripSeparator3
-			// 
-			this.toolStripSeparator3.Name = "toolStripSeparator3";
-			this.toolStripSeparator3.Size = new System.Drawing.Size(215, 6);
-			// 
-			// toolStripMenuItemVersion
-			// 
-			this.toolStripMenuItemVersion.Enabled = false;
-			this.toolStripMenuItemVersion.Name = "toolStripMenuItemVersion";
-			this.toolStripMenuItemVersion.Size = new System.Drawing.Size(218, 22);
-			this.toolStripMenuItemVersion.Text = "Version ...";
 			// 
 			// MainForm
 			// 

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
@@ -18,6 +17,7 @@ namespace GitBranchView
 
 		private DateTime _formClosedAt;
 		private bool _keepOpenOnce;
+		private Point _lastShowPosition;
 
 		public MainForm()
 		{
@@ -157,8 +157,8 @@ namespace GitBranchView
 		{
 			if ((int) Opacity == 0)
 			{
-				Location = new Point(Math.Min(MousePosition.X - Size.Width / 2, Screen.PrimaryScreen.WorkingArea.Width - Size.Width - 8),
-					Math.Max(Screen.PrimaryScreen.WorkingArea.Top, Screen.PrimaryScreen.WorkingArea.Height - Size.Height - 8));
+				_lastShowPosition = MousePosition;
+				SetLocation();
 				Opacity = 1;
 			}
 			Show();
@@ -170,6 +170,12 @@ namespace GitBranchView
 			Hide();
 			Opacity = 0;
 			_formClosedAt = DateTime.Now;
+		}
+
+		private void SetLocation()
+		{
+			Location = new Point(Math.Min(_lastShowPosition.X - Size.Width / 2, Screen.PrimaryScreen.WorkingArea.Width - Size.Width - 8),
+				Math.Max(Screen.PrimaryScreen.WorkingArea.Top, Screen.PrimaryScreen.WorkingArea.Height - Size.Height - 8));
 		}
 
 		private void UpdateButtons()
@@ -190,6 +196,9 @@ namespace GitBranchView
 		{
 			string rootPath = Settings.Default.RootPath;
 			string gitPath = Settings.Default.GitPath;
+
+			foreach (FolderEntry folderEntry in flowLayoutPanel.Controls.OfType<FolderEntry>())
+				folderEntry.WidthChanged -= FolderEntry_WidthChanged;
 
 			flowLayoutPanel.Controls.Clear();
 
@@ -232,10 +241,31 @@ namespace GitBranchView
 				.Select(x => new FolderEntry(rootPath, x.Path, x.Branch, x.TrackedChanges, x.UntrackedChanges))
 				.ToList();
 
-			UpdateSize(folderEntries.Select(x => x.Size).ToArray());
-			folderEntries.ForEach(folderEntry => folderEntry.Width = flowLayoutPanel.Width);
+			folderEntries.ForEach(folderEntry => folderEntry.WidthChanged += FolderEntry_WidthChanged);
+
+			UpdateSize(folderEntries);
 			flowLayoutPanel.Controls.AddRange(folderEntries.ToArray<Control>());
 			folderEntries.FirstOrDefault()?.Focus();
+		}
+
+		private void FolderEntry_WidthChanged(object sender, EventArgs e)
+		{
+			if (!(sender is FolderEntry changedFolderEntry))
+				return;
+
+			if (changedFolderEntry.Width != flowLayoutPanel.Width)
+			{
+				List<FolderEntry> folderEntries = flowLayoutPanel.Controls.OfType<FolderEntry>().ToList();
+				folderEntries.ForEach(folderEntry => folderEntry.UpdateSize());
+				UpdateSize(folderEntries);
+				SetLocation();
+			}
+		}
+
+		private void UpdateSize(List<FolderEntry> folderEntries)
+		{
+			UpdateSize(folderEntries.Select(x => x.Size).ToArray());
+			folderEntries.ForEach(folderEntry => folderEntry.Width = flowLayoutPanel.Width);
 		}
 
 		private void UpdateSize(ICollection<Size> controlSizes)
