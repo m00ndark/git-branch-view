@@ -60,6 +60,19 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Extensions.cs" />
+    <Compile Include="FilterEntry.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="FilterEntry.Designer.cs">
+      <DependentUpon>FilterEntry.cs</DependentUpon>
+    </Compile>
+    <Compile Include="FilterEntryEventArgs.cs" />
+    <Compile Include="FilterForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FilterForm.Designer.cs">
+      <DependentUpon>FilterForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="FolderEntry.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -78,13 +91,25 @@
     <Compile Include="NativeMethods.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="RootEntry.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="RootEntry.Designer.cs">
+      <DependentUpon>RootEntry.cs</DependentUpon>
+    </Compile>
     <Compile Include="Settings.cs" />
-    <Compile Include="CommandForm.cs">
+    <Compile Include="SettingsForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="CommandForm.Designer.cs">
-      <DependentUpon>CommandForm.cs</DependentUpon>
+    <Compile Include="SettingsForm.Designer.cs">
+      <DependentUpon>SettingsForm.cs</DependentUpon>
     </Compile>
+    <EmbeddedResource Include="FilterEntry.resx">
+      <DependentUpon>FilterEntry.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FilterForm.resx">
+      <DependentUpon>FilterForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="FolderEntry.resx">
       <DependentUpon>FolderEntry.cs</DependentUpon>
     </EmbeddedResource>
@@ -101,8 +126,11 @@
       <DependentUpon>Resources.resx</DependentUpon>
       <DesignTime>True</DesignTime>
     </Compile>
-    <EmbeddedResource Include="CommandForm.resx">
-      <DependentUpon>CommandForm.cs</DependentUpon>
+    <EmbeddedResource Include="RootEntry.resx">
+      <DependentUpon>RootEntry.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="SettingsForm.resx">
+      <DependentUpon>SettingsForm.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
@@ -129,6 +157,24 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\more.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\add.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\down.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\remove.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\up.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Resources\app.png" />
+    <Content Include="Resources\collapsed.png" />
+    <Content Include="Resources\expanded.png" />
+    <None Include="Resources\title.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <UsingTask TaskName="ToolComponents.PreBuild.PreBuildTask" AssemblyFile="$(PreBuildTaskAssemblyPath)" />

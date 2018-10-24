@@ -3,8 +3,10 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
+using System.Drawing.Drawing2D;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using ToolComponents.Core.Extensions;
@@ -22,22 +24,30 @@ namespace GitBranchView
 
 		public event EventHandler WidthChanged;
 
-		public FolderEntry(string rootPath, string path, string branch, int trackedChanges, int untrackedChanges)
+		public FolderEntry(Settings.Root root, string path, string branch, int trackedChanges, int untrackedChanges)
 		{
 			InitializeComponent();
-			RootPath = rootPath;
+
+			Root = root;
 			Path = path;
 			Branch = branch;
 			TrackedChanges = trackedChanges;
 			UntrackedChanges = untrackedChanges;
+			HighlightColor = root.Filters
+				.Where(filter => filter.Type == Settings.FilterType.Highlight)
+				.Where(filter => Regex.IsMatch(path.RelativeTo(root), filter.Filter))
+				.Select(filter => (Color?) filter.Color)
+				.FirstOrDefault();
+
 			UpdateInfo();
 		}
 
-		public string RootPath { get; }
+		public Settings.Root Root { get; private set; }
 		public string Path { get; }
 		public string Branch { get; private set; }
 		public int TrackedChanges { get; private set; }
 		public int UntrackedChanges { get; private set; }
+		private Color? HighlightColor { get; set; }
 
 		private void RaiseWidthChanged()
 		{
@@ -69,7 +79,7 @@ namespace GitBranchView
 				labelBranch.ForeColor = SystemColors.ControlDark;
 			}
 
-			linkLabelFolder.Text = Path.Substring(RootPath.Length + 1);
+			linkLabelFolder.Text = Path.RelativeTo(Root);
 			
 			labelBranch.Text = Branch;
 
@@ -103,6 +113,11 @@ namespace GitBranchView
 			labelChanges.Anchor = AnchorStyles.Top | AnchorStyles.Right;
 		}
 
+		public void RefreshRoot(Settings.Root root)
+		{
+			Root = root;
+		}
+
 		private void ButtonMore_Click(object sender, EventArgs e)
 		{
 			Point position = buttonMore.Parent.PointToScreen(new Point(buttonMore.Location.X, buttonMore.Location.Y + buttonMore.Size.Height));
@@ -119,13 +134,14 @@ namespace GitBranchView
 			}
 			catch (Exception ex)
 			{
-				MessageBox.Show("Failed to start link command;" + Environment.NewLine + ex.Message + Environment.NewLine
+				MessageBox.Show("Failed to start link command;"
+					+ Environment.NewLine + ex.Message + Environment.NewLine
 					+ Environment.NewLine + $"Path: {commandPath}"
 					+ Environment.NewLine + $"Args: {commandArgs}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
 			}
 		}
 
-		private void SolutionPathMenuItem_Click(object sender, EventArgs e)
+		private static void SolutionPathMenuItem_Click(object sender, EventArgs e)
 		{
 			if (!(sender is ToolStripMenuItem menuItem))
 				return;
@@ -138,7 +154,8 @@ namespace GitBranchView
 			}
 			catch (Exception ex)
 			{
-				MessageBox.Show("Failed to open solution;" + Environment.NewLine + ex.Message + Environment.NewLine
+				MessageBox.Show("Failed to open solution;"
+					+ Environment.NewLine + ex.Message + Environment.NewLine
 					+ Environment.NewLine + $"File: {solutionPath}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
 			}
 		}
@@ -167,7 +184,8 @@ namespace GitBranchView
 					}
 					catch (Exception ex)
 					{
-						MessageBox.Show($"Failed to checkout {MASTER_BRANCH};" + Environment.NewLine + ex.Message + Environment.NewLine
+						MessageBox.Show($"Failed to checkout {MASTER_BRANCH};"
+							+ Environment.NewLine + ex.Message + Environment.NewLine
 							+ Environment.NewLine + $"Path: {Path}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
 					}
 
@@ -194,7 +212,8 @@ namespace GitBranchView
 					}
 					catch (Exception ex)
 					{
-						MessageBox.Show("Failed to pull;" + Environment.NewLine + ex.Message + Environment.NewLine
+						MessageBox.Show("Failed to pull;"
+							+ Environment.NewLine + ex.Message + Environment.NewLine
 							+ Environment.NewLine + $"Path: {Path}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
 					}
 
@@ -221,7 +240,8 @@ namespace GitBranchView
 					}
 					catch (Exception ex)
 					{
-						MessageBox.Show("Failed to reset;" + Environment.NewLine + ex.Message + Environment.NewLine
+						MessageBox.Show("Failed to reset;"
+							+ Environment.NewLine + ex.Message + Environment.NewLine
 							+ Environment.NewLine + $"Path: {Path}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
 					}
 
@@ -237,7 +257,8 @@ namespace GitBranchView
 					}
 					catch (Exception ex)
 					{
-						MessageBox.Show("Failed to clean;" + Environment.NewLine + ex.Message + Environment.NewLine
+						MessageBox.Show("Failed to clean;"
+							+ Environment.NewLine + ex.Message + Environment.NewLine
 							+ Environment.NewLine + $"Path: {Path}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
 					}
 
@@ -271,7 +292,8 @@ namespace GitBranchView
 			}
 			catch (Exception ex)
 			{
-				MessageBox.Show("Failed to get branch and status;" + Environment.NewLine + ex.Message + Environment.NewLine
+				MessageBox.Show("Failed to get branch and status;"
+					+ Environment.NewLine + ex.Message + Environment.NewLine
 					+ Environment.NewLine + $"Path: {Path}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
 			}
 		}
@@ -326,7 +348,8 @@ namespace GitBranchView
 			}
 			catch (Exception ex)
 			{
-				MessageBox.Show("Failed to check remote branch existance;" + Environment.NewLine + ex.Message + Environment.NewLine
+				MessageBox.Show("Failed to check remote branch existance;"
+					+ Environment.NewLine + ex.Message + Environment.NewLine
 					+ Environment.NewLine + $"Path: {Path}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
 			}
 		}
@@ -351,5 +374,17 @@ namespace GitBranchView
 
 		public static Font WithStyle(Font font, FontStyle style) => new Font(font, font.Style | style);
 		public static Font WithoutStyle(Font font, FontStyle style) => new Font(font, font.Style & ~style);
+
+		protected override void OnPaint(PaintEventArgs e)
+		{
+			if (HighlightColor == null)
+				return;
+
+			using (Brush brush = new SolidBrush(HighlightColor.Value))
+			{
+				e.Graphics.SmoothingMode = SmoothingMode.HighQuality;
+				e.Graphics.FillRectangle(brush, 1, 1, Width - 2, Height - 3);
+			}
+		}
 	}
 }

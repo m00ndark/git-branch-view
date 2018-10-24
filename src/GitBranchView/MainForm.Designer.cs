@@ -34,22 +34,20 @@
 			this.contextMenuStrip = new System.Windows.Forms.ContextMenuStrip(this.components);
 			this.toolStripMenuItemVersion = new System.Windows.Forms.ToolStripMenuItem();
 			this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
-			this.toolStripMenuItemSelectRootFolder = new System.Windows.Forms.ToolStripMenuItem();
-			this.toolStripMenuItemSelectGitExePath = new System.Windows.Forms.ToolStripMenuItem();
-			this.toolStripMenuItemSelectLinkCommand = new System.Windows.Forms.ToolStripMenuItem();
-			this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
-			this.toolStripMenuItemCloseOnLostFocus = new System.Windows.Forms.ToolStripMenuItem();
-			this.toolStripMenuItemStartWithWindows = new System.Windows.Forms.ToolStripMenuItem();
+			this.toolStripMenuItemSettings = new System.Windows.Forms.ToolStripMenuItem();
 			this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
 			this.toolStripMenuItemExit = new System.Windows.Forms.ToolStripMenuItem();
-			this.labelRootPath = new System.Windows.Forms.Label();
+			this.labelInfo = new System.Windows.Forms.Label();
 			this.flowLayoutPanel = new System.Windows.Forms.FlowLayoutPanel();
 			this.panelScroll = new System.Windows.Forms.Panel();
-			this.groupBoxSeparator = new System.Windows.Forms.GroupBox();
-			this.buttonRefresh = new System.Windows.Forms.Button();
 			this.buttonClose = new System.Windows.Forms.Button();
+			this.pictureBoxTitle = new System.Windows.Forms.PictureBox();
+			this.pictureBoxBackground = new System.Windows.Forms.PictureBox();
 			this.contextMenuStrip.SuspendLayout();
 			this.panelScroll.SuspendLayout();
+			((System.ComponentModel.ISupportInitialize)(this.pictureBoxTitle)).BeginInit();
+			((System.ComponentModel.ISupportInitialize)(this.pictureBoxBackground)).BeginInit();
+			this.pictureBoxBackground.SuspendLayout();
 			this.SuspendLayout();
 			// 
 			// notifyIcon
@@ -65,89 +63,53 @@
 			this.contextMenuStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.toolStripMenuItemVersion,
             this.toolStripSeparator3,
-            this.toolStripMenuItemSelectRootFolder,
-            this.toolStripMenuItemSelectGitExePath,
-            this.toolStripMenuItemSelectLinkCommand,
-            this.toolStripSeparator1,
-            this.toolStripMenuItemCloseOnLostFocus,
-            this.toolStripMenuItemStartWithWindows,
+            this.toolStripMenuItemSettings,
             this.toolStripSeparator2,
             this.toolStripMenuItemExit});
 			this.contextMenuStrip.Name = "contextMenuStrip";
-			this.contextMenuStrip.Size = new System.Drawing.Size(219, 176);
+			this.contextMenuStrip.Size = new System.Drawing.Size(126, 82);
 			// 
 			// toolStripMenuItemVersion
 			// 
 			this.toolStripMenuItemVersion.Enabled = false;
 			this.toolStripMenuItemVersion.Name = "toolStripMenuItemVersion";
-			this.toolStripMenuItemVersion.Size = new System.Drawing.Size(218, 22);
+			this.toolStripMenuItemVersion.Size = new System.Drawing.Size(125, 22);
 			this.toolStripMenuItemVersion.Text = "Version ...";
 			// 
 			// toolStripSeparator3
 			// 
 			this.toolStripSeparator3.Name = "toolStripSeparator3";
-			this.toolStripSeparator3.Size = new System.Drawing.Size(215, 6);
+			this.toolStripSeparator3.Size = new System.Drawing.Size(122, 6);
 			// 
-			// toolStripMenuItemSelectRootFolder
+			// toolStripMenuItemSettings
 			// 
-			this.toolStripMenuItemSelectRootFolder.Name = "toolStripMenuItemSelectRootFolder";
-			this.toolStripMenuItemSelectRootFolder.Size = new System.Drawing.Size(218, 22);
-			this.toolStripMenuItemSelectRootFolder.Text = "Select Root Folder...";
-			this.toolStripMenuItemSelectRootFolder.Click += new System.EventHandler(this.ToolStripMenuItemSelectRootFolder_Click);
-			// 
-			// toolStripMenuItemSelectGitExePath
-			// 
-			this.toolStripMenuItemSelectGitExePath.Name = "toolStripMenuItemSelectGitExePath";
-			this.toolStripMenuItemSelectGitExePath.Size = new System.Drawing.Size(218, 22);
-			this.toolStripMenuItemSelectGitExePath.Text = "Select Git Executable Path...";
-			this.toolStripMenuItemSelectGitExePath.Click += new System.EventHandler(this.ToolStripMenuItemSelectGitExePath_Click);
-			// 
-			// toolStripMenuItemSelectLinkCommand
-			// 
-			this.toolStripMenuItemSelectLinkCommand.Name = "toolStripMenuItemSelectLinkCommand";
-			this.toolStripMenuItemSelectLinkCommand.Size = new System.Drawing.Size(218, 22);
-			this.toolStripMenuItemSelectLinkCommand.Text = "Select Link Command...";
-			this.toolStripMenuItemSelectLinkCommand.Click += new System.EventHandler(this.ToolStripMenuItemSelectLinkCommand_Click);
-			// 
-			// toolStripSeparator1
-			// 
-			this.toolStripSeparator1.Name = "toolStripSeparator1";
-			this.toolStripSeparator1.Size = new System.Drawing.Size(215, 6);
-			// 
-			// toolStripMenuItemCloseOnLostFocus
-			// 
-			this.toolStripMenuItemCloseOnLostFocus.Name = "toolStripMenuItemCloseOnLostFocus";
-			this.toolStripMenuItemCloseOnLostFocus.Size = new System.Drawing.Size(218, 22);
-			this.toolStripMenuItemCloseOnLostFocus.Text = "Close On Lost Focus";
-			this.toolStripMenuItemCloseOnLostFocus.Click += new System.EventHandler(this.ToolStripMenuItemCloseOnLostFocus_Click);
-			// 
-			// toolStripMenuItemStartWithWindows
-			// 
-			this.toolStripMenuItemStartWithWindows.Name = "toolStripMenuItemStartWithWindows";
-			this.toolStripMenuItemStartWithWindows.Size = new System.Drawing.Size(218, 22);
-			this.toolStripMenuItemStartWithWindows.Text = "Start With Windows";
-			this.toolStripMenuItemStartWithWindows.Click += new System.EventHandler(this.ToolStripMenuItemStartWithWindows_Click);
+			this.toolStripMenuItemSettings.Name = "toolStripMenuItemSettings";
+			this.toolStripMenuItemSettings.Size = new System.Drawing.Size(125, 22);
+			this.toolStripMenuItemSettings.Text = "Settings...";
+			this.toolStripMenuItemSettings.Click += new System.EventHandler(this.ToolStripMenuItemSettings_Click);
 			// 
 			// toolStripSeparator2
 			// 
 			this.toolStripSeparator2.Name = "toolStripSeparator2";
-			this.toolStripSeparator2.Size = new System.Drawing.Size(215, 6);
+			this.toolStripSeparator2.Size = new System.Drawing.Size(122, 6);
 			// 
 			// toolStripMenuItemExit
 			// 
 			this.toolStripMenuItemExit.Name = "toolStripMenuItemExit";
-			this.toolStripMenuItemExit.Size = new System.Drawing.Size(218, 22);
+			this.toolStripMenuItemExit.Size = new System.Drawing.Size(125, 22);
 			this.toolStripMenuItemExit.Text = "Exit";
 			this.toolStripMenuItemExit.Click += new System.EventHandler(this.ToolStripMenuItemExit_Click);
 			// 
-			// labelRootPath
+			// labelInfo
 			// 
-			this.labelRootPath.AutoSize = true;
-			this.labelRootPath.Location = new System.Drawing.Point(3, 2);
-			this.labelRootPath.Name = "labelRootPath";
-			this.labelRootPath.Size = new System.Drawing.Size(129, 13);
-			this.labelRootPath.TabIndex = 1;
-			this.labelRootPath.Text = "No root folder selected.";
+			this.labelInfo.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+			this.labelInfo.Location = new System.Drawing.Point(0, 44);
+			this.labelInfo.Name = "labelInfo";
+			this.labelInfo.Size = new System.Drawing.Size(267, 13);
+			this.labelInfo.TabIndex = 1;
+			this.labelInfo.Text = "No root folder selected.";
+			this.labelInfo.TextAlign = System.Drawing.ContentAlignment.TopCenter;
 			// 
 			// flowLayoutPanel
 			// 
@@ -156,8 +118,9 @@
 			this.flowLayoutPanel.BackColor = System.Drawing.SystemColors.Window;
 			this.flowLayoutPanel.FlowDirection = System.Windows.Forms.FlowDirection.TopDown;
 			this.flowLayoutPanel.Location = new System.Drawing.Point(0, 0);
+			this.flowLayoutPanel.Margin = new System.Windows.Forms.Padding(0);
 			this.flowLayoutPanel.Name = "flowLayoutPanel";
-			this.flowLayoutPanel.Size = new System.Drawing.Size(254, 72);
+			this.flowLayoutPanel.Size = new System.Drawing.Size(267, 117);
 			this.flowLayoutPanel.TabIndex = 2;
 			// 
 			// panelScroll
@@ -167,66 +130,63 @@
             | System.Windows.Forms.AnchorStyles.Right)));
 			this.panelScroll.AutoScroll = true;
 			this.panelScroll.Controls.Add(this.flowLayoutPanel);
-			this.panelScroll.Location = new System.Drawing.Point(0, 29);
+			this.panelScroll.Location = new System.Drawing.Point(0, 33);
+			this.panelScroll.Margin = new System.Windows.Forms.Padding(3, 0, 3, 3);
 			this.panelScroll.Name = "panelScroll";
-			this.panelScroll.Size = new System.Drawing.Size(254, 72);
+			this.panelScroll.Size = new System.Drawing.Size(267, 117);
 			this.panelScroll.TabIndex = 3;
-			// 
-			// groupBoxSeparator
-			// 
-			this.groupBoxSeparator.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-			this.groupBoxSeparator.Location = new System.Drawing.Point(-3, 16);
-			this.groupBoxSeparator.Name = "groupBoxSeparator";
-			this.groupBoxSeparator.Size = new System.Drawing.Size(269, 105);
-			this.groupBoxSeparator.TabIndex = 4;
-			this.groupBoxSeparator.TabStop = false;
-			// 
-			// buttonRefresh
-			// 
-			this.buttonRefresh.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.buttonRefresh.BackColor = System.Drawing.SystemColors.Window;
-			this.buttonRefresh.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
-			this.buttonRefresh.FlatAppearance.BorderSize = 0;
-			this.buttonRefresh.FlatAppearance.MouseOverBackColor = System.Drawing.SystemColors.ButtonFace;
-			this.buttonRefresh.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-			this.buttonRefresh.Image = global::GitBranchView.Properties.Resources.refresh;
-			this.buttonRefresh.Location = new System.Drawing.Point(206, -1);
-			this.buttonRefresh.Name = "buttonRefresh";
-			this.buttonRefresh.Size = new System.Drawing.Size(21, 21);
-			this.buttonRefresh.TabIndex = 5;
-			this.buttonRefresh.UseVisualStyleBackColor = true;
-			this.buttonRefresh.Click += new System.EventHandler(this.ButtonRefresh_Click);
 			// 
 			// buttonClose
 			// 
 			this.buttonClose.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.buttonClose.BackColor = System.Drawing.SystemColors.Window;
+			this.buttonClose.BackColor = System.Drawing.Color.Transparent;
 			this.buttonClose.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
 			this.buttonClose.FlatAppearance.BorderSize = 0;
-			this.buttonClose.FlatAppearance.MouseOverBackColor = System.Drawing.SystemColors.ButtonFace;
+			this.buttonClose.FlatAppearance.MouseDownBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(190)))), ((int)(((byte)(190)))), ((int)(((byte)(190)))));
+			this.buttonClose.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(210)))), ((int)(((byte)(210)))), ((int)(((byte)(210)))));
 			this.buttonClose.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
 			this.buttonClose.Image = global::GitBranchView.Properties.Resources.close;
-			this.buttonClose.Location = new System.Drawing.Point(229, -1);
+			this.buttonClose.Location = new System.Drawing.Point(253, 0);
+			this.buttonClose.Margin = new System.Windows.Forms.Padding(3, 3, 3, 0);
 			this.buttonClose.Name = "buttonClose";
 			this.buttonClose.Size = new System.Drawing.Size(21, 21);
 			this.buttonClose.TabIndex = 6;
-			this.buttonClose.UseVisualStyleBackColor = true;
+			this.buttonClose.UseVisualStyleBackColor = false;
 			this.buttonClose.Click += new System.EventHandler(this.ButtonClose_Click);
+			// 
+			// pictureBoxTitle
+			// 
+			this.pictureBoxTitle.BackColor = System.Drawing.Color.Transparent;
+			this.pictureBoxTitle.Image = global::GitBranchView.Properties.Resources.title;
+			this.pictureBoxTitle.Location = new System.Drawing.Point(13, 4);
+			this.pictureBoxTitle.Name = "pictureBoxTitle";
+			this.pictureBoxTitle.Size = new System.Drawing.Size(118, 13);
+			this.pictureBoxTitle.TabIndex = 7;
+			this.pictureBoxTitle.TabStop = false;
+			// 
+			// pictureBoxBackground
+			// 
+			this.pictureBoxBackground.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+			this.pictureBoxBackground.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(230)))), ((int)(((byte)(230)))), ((int)(((byte)(230)))));
+			this.pictureBoxBackground.Controls.Add(this.pictureBoxTitle);
+			this.pictureBoxBackground.Controls.Add(this.buttonClose);
+			this.pictureBoxBackground.Location = new System.Drawing.Point(-8, -1);
+			this.pictureBoxBackground.Name = "pictureBoxBackground";
+			this.pictureBoxBackground.Size = new System.Drawing.Size(283, 21);
+			this.pictureBoxBackground.TabIndex = 8;
+			this.pictureBoxBackground.TabStop = false;
 			// 
 			// MainForm
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.BackColor = System.Drawing.SystemColors.Window;
-			this.ClientSize = new System.Drawing.Size(254, 104);
+			this.ClientSize = new System.Drawing.Size(267, 152);
 			this.ControlBox = false;
-			this.Controls.Add(this.buttonClose);
-			this.Controls.Add(this.buttonRefresh);
+			this.Controls.Add(this.labelInfo);
 			this.Controls.Add(this.panelScroll);
-			this.Controls.Add(this.groupBoxSeparator);
-			this.Controls.Add(this.labelRootPath);
+			this.Controls.Add(this.pictureBoxBackground);
 			this.Font = new System.Drawing.Font("Segoe UI", 8.25F);
 			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
 			this.MaximizeBox = false;
@@ -241,8 +201,10 @@
 			this.Load += new System.EventHandler(this.MainForm_Load);
 			this.contextMenuStrip.ResumeLayout(false);
 			this.panelScroll.ResumeLayout(false);
+			((System.ComponentModel.ISupportInitialize)(this.pictureBoxTitle)).EndInit();
+			((System.ComponentModel.ISupportInitialize)(this.pictureBoxBackground)).EndInit();
+			this.pictureBoxBackground.ResumeLayout(false);
 			this.ResumeLayout(false);
-			this.PerformLayout();
 
 		}
 
@@ -250,22 +212,17 @@
 
 		private System.Windows.Forms.NotifyIcon notifyIcon;
 		private System.Windows.Forms.ContextMenuStrip contextMenuStrip;
-		private System.Windows.Forms.ToolStripMenuItem toolStripMenuItemSelectRootFolder;
-		private System.Windows.Forms.Label labelRootPath;
+		private System.Windows.Forms.Label labelInfo;
 		private System.Windows.Forms.FlowLayoutPanel flowLayoutPanel;
-		private System.Windows.Forms.ToolStripMenuItem toolStripMenuItemSelectGitExePath;
-		private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
 		private System.Windows.Forms.ToolStripMenuItem toolStripMenuItemExit;
 		private System.Windows.Forms.Panel panelScroll;
-		private System.Windows.Forms.GroupBox groupBoxSeparator;
-		private System.Windows.Forms.ToolStripMenuItem toolStripMenuItemSelectLinkCommand;
-		private System.Windows.Forms.Button buttonRefresh;
-		private System.Windows.Forms.ToolStripMenuItem toolStripMenuItemStartWithWindows;
 		private System.Windows.Forms.ToolStripSeparator toolStripSeparator2;
 		private System.Windows.Forms.Button buttonClose;
-		private System.Windows.Forms.ToolStripMenuItem toolStripMenuItemCloseOnLostFocus;
 		private System.Windows.Forms.ToolStripMenuItem toolStripMenuItemVersion;
 		private System.Windows.Forms.ToolStripSeparator toolStripSeparator3;
+		private System.Windows.Forms.ToolStripMenuItem toolStripMenuItemSettings;
+		private System.Windows.Forms.PictureBox pictureBoxTitle;
+		private System.Windows.Forms.PictureBox pictureBoxBackground;
 	}
 }
 
