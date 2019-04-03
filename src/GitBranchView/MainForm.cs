@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using System.Reflection;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 using ToolComponents.Core.Extensions;
 
@@ -13,6 +14,7 @@ namespace GitBranchView
 		private readonly SettingsForm _settingsForm;
 		private DateTime _formClosedAt;
 		private bool _keepOpenOnce;
+		private bool _isUpdatingRootFolders;
 		private Point _lastShowPosition;
 
 		public MainForm()
@@ -23,6 +25,7 @@ namespace GitBranchView
 			_settingsForm.SettingsChanged += SettingsForm_SettingsChanged;
 			_formClosedAt = DateTime.MinValue;
 			_keepOpenOnce = false;
+			_isUpdatingRootFolders = false;
 		}
 
 		private void SettingsForm_SettingsChanged(object sender, EventArgs e)
@@ -117,25 +120,36 @@ namespace GitBranchView
 			buttonClose.Visible = !Settings.Default.CloseOnLostFocus || _keepOpenOnce;
 		}
 
-		private void UpdateRootFolders()
+		private async void UpdateRootFolders()
 		{
-			foreach (RootEntry rootEntry in flowLayoutPanel.Controls.OfType<RootEntry>())
-				rootEntry.SizeChanged -= RootEntry_SizeChanged;
+			try
+			{
+				_isUpdatingRootFolders = true;
 
-			flowLayoutPanel.Controls.Clear();
-			labelInfo.Visible = !Settings.Default.Roots.Any();
+				foreach (RootEntry rootEntry in flowLayoutPanel.Controls.OfType<RootEntry>())
+					rootEntry.SizeChanged -= RootEntry_SizeChanged;
 
-			List<RootEntry> rootEntries = Settings.Default.Roots
-				.Select(root => new RootEntry(root))
-				.ToList();
+				flowLayoutPanel.Controls.Clear();
+				labelInfo.Visible = !Settings.Default.Roots.Any();
 
-			rootEntries.ForEach(rootEntry => rootEntry.UpdateFolders());
+				List<RootEntry> rootEntries = Settings.Default.Roots
+					.OrderBy(root => root.Path)
+					.Select(root => new RootEntry(root))
+					.ToList();
 
-			UpdateSize(rootEntries);
-			flowLayoutPanel.Controls.AddRange(rootEntries.ToArray<Control>());
+				rootEntries.ForEach(rootEntry => rootEntry.UpdateSize());
+				UpdateSize(rootEntries);
+				flowLayoutPanel.Controls.AddRange(rootEntries.ToArray<Control>());
+				rootEntries.FirstOrDefault()?.Focus();
 
-			rootEntries.ForEach(rootEntry => rootEntry.SizeChanged += RootEntry_SizeChanged);
-			rootEntries.FirstOrDefault()?.Focus();
+				rootEntries.ForEach(rootEntry => rootEntry.SizeChanged += RootEntry_SizeChanged);
+
+				await Task.WhenAll(rootEntries.Select(rootEntry => rootEntry.UpdateFolders()));
+			}
+			finally
+			{
+				_isUpdatingRootFolders = false;
+			}
 		}
 
 		private void RootEntry_SizeChanged(object sender, EventArgs e)
@@ -144,50 +158,71 @@ namespace GitBranchView
 				return;
 
 			List<RootEntry> rootEntries = flowLayoutPanel.Controls.OfType<RootEntry>().ToList();
-			rootEntries.ForEach(rootEntry =>
+
+			if (!_isUpdatingRootFolders)
+			{
+				foreach (RootEntry rootEntry in rootEntries)
 				{
-					if (rootEntry != changedRootEntry)
-					{
-						rootEntry.SizeChanged -= RootEntry_SizeChanged;
-						rootEntry.UpdateSize();
-						rootEntry.SizeChanged += RootEntry_SizeChanged;
-					}
-				});
+					if (rootEntry == changedRootEntry)
+						continue;
+
+					rootEntry.SizeChanged -= RootEntry_SizeChanged;
+					rootEntry.UpdateSize();
+					rootEntry.SizeChanged += RootEntry_SizeChanged;
+				}
+			}
 
 			UpdateSize(rootEntries);
-			SetLocation();
 		}
 
 		private void UpdateSize(List<RootEntry> rootEntries)
 		{
 			UpdateSize(rootEntries.Select(x => (x.Size, x.Margin)).ToArray());
-			rootEntries.ForEach(rootEntry =>
-				{
-					if (rootEntry.Width != flowLayoutPanel.Width)
-					{
-						rootEntry.Width = flowLayoutPanel.Width;
-						rootEntry.UpdateWidth();
-					}
-				});
+			SetLocation();
+
+			foreach (RootEntry rootEntry in rootEntries)
+			{
+				if (rootEntry.Width == flowLayoutPanel.Width)
+					continue;
+
+				rootEntry.Width = flowLayoutPanel.Width;
+				rootEntry.UpdateWidth();
+			}
 		}
 
 		private void UpdateSize(ICollection<(Size Size, Padding Margin)> controlDimensions)
 		{
 			const int MIN_WIDTH = 290, MIN_HEIGHT = 170;
+
 			MinimumSize = MaximumSize = new Size(0, 0);
+
+			Size newSize;
+			int totalControlsHeight = controlDimensions?.Sum(x => x.Size.Height + x.Margin.Vertical) ?? 0;
 
 			if (controlDimensions != null && controlDimensions.Count > 0)
 			{
-				int totalControlsHeight = controlDimensions.Sum(x => x.Size.Height + x.Margin.Vertical);
 				int maxControlWidth = controlDimensions.Max(x => x.Size.Width + x.Margin.Horizontal);
-				Size = new Size(Math.Max(MIN_WIDTH, Width - panelScroll.Width + maxControlWidth),
+				newSize = new Size(Math.Max(MIN_WIDTH, Width - panelScroll.Width + maxControlWidth),
 					Math.Min(Height - panelScroll.Height + totalControlsHeight, Screen.PrimaryScreen.WorkingArea.Height));
-				flowLayoutPanel.Size = new Size(flowLayoutPanel.Width, totalControlsHeight);
 			}
 			else
 			{
-				Size = new Size(MIN_WIDTH, MIN_HEIGHT);
-				flowLayoutPanel.Size = new Size(flowLayoutPanel.Width, 0);
+				newSize = new Size(MIN_WIDTH, MIN_HEIGHT);
+			}
+
+			if (newSize.Width != Size.Width || newSize.Height != Size.Height)
+			{
+				bool flowLayoutPanelHeightChanged = false;
+				if (totalControlsHeight < flowLayoutPanel.Height)
+				{
+					flowLayoutPanel.Size = new Size(flowLayoutPanel.Width, totalControlsHeight);
+					flowLayoutPanelHeightChanged = true;
+				}
+
+				Size = newSize;
+
+				if (!flowLayoutPanelHeightChanged)
+					flowLayoutPanel.Size = new Size(flowLayoutPanel.Width, totalControlsHeight);
 			}
 
 			MinimumSize = MaximumSize = Size;

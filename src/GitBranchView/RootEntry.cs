@@ -5,11 +5,15 @@ using System.Drawing;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using GitBranchView.Properties;
+using ToolComponents.Core.Extensions;
 
 namespace GitBranchView
 {
 	public partial class RootEntry : UserControl
 	{
+		private bool _isUpdatingFolders = false;
+
 		public event EventHandler ExpandedCollapsed;
 
 		public RootEntry(Settings.Root root)
@@ -27,54 +31,88 @@ namespace GitBranchView
 
 		private void PictureBoxExpandCollapse_MouseDown(object sender, MouseEventArgs e)
 		{
+			if (_isUpdatingFolders)
+				return;
+
 			Root.Expanded = !Root.Expanded;
-			pictureBoxExpandCollapse.Image = Root.Expanded ? Properties.Resources.expanded : Properties.Resources.collapsed;
+			pictureBoxExpandCollapse.Image = Root.Expanded ? Resources.expanded : Resources.collapsed;
+			buttonRefresh.Visible = Root.Expanded;
 			UpdateSize();
 			RaiseExpandedCollapsed();
 		}
 
-		private void ButtonRefresh_Click(object sender, EventArgs e)
+		private async void ButtonRefresh_Click(object sender, EventArgs e)
 		{
-			UpdateFolders();
+			await UpdateFolders();
 		}
 
-		public void UpdateFolders()
+		public async Task UpdateFolders()
 		{
-			foreach (FolderEntry folderEntry in flowLayoutPanel.Controls.OfType<FolderEntry>())
-				folderEntry.WidthChanged -= FolderEntry_WidthChanged;
-
-			flowLayoutPanel.Controls.Clear();
-			labelError.Visible = false;
-
-			if (!Settings.Default.GitPath.GitPathIsValid(out string error) || !Root.IsValid(out error))
+			try
 			{
-				labelError.Text = error;
-				labelError.Visible = true;
-				return;
-			}
+				_isUpdatingFolders = true;
 
-			pictureBoxExpandCollapse.Image = Root.Expanded ? Properties.Resources.expanded : Properties.Resources.collapsed;
-			labelRootPath.Text = Root.Path;
+				foreach (FolderEntry folderEntry in flowLayoutPanel.Controls.OfType<FolderEntry>())
+					folderEntry.WidthChanged -= FolderEntry_WidthChanged;
 
-			ConcurrentBag<(string Path, string Branch, int TrackedChanges, int UntrackedChanges)> gitRepositories = new ConcurrentBag<(string, string, int, int)>();
+				flowLayoutPanel.Controls.Clear();
+				labelInfo.Text = "Scanning...";
+				labelInfo.Visible = true;
+				buttonRefresh.Visible = false;
 
-			Parallel.ForEach(Root.Path.ScanFolder(), folder =>
+				if (!Settings.Default.GitPath.GitPathIsValid(out string error) || !Root.IsValid(out error))
 				{
-					if (Git.TryGetBranch(folder, out string branch, out int trackedChanges, out int untrackedChanges))
-						gitRepositories.Add((folder, branch, trackedChanges, untrackedChanges));
-				});
+					labelInfo.Text = error;
+					return;
+				}
 
-			List<FolderEntry> folderEntries = gitRepositories
-				.Where(x => Root.ShouldInclude(x.Path))
-				.OrderBy(x => x.Path)
-				.Select(x => new FolderEntry(Root, x.Path, x.Branch, x.TrackedChanges, x.UntrackedChanges))
-				.ToList();
+				pictureBoxExpandCollapse.Image = Root.Expanded ? Resources.expanded : Resources.collapsed;
+				labelRootPath.Text = Root.Path;
 
-			folderEntries.ForEach(folderEntry => folderEntry.WidthChanged += FolderEntry_WidthChanged);
+				await Task.Run(() =>
+					{
+						ConcurrentBag<(string Path, string Branch, int TrackedChanges, int UntrackedChanges)> gitRepositories = new ConcurrentBag<(string, string, int, int)>();
 
-			UpdateSize(folderEntries);
-			flowLayoutPanel.Controls.AddRange(folderEntries.ToArray<Control>());
-			folderEntries.FirstOrDefault()?.Focus();
+						Parallel.ForEach(Root.Path.ScanFolder(), folder =>
+							{
+								if (!Root.ShouldInclude(folder) || !Git.TryGetBranch(folder, out string branch, out int trackedChanges, out int untrackedChanges))
+									return;
+
+								gitRepositories.Add((folder, branch, trackedChanges, untrackedChanges));
+								this.InvokeIfRequired(() =>
+									{
+										int repositoriesCount = gitRepositories.Count;
+										return labelInfo.Text = $"Scanning; found {repositoriesCount} {(repositoriesCount == 1 ? "repository" : "repositories")}...";
+									});
+							});
+
+						this.InvokeIfRequired(() =>
+							{
+								int repositoriesCount = gitRepositories.Count;
+								return labelInfo.Text = $"Rendering {repositoriesCount} {(repositoriesCount == 1 ? "repository" : "repositories")}...";
+							});
+
+						List<FolderEntry> folderEntries = gitRepositories
+							.OrderBy(x => x.Path)
+							.Select(x => new FolderEntry(Root, x.Path, x.Branch, x.TrackedChanges, x.UntrackedChanges))
+							.ToList();
+
+						folderEntries.ForEach(folderEntry => folderEntry.WidthChanged += FolderEntry_WidthChanged);
+
+						this.InvokeIfRequired(() =>
+							{
+								UpdateSize(folderEntries);
+								labelInfo.Visible = false;
+								buttonRefresh.Visible = Root.Expanded;
+								flowLayoutPanel.Controls.AddRange(folderEntries.ToArray<Control>());
+								folderEntries.FirstOrDefault()?.Focus();
+							});
+					});
+			}
+			finally
+			{
+				_isUpdatingFolders = false;
+			}
 		}
 
 		private void FolderEntry_WidthChanged(object sender, EventArgs e)
@@ -89,7 +127,6 @@ namespace GitBranchView
 		public void UpdateSize()
 		{
 			List<FolderEntry> folderEntries = flowLayoutPanel.Controls.OfType<FolderEntry>().ToList();
-			folderEntries.ForEach(folderEntry => folderEntry.UpdateSize());
 			UpdateSize(folderEntries);
 		}
 
@@ -102,13 +139,13 @@ namespace GitBranchView
 
 		private void UpdateSize(ICollection<(Size Size, Padding Margin)> controlDimensions, int headingWidth)
 		{
-			const int MIN_WIDTH = 270, MIN_HEIGHT = 120;
+			const int MIN_WIDTH = 270, MIN_HEIGHT = 50;
 
 			if (controlDimensions != null && controlDimensions.Count > 0)
 			{
 				int totalControlsHeight = controlDimensions.Sum(x => x.Size.Height + x.Margin.Vertical);
 				int maxControlWidth = Math.Max(headingWidth, controlDimensions.Max(x => x.Size.Width + x.Margin.Horizontal));
-				Size newSize = new Size(Root.Expanded ? maxControlWidth : MIN_WIDTH, (Root.Expanded ? flowLayoutPanel.Top + totalControlsHeight : flowLayoutPanel.Top) + 1);
+				Size newSize = new Size(maxControlWidth, (Root.Expanded ? flowLayoutPanel.Top + totalControlsHeight : flowLayoutPanel.Top) + 1);
 				if (newSize.Width != Size.Width || newSize.Height != Size.Height)
 					Size = newSize;
 			}

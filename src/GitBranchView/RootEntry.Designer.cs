@@ -33,7 +33,7 @@
 			this.groupBoxSeparator = new System.Windows.Forms.GroupBox();
 			this.labelRootPath = new System.Windows.Forms.Label();
 			this.pictureBoxExpandCollapse = new System.Windows.Forms.PictureBox();
-			this.labelError = new System.Windows.Forms.Label();
+			this.labelInfo = new System.Windows.Forms.Label();
 			((System.ComponentModel.ISupportInitialize)(this.pictureBoxExpandCollapse)).BeginInit();
 			this.SuspendLayout();
 			// 
@@ -95,21 +95,20 @@
 			this.pictureBoxExpandCollapse.TabStop = false;
 			this.pictureBoxExpandCollapse.MouseDown += new System.Windows.Forms.MouseEventHandler(this.PictureBoxExpandCollapse_MouseDown);
 			// 
-			// labelError
+			// labelInfo
 			// 
-			this.labelError.AutoSize = true;
-			this.labelError.Location = new System.Drawing.Point(6, 34);
-			this.labelError.Name = "labelError";
-			this.labelError.Size = new System.Drawing.Size(129, 13);
-			this.labelError.TabIndex = 11;
-			this.labelError.Text = "No root folder selected.";
+			this.labelInfo.AutoSize = true;
+			this.labelInfo.Location = new System.Drawing.Point(6, 34);
+			this.labelInfo.Name = "labelInfo";
+			this.labelInfo.Size = new System.Drawing.Size(0, 13);
+			this.labelInfo.TabIndex = 11;
 			// 
 			// RootEntry
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.BackColor = System.Drawing.SystemColors.Window;
-			this.Controls.Add(this.labelError);
+			this.Controls.Add(this.labelInfo);
 			this.Controls.Add(this.pictureBoxExpandCollapse);
 			this.Controls.Add(this.buttonRefresh);
 			this.Controls.Add(this.flowLayoutPanel);
@@ -132,6 +131,6 @@
 		private System.Windows.Forms.GroupBox groupBoxSeparator;
 		private System.Windows.Forms.Label labelRootPath;
 		private System.Windows.Forms.PictureBox pictureBoxExpandCollapse;
-		private System.Windows.Forms.Label labelError;
+		private System.Windows.Forms.Label labelInfo;
 	}
 }

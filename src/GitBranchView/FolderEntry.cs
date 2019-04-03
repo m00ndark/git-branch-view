@@ -47,7 +47,7 @@ namespace GitBranchView
 		public string Branch { get; private set; }
 		public int TrackedChanges { get; private set; }
 		public int UntrackedChanges { get; private set; }
-		private Color? HighlightColor { get; set; }
+		private Color? HighlightColor { get; }
 
 		private void RaiseWidthChanged()
 		{
@@ -99,7 +99,7 @@ namespace GitBranchView
 				});
 		}
 
-		public void UpdateSize()
+		private void UpdateSize()
 		{
 			labelBranch.Left = linkLabelFolder.Left + linkLabelFolder.Width + linkLabelFolder.Margin.Right;
 			labelChanges.Left = labelBranch.Left + labelBranch.Width + labelBranch.Margin.Right;
