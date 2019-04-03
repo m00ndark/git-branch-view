@@ -37,6 +37,7 @@
 			this.tableLayoutPanel = new System.Windows.Forms.TableLayoutPanel();
 			this.buttonOK = new System.Windows.Forms.Button();
 			this.buttonCancel = new System.Windows.Forms.Button();
+			this.labelInfo = new System.Windows.Forms.Label();
 			this.tableLayoutPanel.SuspendLayout();
 			this.SuspendLayout();
 			// 
@@ -106,7 +107,7 @@
 			this.tableLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
 			this.tableLayoutPanel.Controls.Add(this.buttonOK, 0, 0);
 			this.tableLayoutPanel.Controls.Add(this.buttonCancel, 1, 0);
-			this.tableLayoutPanel.Location = new System.Drawing.Point(11, 80);
+			this.tableLayoutPanel.Location = new System.Drawing.Point(11, 93);
 			this.tableLayoutPanel.Name = "tableLayoutPanel";
 			this.tableLayoutPanel.RowCount = 1;
 			this.tableLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
@@ -137,13 +138,23 @@
 			this.buttonCancel.UseVisualStyleBackColor = true;
 			this.buttonCancel.Click += new System.EventHandler(this.ButtonCancel_Click);
 			// 
+			// labelInfo
+			// 
+			this.labelInfo.AutoSize = true;
+			this.labelInfo.Location = new System.Drawing.Point(51, 65);
+			this.labelInfo.Name = "labelInfo";
+			this.labelInfo.Size = new System.Drawing.Size(246, 13);
+			this.labelInfo.TabIndex = 8;
+			this.labelInfo.Text = "(the filter should be a valid regular expression)";
+			// 
 			// FilterForm
 			// 
 			this.AcceptButton = this.buttonOK;
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.CancelButton = this.buttonCancel;
-			this.ClientSize = new System.Drawing.Size(539, 115);
+			this.ClientSize = new System.Drawing.Size(539, 128);
+			this.Controls.Add(this.labelInfo);
 			this.Controls.Add(this.tableLayoutPanel);
 			this.Controls.Add(this.buttonColor);
 			this.Controls.Add(this.labelColor);
@@ -176,5 +187,6 @@
 		private System.Windows.Forms.TableLayoutPanel tableLayoutPanel;
 		private System.Windows.Forms.Button buttonOK;
 		private System.Windows.Forms.Button buttonCancel;
+		private System.Windows.Forms.Label labelInfo;
 	}
 }

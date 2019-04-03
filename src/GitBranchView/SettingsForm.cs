@@ -108,6 +108,7 @@ namespace GitBranchView
 				return;
 
 			Settings.Root selectedRoot = (Settings.Root) comboBoxRootPaths.SelectedItem;
+			Settings.Default.SelectedRootPath = selectedRoot.Path;
 
 			ResetFlowLayoutPanel();
 			flowLayoutPanelRootFolderFilters.Controls.AddRange(_rootFilters[selectedRoot].ToArray<Control>());
@@ -280,12 +281,15 @@ namespace GitBranchView
 			foreach (Settings.Root root in Settings.Default.Roots.Select(x => x.Clone()))
 				_rootFilters.Add(root, root.Filters.Select(CreateFilterEntry).ToList());
 
-			int selectedIndex = comboBoxRootPaths.SelectedIndex;
 			comboBoxRootPaths.Items.Clear();
 			comboBoxRootPaths.Items.AddRange(_rootFilters.Keys.ToArray<object>());
 
 			if (comboBoxRootPaths.Items.Count > 0)
-				comboBoxRootPaths.SelectedIndex = selectedIndex > -1 && selectedIndex < comboBoxRootPaths.Items.Count ? selectedIndex : 0;
+			{
+				comboBoxRootPaths.SelectedItem = comboBoxRootPaths.Items
+					.Cast<Settings.Root>()
+					.FirstOrDefault(root => string.Equals(root.Path, Settings.Default.SelectedRootPath, StringComparison.CurrentCultureIgnoreCase)) ?? comboBoxRootPaths.Items[0];
+			}
 		}
 
 		private void SaveSettings()

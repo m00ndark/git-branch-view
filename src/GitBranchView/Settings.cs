@@ -62,6 +62,7 @@ namespace GitBranchView
 
 		public enum FilterType
 		{
+			Include,
 			Exclude,
 			Highlight
 		}
@@ -91,6 +92,9 @@ namespace GitBranchView
 
 		[DefaultValue(false)]
 		public bool StartWithWindows { get; set; }
+
+		[DefaultValue(null)]
+		public string SelectedRootPath { get; set; }
 
 		// ---------------------------------------------------------------------
 

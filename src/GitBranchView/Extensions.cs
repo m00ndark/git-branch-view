@@ -75,8 +75,8 @@ namespace GitBranchView
 		public static bool ShouldInclude(this Settings.Root root, string path)
 		{
 			return root.Filters
-				.Where(filter => filter.Type == Settings.FilterType.Exclude)
-				.All(filter => !Regex.IsMatch(path.RelativeTo(root), filter.Filter));
+				.Where(filter => filter.Type == Settings.FilterType.Include || filter.Type == Settings.FilterType.Exclude)
+				.Aggregate(true, (include, filter) => Regex.IsMatch(path.RelativeTo(root), filter.Filter) ? filter.Type == Settings.FilterType.Include : include);
 		}
 
 		public static IEnumerable<string> ScanFolder(this string path)

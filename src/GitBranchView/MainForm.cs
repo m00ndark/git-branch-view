@@ -60,7 +60,12 @@ namespace GitBranchView
 		private void NotifyIcon_MouseUp(object sender, MouseEventArgs e)
 		{
 			if (e.Button != MouseButtons.Left)
+			{
+				if (ModifierKeys == Keys.Control)
+					TrySetClipboardText(Assembly.GetExecutingAssembly().GetBuildVersion());
+
 				return;
+			}
 
 			if (ModifierKeys == Keys.Control)
 			{
@@ -227,6 +232,23 @@ namespace GitBranchView
 
 			MinimumSize = MaximumSize = Size;
 			SetLocation();
+		}
+
+		public static void TrySetClipboardText(string text)
+		{
+			int attempt = 0;
+			while (attempt++ < 10)
+			{
+				try
+				{
+					Clipboard.SetText(text);
+					break;
+				}
+				catch
+				{
+					;
+				}
+			}
 		}
 
 		private class ToolStripMenuRenderer : ToolStripProfessionalRenderer

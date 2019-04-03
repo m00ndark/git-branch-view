@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Linq;
-using System.Runtime.Remoting.Activation;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
 
@@ -97,6 +96,7 @@ namespace GitBranchView
 
 			try
 			{
+				// ReSharper disable once ReturnValueOfPureMethodIsNotUsed
 				Regex.IsMatch("", pattern);
 			}
 			catch (ArgumentException)
