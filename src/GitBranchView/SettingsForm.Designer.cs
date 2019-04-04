@@ -55,6 +55,7 @@
 			this.buttonCancel = new System.Windows.Forms.Button();
 			this.tableLayoutPanel = new System.Windows.Forms.TableLayoutPanel();
 			this.buttonApply = new System.Windows.Forms.Button();
+			this.checkBoxEnableLogging = new System.Windows.Forms.CheckBox();
 			this.tabControl.SuspendLayout();
 			this.tabPageGeneral.SuspendLayout();
 			this.groupBoxLinkCommand.SuspendLayout();
@@ -81,6 +82,7 @@
 			// 
 			// tabPageGeneral
 			// 
+			this.tabPageGeneral.Controls.Add(this.checkBoxEnableLogging);
 			this.tabPageGeneral.Controls.Add(this.checkBoxStartWithWindows);
 			this.tabPageGeneral.Controls.Add(this.checkBoxCloseOnLostFocus);
 			this.tabPageGeneral.Controls.Add(this.groupBoxLinkCommand);
@@ -382,6 +384,16 @@
 			this.buttonApply.UseVisualStyleBackColor = true;
 			this.buttonApply.Click += new System.EventHandler(this.ButtonApply_Click);
 			// 
+			// checkBoxEnableLogging
+			// 
+			this.checkBoxEnableLogging.AutoSize = true;
+			this.checkBoxEnableLogging.Location = new System.Drawing.Point(9, 235);
+			this.checkBoxEnableLogging.Name = "checkBoxEnableLogging";
+			this.checkBoxEnableLogging.Size = new System.Drawing.Size(105, 17);
+			this.checkBoxEnableLogging.TabIndex = 7;
+			this.checkBoxEnableLogging.Text = "Enable logging";
+			this.checkBoxEnableLogging.UseVisualStyleBackColor = true;
+			// 
 			// SettingsForm
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -442,5 +454,6 @@
 		private System.Windows.Forms.TableLayoutPanel tableLayoutPanel;
 		private System.Windows.Forms.Panel panelScroll;
 		private System.Windows.Forms.Button buttonApply;
+		private System.Windows.Forms.CheckBox checkBoxEnableLogging;
 	}
 }

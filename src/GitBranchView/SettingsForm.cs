@@ -11,14 +11,28 @@ namespace GitBranchView
 {
 	public partial class SettingsForm : Form
 	{
+		public class ChangedEventArgs : EventArgs
+		{
+			public ChangedEventArgs(bool rootFoldersChanged, bool rootFoldersHighlightChanged)
+			{
+				RootFoldersChanged = rootFoldersChanged;
+				RootFoldersHighlightChanged = rootFoldersHighlightChanged;
+			}
+
+			public bool RootFoldersChanged { get; }
+			public bool RootFoldersHighlightChanged { get; }
+		}
+
 		private const string WINDOWS_RUN_REGISTRY_KEY = @"SOFTWARE\Microsoft\Windows\CurrentVersion\Run";
 
 		private readonly Label _widthHolder = new Label { Height = 1, Text = string.Empty };
 		private readonly IDictionary<Settings.Root, List<FilterEntry>> _rootFilters;
 		private bool _lastStartWithWindows;
 		private bool _isTerminating;
+		private bool _rootFoldersChanged;
+		private bool _rootFoldersHighlightChanged;
 
-		public event EventHandler SettingsChanged; 
+		public event EventHandler<ChangedEventArgs> SettingsChanged; 
 
 		public SettingsForm()
 		{
@@ -48,9 +62,9 @@ namespace GitBranchView
 			Opacity = 0;
 		}
 
-		private void RaiseSettingsChangedEvent()
+		private void RaiseSettingsChangedEvent(bool rootFoldersChanged, bool rootFoldersHighlightChanged)
 		{
-			Task.Run(() => SettingsChanged?.Invoke(this, EventArgs.Empty));
+			Task.Run(() => SettingsChanged?.Invoke(this, new ChangedEventArgs(rootFoldersChanged, rootFoldersHighlightChanged)));
 		}
 
 		private void SettingsForm_Load(object sender, EventArgs e)
@@ -132,6 +146,7 @@ namespace GitBranchView
 			_rootFilters.Add(root, new List<FilterEntry>());
 			comboBoxRootPaths.Items.Add(root);
 			comboBoxRootPaths.SelectedItem = root;
+			_rootFoldersChanged = true;
 		}
 
 		private void ButtonRootPathRemove_Click(object sender, EventArgs e)
@@ -147,6 +162,7 @@ namespace GitBranchView
 				comboBoxRootPaths.Items.Remove(selectedRoot);
 				_rootFilters[selectedRoot].ForEach(DisposeFilterEntry);
 				_rootFilters.Remove(selectedRoot);
+				_rootFoldersChanged = true;
 			}
 		}
 
@@ -171,6 +187,8 @@ namespace GitBranchView
 				_rootFilters[selectedRoot].Add(filterEntry);
 				flowLayoutPanelRootFolderFilters.Controls.Add(filterEntry);
 				UpdateFlowLayoutPanelSize();
+				_rootFoldersChanged = _rootFoldersChanged | filterEntry.Filter.Type != Settings.FilterType.Highlight;
+				_rootFoldersHighlightChanged = _rootFoldersHighlightChanged | filterEntry.Filter.Type == Settings.FilterType.Highlight;
 			}
 		}
 
@@ -190,10 +208,13 @@ namespace GitBranchView
 			SaveSettings();
 		}
 
-		private void FilterEntry_Action(object sender, FilterEntryEventArgs e)
+		private void FilterEntry_Action(object sender, FilterEntry.ActionEventArgs e)
 		{
 			if (!(sender is FilterEntry filterEntry))
 				return;
+
+			_rootFoldersChanged = _rootFoldersChanged | filterEntry.Filter.Type != Settings.FilterType.Highlight;
+			_rootFoldersHighlightChanged = _rootFoldersHighlightChanged | filterEntry.Filter.Type == Settings.FilterType.Highlight;
 
 			this.InvokeIfRequired(() =>
 				{
@@ -222,6 +243,12 @@ namespace GitBranchView
 				});
 		}
 
+		private void FilterEntry_Changed(object sender, FilterEntry.ChangedEventArgs e)
+		{
+			_rootFoldersChanged = _rootFoldersChanged | e.FromType != Settings.FilterType.Highlight | e.ToType != Settings.FilterType.Highlight;
+			_rootFoldersHighlightChanged = _rootFoldersHighlightChanged | e.FromType == Settings.FilterType.Highlight | e.ToType == Settings.FilterType.Highlight;
+		}
+
 		private void UpdateFlowLayoutPanelSize()
 		{
 			flowLayoutPanelRootFolderFilters.Height = flowLayoutPanelRootFolderFilters.Controls.Cast<Control>().Sum(x => x.Height + x.Margin.Vertical);
@@ -238,12 +265,14 @@ namespace GitBranchView
 		{
 			FilterEntry filterEntry = new FilterEntry(filter);
 			filterEntry.Action += FilterEntry_Action;
+			filterEntry.Changed += FilterEntry_Changed;
 			return filterEntry;
 		}
 
 		private void DisposeFilterEntry(FilterEntry filterEntry)
 		{
 			filterEntry.Action -= FilterEntry_Action;
+			filterEntry.Changed -= FilterEntry_Changed;
 			filterEntry.Dispose();
 		}
 
@@ -272,6 +301,7 @@ namespace GitBranchView
 			textBoxLinkCommandArgs.Text = Settings.Default.CommandArgs;
 			checkBoxCloseOnLostFocus.Checked = Settings.Default.CloseOnLostFocus;
 			checkBoxStartWithWindows.Checked = _lastStartWithWindows = Settings.Default.StartWithWindows;
+			checkBoxEnableLogging.Checked = Settings.Default.EnableLogging;
 
 			foreach (Settings.Root root in _rootFilters.Keys)
 				_rootFilters[root].ForEach(DisposeFilterEntry);
@@ -299,10 +329,13 @@ namespace GitBranchView
 			Settings.Default.CommandArgs = textBoxLinkCommandArgs.Text;
 			Settings.Default.CloseOnLostFocus = checkBoxCloseOnLostFocus.Checked;
 			Settings.Default.StartWithWindows = checkBoxStartWithWindows.Checked;
+			Settings.Default.EnableLogging = checkBoxEnableLogging.Checked;
 			Settings.Default.Roots = _rootFilters.Keys
 				.Select(root =>
 					{
-						root.Filters = _rootFilters[root].Select(entry => entry.Filter).ToList();
+						List<FilterEntry> filterEntries = _rootFilters[root];
+						root = Settings.Default.Roots.FirstOrDefault(x => x.Id == root.Id) ?? root;
+						root.Filters = filterEntries.Select(entry => entry.Filter).ToList();
 						return root;
 					})
 				.ToList();
@@ -315,7 +348,8 @@ namespace GitBranchView
 				_lastStartWithWindows = Settings.Default.StartWithWindows;
 			}
 
-			RaiseSettingsChangedEvent();
+			RaiseSettingsChangedEvent(_rootFoldersChanged, _rootFoldersHighlightChanged);
+			_rootFoldersChanged = _rootFoldersHighlightChanged = false;
 		}
 
 		public static void SetWindowsStartupTrigger(string executablePath)

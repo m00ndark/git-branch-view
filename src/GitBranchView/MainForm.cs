@@ -6,6 +6,7 @@ using System.Reflection;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using ToolComponents.Core.Extensions;
+using ToolComponents.Core.Logging;
 
 namespace GitBranchView
 {
@@ -28,12 +29,20 @@ namespace GitBranchView
 			_isUpdatingRootFolders = false;
 		}
 
-		private void SettingsForm_SettingsChanged(object sender, EventArgs e)
+		private void SettingsForm_SettingsChanged(object sender, SettingsForm.ChangedEventArgs e)
 		{
 			this.InvokeIfRequired(() =>
 				{
 					UpdateButtons();
-					UpdateRootFolders();
+
+					if (e.RootFoldersChanged)
+					{
+						UpdateRootFolders();
+					}
+					else if (e.RootFoldersHighlightChanged)
+					{
+						RootFolderHighlightChanged();
+					}
 				});
 		}
 
@@ -123,6 +132,14 @@ namespace GitBranchView
 		private void UpdateButtons()
 		{
 			buttonClose.Visible = !Settings.Default.CloseOnLostFocus || _keepOpenOnce;
+		}
+
+		private void RootFolderHighlightChanged()
+		{
+			foreach (RootEntry rootEntry in flowLayoutPanel.Controls.OfType<RootEntry>())
+			{
+				rootEntry.HighlightChanged();
+			}
 		}
 
 		private async void UpdateRootFolders()

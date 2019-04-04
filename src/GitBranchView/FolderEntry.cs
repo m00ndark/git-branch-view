@@ -24,7 +24,7 @@ namespace GitBranchView
 
 		public event EventHandler WidthChanged;
 
-		public FolderEntry(Settings.Root root, string path, string branch, int trackedChanges, int untrackedChanges)
+		public FolderEntry(Settings.Root root, string path, string branch, int trackedChanges, int untrackedChanges, string[] errors)
 		{
 			InitializeComponent();
 
@@ -33,35 +33,46 @@ namespace GitBranchView
 			Branch = branch;
 			TrackedChanges = trackedChanges;
 			UntrackedChanges = untrackedChanges;
-			HighlightColor = root.Filters
-				.Where(filter => filter.Type == Settings.FilterType.Highlight)
-				.Where(filter => Regex.IsMatch(path.RelativeTo(root), filter.Filter))
-				.Select(filter => (Color?) filter.Color)
-				.FirstOrDefault();
+			Errors = errors;
 
+			SetHighlightColor();
 			UpdateInfo();
 		}
 
-		public Settings.Root Root { get; private set; }
+		public Settings.Root Root { get; }
 		public string Path { get; }
 		public string Branch { get; private set; }
 		public int TrackedChanges { get; private set; }
 		public int UntrackedChanges { get; private set; }
-		private Color? HighlightColor { get; }
+		public string[] Errors { get; private set; }
+		private Color? HighlightColor { get; set; }
 
 		private void RaiseWidthChanged()
 		{
 			WidthChanged?.Invoke(this, EventArgs.Empty);
 		}
 
+		private void SetHighlightColor()
+		{
+			HighlightColor = Root.Filters
+				.Where(filter => filter.Type == Settings.FilterType.Highlight)
+				.Where(filter => Regex.IsMatch(Path.RelativeTo(Root), filter.Filter))
+				.Select(filter => (Color?) filter.Color)
+				.FirstOrDefault();
+		}
+
 		private void UpdateInfo()
 		{
 			int width = Width;
+
+			labelBranch.Top = Errors == null ? 3 : -20;
+			linkLabelBranchError.Top = Errors != null ? 3 : -20;
 
 			if (TrackedChanges > 0 || UntrackedChanges > 0)
 			{
 				linkLabelFolder.Font = WithStyle(linkLabelFolder.Font, FontStyle.Bold);
 				labelBranch.Font = WithStyle(labelBranch.Font, FontStyle.Bold);
+				linkLabelBranchError.Font = WithStyle(linkLabelBranchError.Font, FontStyle.Bold);
 				labelChanges.Font = WithStyle(labelChanges.Font, FontStyle.Bold);
 				labelChanges.ForeColor = SystemColors.ControlText;
 			}
@@ -69,6 +80,7 @@ namespace GitBranchView
 			{
 				linkLabelFolder.Font = WithoutStyle(linkLabelFolder.Font, FontStyle.Bold);
 				labelBranch.Font = WithoutStyle(labelBranch.Font, FontStyle.Bold);
+				linkLabelBranchError.Font = WithoutStyle(linkLabelBranchError.Font, FontStyle.Bold);
 				labelChanges.Font = WithoutStyle(labelChanges.Font, FontStyle.Bold);
 				labelChanges.ForeColor = SystemColors.ControlDark;
 			}
@@ -80,8 +92,9 @@ namespace GitBranchView
 			}
 
 			linkLabelFolder.Text = Path.RelativeTo(Root);
-			
+
 			labelBranch.Text = Branch;
+			linkLabelBranchError.Text = Branch;
 
 			string trackedChanges = TrackedChanges > -1 ? TrackedChanges.ToString() : "?";
 			string untrackedChanges = UntrackedChanges > -1 ? UntrackedChanges.ToString() : "?";
@@ -101,21 +114,22 @@ namespace GitBranchView
 
 		private void UpdateSize()
 		{
-			labelBranch.Left = linkLabelFolder.Left + linkLabelFolder.Width + linkLabelFolder.Margin.Right;
+			linkLabelBranchError.Left = labelBranch.Left = linkLabelFolder.Left + linkLabelFolder.Width + linkLabelFolder.Margin.Right;
 			labelChanges.Left = labelBranch.Left + labelBranch.Width + labelBranch.Margin.Right;
 
-			labelBranch.Anchor = AnchorStyles.Top | AnchorStyles.Left;
+			linkLabelBranchError.Anchor = labelBranch.Anchor = AnchorStyles.Top | AnchorStyles.Left;
 			labelChanges.Anchor = AnchorStyles.Top | AnchorStyles.Left;
 
 			Width = labelBranch.Left + labelBranch.Width + labelChanges.Width + labelChanges.Margin.Right;
 
-			labelBranch.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+			linkLabelBranchError.Anchor = labelBranch.Anchor = AnchorStyles.Top | AnchorStyles.Right;
 			labelChanges.Anchor = AnchorStyles.Top | AnchorStyles.Right;
 		}
 
-		public void RefreshRoot(Settings.Root root)
+		public void HighlightChanged()
 		{
-			Root = root;
+			SetHighlightColor();
+			Refresh();
 		}
 
 		private void ButtonMore_Click(object sender, EventArgs e)
@@ -139,6 +153,11 @@ namespace GitBranchView
 					+ Environment.NewLine + $"Path: {commandPath}"
 					+ Environment.NewLine + $"Args: {commandArgs}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
 			}
+		}
+
+		private void LinkLabelBranchError_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+		{
+			new ErrorForm(Errors.Select((error, i) => i == 0 ? $"{Path}> {error}" : error)).Show(this);
 		}
 
 		private static void SolutionPathMenuItem_Click(object sender, EventArgs e)
@@ -174,7 +193,7 @@ namespace GitBranchView
 
 					try
 					{
-						if (!Git.Checkout(Path, MASTER_BRANCH))
+						if (!Git.Checkout(Root, Path, MASTER_BRANCH))
 						{
 							MessageBox.Show($"Failed to checkout {MASTER_BRANCH}. Make sure it is not dirty." + Environment.NewLine
 								+ Environment.NewLine + $"Path: {Path}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -202,7 +221,7 @@ namespace GitBranchView
 				{
 					try
 					{
-						if (!Git.Pull(Path))
+						if (!Git.Pull(Root, Path))
 						{
 							MessageBox.Show("Failed to pull. Make sure branch is not dirty." + Environment.NewLine
 								+ Environment.NewLine + $"Path: {Path}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -230,7 +249,7 @@ namespace GitBranchView
 				{
 					try
 					{
-						if (!Git.ResetHard(Path))
+						if (!Git.ResetHard(Root, Path))
 						{
 							MessageBox.Show("Failed to reset." + Environment.NewLine
 								+ Environment.NewLine + $"Path: {Path}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -247,7 +266,7 @@ namespace GitBranchView
 
 					try
 					{
-						if (!Git.CleanAll(Path))
+						if (!Git.CleanAll(Root, Path))
 						{
 							MessageBox.Show("Failed to clean." + Environment.NewLine
 								+ Environment.NewLine + $"Path: {Path}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -275,17 +294,12 @@ namespace GitBranchView
 			{
 				await Task.Run(() =>
 					{
-						if (!Git.TryGetBranch(Path, out string branch, out int trackedChanges, out int untrackedChanges))
-						{
-							MessageBox.Show("Failed to get branch and status." + Environment.NewLine
-								+ Environment.NewLine + $"Path: {Path}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-
-							return;
-						}
+						Git.TryGetBranch(Root, Path, out string branch, out int trackedChanges, out int untrackedChanges, out string[] errors);
 
 						Branch = branch;
 						TrackedChanges = trackedChanges;
 						UntrackedChanges = untrackedChanges;
+						Errors = errors;
 					});
 
 				UpdateInfo();
@@ -329,10 +343,17 @@ namespace GitBranchView
 		{
 			try
 			{
-				bool branchExistRemote = Git.BranchExistRemote(Path, Branch);
+				if (Errors != null)
+					return;
+
+				bool branchExistRemote = Git.BranchExistRemote(Root, Path, Branch, out string[] errors);
+				Errors = errors;
 
 				this.InvokeIfRequired(() =>
 					{
+						labelBranch.Top = Errors == null ? 3 : -20;
+						linkLabelBranchError.Top = Errors != null ? 3 : -20;
+
 						labelBranch.ForeColor = SystemColors.ControlText;
 						labelBranch.Font = branchExistRemote
 							? WithoutStyle(labelBranch.Font, FontStyle.Strikeout)
@@ -348,7 +369,7 @@ namespace GitBranchView
 			}
 			catch (Exception ex)
 			{
-				MessageBox.Show("Failed to check remote branch existance;"
+				MessageBox.Show("Failed to check remote branch existence;"
 					+ Environment.NewLine + ex.Message + Environment.NewLine
 					+ Environment.NewLine + $"Path: {Path}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
 			}

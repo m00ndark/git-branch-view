@@ -5,9 +5,39 @@ using System.Windows.Forms;
 
 namespace GitBranchView
 {
+	public enum FilterEntryAction
+	{
+		Delete,
+		MoveUp,
+		MoveDown
+	}
+
 	public partial class FilterEntry : UserControl
 	{
-		public event EventHandler<FilterEntryEventArgs> Action;
+		public class ActionEventArgs : EventArgs
+		{
+			public ActionEventArgs(FilterEntryAction action)
+			{
+				Action = action;
+			}
+
+			public FilterEntryAction Action { get; }
+		}
+
+		public class ChangedEventArgs : EventArgs
+		{
+			public ChangedEventArgs(Settings.FilterType fromType, Settings.FilterType toType)
+			{
+				FromType = fromType;
+				ToType = toType;
+			}
+
+			public Settings.FilterType FromType { get; }
+			public Settings.FilterType ToType { get; }
+		}
+
+		public event EventHandler<ActionEventArgs> Action;
+		public event EventHandler<ChangedEventArgs> Changed;
 
 		public FilterEntry(Settings.RootPathFilter filter)
 		{
@@ -65,9 +95,14 @@ namespace GitBranchView
 				if (filterForm.ShowDialog(this) != DialogResult.OK)
 					return;
 
+				Settings.FilterType fromType = Filter.Type;
+				Settings.FilterType toType = filterForm.Filter.Type;
+
 				Filter = filterForm.Filter;
 				UpdateInfo();
 				Invalidate();
+
+				RaiseChangedEvent(fromType, toType);
 			}
 		}
 
@@ -80,7 +115,12 @@ namespace GitBranchView
 
 		private void RaiseActionEvent(FilterEntryAction action)
 		{
-			Action?.BeginInvoke(this, new FilterEntryEventArgs(action), null, null);
+			Action?.BeginInvoke(this, new ActionEventArgs(action), null, null);
+		}
+
+		private void RaiseChangedEvent(Settings.FilterType fromType, Settings.FilterType toType)
+		{
+			Changed?.BeginInvoke(this, new ChangedEventArgs(fromType, toType), null, null);
 		}
 	}
 }

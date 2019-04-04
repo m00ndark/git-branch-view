@@ -34,6 +34,8 @@
 			this.contextMenuStrip = new System.Windows.Forms.ContextMenuStrip(this.components);
 			this.labelChanges = new System.Windows.Forms.Label();
 			this.buttonMore = new System.Windows.Forms.Button();
+			this.linkLabelBranchError = new System.Windows.Forms.LinkLabel();
+			this.toolTip = new System.Windows.Forms.ToolTip(this.components);
 			this.SuspendLayout();
 			// 
 			// linkLabelFolder
@@ -98,12 +100,31 @@
 			this.buttonMore.UseVisualStyleBackColor = false;
 			this.buttonMore.Click += new System.EventHandler(this.ButtonMore_Click);
 			// 
+			// linkLabelBranchError
+			// 
+			this.linkLabelBranchError.ActiveLinkColor = System.Drawing.Color.Tomato;
+			this.linkLabelBranchError.AutoSize = true;
+			this.linkLabelBranchError.BackColor = System.Drawing.Color.Transparent;
+			this.linkLabelBranchError.DisabledLinkColor = System.Drawing.Color.Gray;
+			this.linkLabelBranchError.LinkBehavior = System.Windows.Forms.LinkBehavior.HoverUnderline;
+			this.linkLabelBranchError.LinkColor = System.Drawing.Color.Tomato;
+			this.linkLabelBranchError.Location = new System.Drawing.Point(252, 3);
+			this.linkLabelBranchError.Name = "linkLabelBranchError";
+			this.linkLabelBranchError.Size = new System.Drawing.Size(43, 13);
+			this.linkLabelBranchError.TabIndex = 10;
+			this.linkLabelBranchError.TabStop = true;
+			this.linkLabelBranchError.Text = "Branch";
+			this.toolTip.SetToolTip(this.linkLabelBranchError, "An error occurred. Click link for more information.");
+			this.linkLabelBranchError.VisitedLinkColor = System.Drawing.Color.Tomato;
+			this.linkLabelBranchError.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.LinkLabelBranchError_LinkClicked);
+			// 
 			// FolderEntry
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.AutoScrollMargin = new System.Drawing.Size(16, 0);
 			this.BackColor = System.Drawing.SystemColors.Window;
+			this.Controls.Add(this.linkLabelBranchError);
 			this.Controls.Add(this.labelChanges);
 			this.Controls.Add(this.buttonMore);
 			this.Controls.Add(this.labelBranch);
@@ -124,5 +145,7 @@
 		private System.Windows.Forms.ContextMenuStrip contextMenuStrip;
 		private System.Windows.Forms.Label labelChanges;
 		private System.Windows.Forms.Button buttonMore;
+		private System.Windows.Forms.LinkLabel linkLabelBranchError;
+		private System.Windows.Forms.ToolTip toolTip;
 	}
 }

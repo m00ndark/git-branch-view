@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using System.Threading.Tasks;
@@ -69,45 +70,46 @@ namespace GitBranchView
 				pictureBoxExpandCollapse.Image = Root.Expanded ? Resources.expanded : Resources.collapsed;
 				labelRootPath.Text = Root.Path;
 
+				Stopwatch stopwatch = Stopwatch.StartNew();
+
+				ConcurrentBag<(string Path, string Branch, int TrackedChanges, int UntrackedChanges, string[] Errors)> gitRepositories = new ConcurrentBag<(string, string, int, int, string[])>();
+
 				await Task.Run(() =>
 					{
-						ConcurrentBag<(string Path, string Branch, int TrackedChanges, int UntrackedChanges)> gitRepositories = new ConcurrentBag<(string, string, int, int)>();
-
 						Parallel.ForEach(Root.Path.ScanFolder(), folder =>
 							{
-								if (!Root.ShouldInclude(folder) || !Git.TryGetBranch(folder, out string branch, out int trackedChanges, out int untrackedChanges))
+								if (!Root.ShouldInclude(folder))
 									return;
 
-								gitRepositories.Add((folder, branch, trackedChanges, untrackedChanges));
+								Git.TryGetBranch(Root, folder, out string branch, out int trackedChanges, out int untrackedChanges, out string[] errors);
+								gitRepositories.Add((folder, branch, trackedChanges, untrackedChanges, errors));
+
 								this.InvokeIfRequired(() =>
 									{
 										int repositoriesCount = gitRepositories.Count;
-										return labelInfo.Text = $"Scanning; found {repositoriesCount} {(repositoriesCount == 1 ? "repository" : "repositories")}...";
+										labelInfo.Text = $"Scanning; found {repositoriesCount} {(repositoriesCount == 1 ? "repository" : "repositories")}...";
+										Application.DoEvents();
 									});
 							});
-
-						this.InvokeIfRequired(() =>
-							{
-								int repositoriesCount = gitRepositories.Count;
-								return labelInfo.Text = $"Rendering {repositoriesCount} {(repositoriesCount == 1 ? "repository" : "repositories")}...";
-							});
-
-						List<FolderEntry> folderEntries = gitRepositories
-							.OrderBy(x => x.Path)
-							.Select(x => new FolderEntry(Root, x.Path, x.Branch, x.TrackedChanges, x.UntrackedChanges))
-							.ToList();
-
-						folderEntries.ForEach(folderEntry => folderEntry.WidthChanged += FolderEntry_WidthChanged);
-
-						this.InvokeIfRequired(() =>
-							{
-								UpdateSize(folderEntries);
-								labelInfo.Visible = false;
-								buttonRefresh.Visible = Root.Expanded;
-								flowLayoutPanel.Controls.AddRange(folderEntries.ToArray<Control>());
-								folderEntries.FirstOrDefault()?.Focus();
-							});
 					});
+
+				labelInfo.Text = $"Rendering {gitRepositories.Count} {(gitRepositories.Count == 1 ? "repository" : "repositories")}...";
+				Application.DoEvents();
+
+				List<FolderEntry> folderEntries = gitRepositories
+					.OrderBy(x => x.Path)
+					.Select(x => new FolderEntry(Root, x.Path, x.Branch, x.TrackedChanges, x.UntrackedChanges, x.Errors))
+					.ToList();
+
+				folderEntries.ForEach(folderEntry => folderEntry.WidthChanged += FolderEntry_WidthChanged);
+
+				UpdateSize(folderEntries);
+				labelInfo.Visible = false;
+				buttonRefresh.Visible = Root.Expanded;
+				flowLayoutPanel.Controls.AddRange(folderEntries.ToArray<Control>());
+				folderEntries.FirstOrDefault()?.Focus();
+
+				Debug.WriteLine($"{Root.Path}\t{stopwatch.Elapsed}");
 			}
 			finally
 			{
@@ -161,7 +163,19 @@ namespace GitBranchView
 
 		private void UpdateWidth(List<FolderEntry> folderEntries)
 		{
-			folderEntries.ForEach(folderEntry => folderEntry.Width = flowLayoutPanel.Width);
+			folderEntries.ForEach(folderEntry =>
+				{
+					if (folderEntry.Width != flowLayoutPanel.Width)
+						folderEntry.Width = flowLayoutPanel.Width;
+				});
+		}
+
+		public void HighlightChanged()
+		{
+			foreach (FolderEntry folderEntry in flowLayoutPanel.Controls.OfType<FolderEntry>())
+			{
+				folderEntry.HighlightChanged();
+			}
 		}
 	}
 }

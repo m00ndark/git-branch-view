@@ -14,6 +14,7 @@ namespace GitBranchView
 	{
 		public class Root
 		{
+			public Guid Id { get; set; } = Guid.NewGuid();
 			public string Path { get; set; }
 			public bool Expanded { get; set; } = true;
 
@@ -22,7 +23,7 @@ namespace GitBranchView
 
 			public override string ToString() => Path;
 
-			public Root Clone() => new Root { Path = Path, Expanded = Expanded, Filters = Filters.Select(x => x.Clone()).ToList() };
+			public Root Clone() => new Root { Id = Id, Path = Path, Expanded = Expanded, Filters = Filters.Select(x => x.Clone()).ToList() };
 		}
 
 		public class RootPathFilter
@@ -92,6 +93,9 @@ namespace GitBranchView
 
 		[DefaultValue(false)]
 		public bool StartWithWindows { get; set; }
+
+		[DefaultValue(false)]
+		public bool EnableLogging { get; set; }
 
 		[DefaultValue(null)]
 		public string SelectedRootPath { get; set; }
