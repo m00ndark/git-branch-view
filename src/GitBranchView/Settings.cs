@@ -14,7 +14,9 @@ namespace GitBranchView
 	{
 		public class Root
 		{
+			[JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
 			public Guid Id { get; set; } = Guid.NewGuid();
+
 			public string Path { get; set; }
 			public bool Expanded { get; set; } = true;
 
@@ -96,6 +98,9 @@ namespace GitBranchView
 
 		[DefaultValue(false)]
 		public bool EnableLogging { get; set; }
+
+		[DefaultValue(true)]
+		public bool EnableRemoteBranchLookup { get; set; }
 
 		[DefaultValue(null)]
 		public string SelectedRootPath { get; set; }

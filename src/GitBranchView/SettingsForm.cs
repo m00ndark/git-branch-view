@@ -296,12 +296,13 @@ namespace GitBranchView
 
 		private void LoadSettings()
 		{
-			textBoxGitExePath.Text = Settings.Default.GitPath;
 			textBoxLinkCommandPath.Text = Settings.Default.CommandPath;
 			textBoxLinkCommandArgs.Text = Settings.Default.CommandArgs;
 			checkBoxCloseOnLostFocus.Checked = Settings.Default.CloseOnLostFocus;
 			checkBoxStartWithWindows.Checked = _lastStartWithWindows = Settings.Default.StartWithWindows;
 			checkBoxEnableLogging.Checked = Settings.Default.EnableLogging;
+			textBoxGitExePath.Text = Settings.Default.GitPath;
+			checkBoxGitEnableRemoteBranchLookup.Checked = Settings.Default.EnableRemoteBranchLookup;
 
 			foreach (Settings.Root root in _rootFilters.Keys)
 				_rootFilters[root].ForEach(DisposeFilterEntry);
@@ -324,12 +325,14 @@ namespace GitBranchView
 
 		private void SaveSettings()
 		{
-			Settings.Default.GitPath = textBoxGitExePath.Text;
 			Settings.Default.CommandPath = textBoxLinkCommandPath.Text;
 			Settings.Default.CommandArgs = textBoxLinkCommandArgs.Text;
 			Settings.Default.CloseOnLostFocus = checkBoxCloseOnLostFocus.Checked;
 			Settings.Default.StartWithWindows = checkBoxStartWithWindows.Checked;
 			Settings.Default.EnableLogging = checkBoxEnableLogging.Checked;
+			Settings.Default.GitPath = textBoxGitExePath.Text;
+			Settings.Default.EnableRemoteBranchLookup = checkBoxGitEnableRemoteBranchLookup.Checked;
+
 			Settings.Default.Roots = _rootFilters.Keys
 				.Select(root =>
 					{

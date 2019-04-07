@@ -30,6 +30,7 @@
 		{
 			this.tabControl = new System.Windows.Forms.TabControl();
 			this.tabPageGeneral = new System.Windows.Forms.TabPage();
+			this.checkBoxEnableLogging = new System.Windows.Forms.CheckBox();
 			this.checkBoxStartWithWindows = new System.Windows.Forms.CheckBox();
 			this.checkBoxCloseOnLostFocus = new System.Windows.Forms.CheckBox();
 			this.groupBoxLinkCommand = new System.Windows.Forms.GroupBox();
@@ -39,10 +40,6 @@
 			this.textBoxLinkCommandPath = new System.Windows.Forms.TextBox();
 			this.buttonBrowseLinkCommandPath = new System.Windows.Forms.Button();
 			this.labelLinkCommandPath = new System.Windows.Forms.Label();
-			this.groupBoxGitExe = new System.Windows.Forms.GroupBox();
-			this.textBoxGitExePath = new System.Windows.Forms.TextBox();
-			this.buttonBrowseGitExePath = new System.Windows.Forms.Button();
-			this.labelGitExePath = new System.Windows.Forms.Label();
 			this.tabPageRootFolders = new System.Windows.Forms.TabPage();
 			this.groupBoxFilters = new System.Windows.Forms.GroupBox();
 			this.panelScroll = new System.Windows.Forms.Panel();
@@ -55,15 +52,22 @@
 			this.buttonCancel = new System.Windows.Forms.Button();
 			this.tableLayoutPanel = new System.Windows.Forms.TableLayoutPanel();
 			this.buttonApply = new System.Windows.Forms.Button();
-			this.checkBoxEnableLogging = new System.Windows.Forms.CheckBox();
+			this.tabPageGit = new System.Windows.Forms.TabPage();
+			this.groupBoxGitExe = new System.Windows.Forms.GroupBox();
+			this.textBoxGitExePath = new System.Windows.Forms.TextBox();
+			this.buttonBrowseGitExePath = new System.Windows.Forms.Button();
+			this.labelGitExePath = new System.Windows.Forms.Label();
+			this.groupBoxGitContextMenuCommands = new System.Windows.Forms.GroupBox();
+			this.checkBoxGitEnableRemoteBranchLookup = new System.Windows.Forms.CheckBox();
 			this.tabControl.SuspendLayout();
 			this.tabPageGeneral.SuspendLayout();
 			this.groupBoxLinkCommand.SuspendLayout();
-			this.groupBoxGitExe.SuspendLayout();
 			this.tabPageRootFolders.SuspendLayout();
 			this.groupBoxFilters.SuspendLayout();
 			this.panelScroll.SuspendLayout();
 			this.tableLayoutPanel.SuspendLayout();
+			this.tabPageGit.SuspendLayout();
+			this.groupBoxGitExe.SuspendLayout();
 			this.SuspendLayout();
 			// 
 			// tabControl
@@ -72,6 +76,7 @@
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
 			this.tabControl.Controls.Add(this.tabPageGeneral);
+			this.tabControl.Controls.Add(this.tabPageGit);
 			this.tabControl.Controls.Add(this.tabPageRootFolders);
 			this.tabControl.Location = new System.Drawing.Point(9, 9);
 			this.tabControl.Margin = new System.Windows.Forms.Padding(0);
@@ -86,7 +91,6 @@
 			this.tabPageGeneral.Controls.Add(this.checkBoxStartWithWindows);
 			this.tabPageGeneral.Controls.Add(this.checkBoxCloseOnLostFocus);
 			this.tabPageGeneral.Controls.Add(this.groupBoxLinkCommand);
-			this.tabPageGeneral.Controls.Add(this.groupBoxGitExe);
 			this.tabPageGeneral.Location = new System.Drawing.Point(4, 22);
 			this.tabPageGeneral.Name = "tabPageGeneral";
 			this.tabPageGeneral.Padding = new System.Windows.Forms.Padding(6);
@@ -95,10 +99,20 @@
 			this.tabPageGeneral.Text = "General";
 			this.tabPageGeneral.UseVisualStyleBackColor = true;
 			// 
+			// checkBoxEnableLogging
+			// 
+			this.checkBoxEnableLogging.AutoSize = true;
+			this.checkBoxEnableLogging.Location = new System.Drawing.Point(9, 170);
+			this.checkBoxEnableLogging.Name = "checkBoxEnableLogging";
+			this.checkBoxEnableLogging.Size = new System.Drawing.Size(105, 17);
+			this.checkBoxEnableLogging.TabIndex = 7;
+			this.checkBoxEnableLogging.Text = "Enable logging";
+			this.checkBoxEnableLogging.UseVisualStyleBackColor = true;
+			// 
 			// checkBoxStartWithWindows
 			// 
 			this.checkBoxStartWithWindows.AutoSize = true;
-			this.checkBoxStartWithWindows.Location = new System.Drawing.Point(9, 212);
+			this.checkBoxStartWithWindows.Location = new System.Drawing.Point(9, 147);
 			this.checkBoxStartWithWindows.Name = "checkBoxStartWithWindows";
 			this.checkBoxStartWithWindows.Size = new System.Drawing.Size(211, 17);
 			this.checkBoxStartWithWindows.TabIndex = 6;
@@ -108,7 +122,7 @@
 			// checkBoxCloseOnLostFocus
 			// 
 			this.checkBoxCloseOnLostFocus.AutoSize = true;
-			this.checkBoxCloseOnLostFocus.Location = new System.Drawing.Point(9, 189);
+			this.checkBoxCloseOnLostFocus.Location = new System.Drawing.Point(9, 124);
 			this.checkBoxCloseOnLostFocus.Name = "checkBoxCloseOnLostFocus";
 			this.checkBoxCloseOnLostFocus.Size = new System.Drawing.Size(326, 17);
 			this.checkBoxCloseOnLostFocus.TabIndex = 5;
@@ -123,7 +137,7 @@
 			this.groupBoxLinkCommand.Controls.Add(this.textBoxLinkCommandPath);
 			this.groupBoxLinkCommand.Controls.Add(this.buttonBrowseLinkCommandPath);
 			this.groupBoxLinkCommand.Controls.Add(this.labelLinkCommandPath);
-			this.groupBoxLinkCommand.Location = new System.Drawing.Point(9, 74);
+			this.groupBoxLinkCommand.Location = new System.Drawing.Point(9, 9);
 			this.groupBoxLinkCommand.Name = "groupBoxLinkCommand";
 			this.groupBoxLinkCommand.Size = new System.Drawing.Size(662, 100);
 			this.groupBoxLinkCommand.TabIndex = 4;
@@ -185,47 +199,6 @@
 			this.labelLinkCommandPath.Size = new System.Drawing.Size(33, 13);
 			this.labelLinkCommandPath.TabIndex = 0;
 			this.labelLinkCommandPath.Text = "Path:";
-			// 
-			// groupBoxGitExe
-			// 
-			this.groupBoxGitExe.Controls.Add(this.textBoxGitExePath);
-			this.groupBoxGitExe.Controls.Add(this.buttonBrowseGitExePath);
-			this.groupBoxGitExe.Controls.Add(this.labelGitExePath);
-			this.groupBoxGitExe.Location = new System.Drawing.Point(9, 9);
-			this.groupBoxGitExe.Name = "groupBoxGitExe";
-			this.groupBoxGitExe.Size = new System.Drawing.Size(662, 59);
-			this.groupBoxGitExe.TabIndex = 3;
-			this.groupBoxGitExe.TabStop = false;
-			this.groupBoxGitExe.Text = "Git Executable";
-			// 
-			// textBoxGitExePath
-			// 
-			this.textBoxGitExePath.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-			this.textBoxGitExePath.Location = new System.Drawing.Point(45, 21);
-			this.textBoxGitExePath.Name = "textBoxGitExePath";
-			this.textBoxGitExePath.Size = new System.Drawing.Size(573, 22);
-			this.textBoxGitExePath.TabIndex = 1;
-			// 
-			// buttonBrowseGitExePath
-			// 
-			this.buttonBrowseGitExePath.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.buttonBrowseGitExePath.Location = new System.Drawing.Point(624, 20);
-			this.buttonBrowseGitExePath.Name = "buttonBrowseGitExePath";
-			this.buttonBrowseGitExePath.Size = new System.Drawing.Size(32, 24);
-			this.buttonBrowseGitExePath.TabIndex = 2;
-			this.buttonBrowseGitExePath.Text = "...";
-			this.buttonBrowseGitExePath.UseVisualStyleBackColor = true;
-			this.buttonBrowseGitExePath.Click += new System.EventHandler(this.ButtonBrowseGitExePath_Click);
-			// 
-			// labelGitExePath
-			// 
-			this.labelGitExePath.AutoSize = true;
-			this.labelGitExePath.Location = new System.Drawing.Point(6, 24);
-			this.labelGitExePath.Name = "labelGitExePath";
-			this.labelGitExePath.Size = new System.Drawing.Size(33, 13);
-			this.labelGitExePath.TabIndex = 0;
-			this.labelGitExePath.Text = "Path:";
 			// 
 			// tabPageRootFolders
 			// 
@@ -384,15 +357,82 @@
 			this.buttonApply.UseVisualStyleBackColor = true;
 			this.buttonApply.Click += new System.EventHandler(this.ButtonApply_Click);
 			// 
-			// checkBoxEnableLogging
+			// tabPageGit
 			// 
-			this.checkBoxEnableLogging.AutoSize = true;
-			this.checkBoxEnableLogging.Location = new System.Drawing.Point(9, 235);
-			this.checkBoxEnableLogging.Name = "checkBoxEnableLogging";
-			this.checkBoxEnableLogging.Size = new System.Drawing.Size(105, 17);
-			this.checkBoxEnableLogging.TabIndex = 7;
-			this.checkBoxEnableLogging.Text = "Enable logging";
-			this.checkBoxEnableLogging.UseVisualStyleBackColor = true;
+			this.tabPageGit.Controls.Add(this.checkBoxGitEnableRemoteBranchLookup);
+			this.tabPageGit.Controls.Add(this.groupBoxGitContextMenuCommands);
+			this.tabPageGit.Controls.Add(this.groupBoxGitExe);
+			this.tabPageGit.Location = new System.Drawing.Point(4, 22);
+			this.tabPageGit.Name = "tabPageGit";
+			this.tabPageGit.Padding = new System.Windows.Forms.Padding(6);
+			this.tabPageGit.Size = new System.Drawing.Size(680, 366);
+			this.tabPageGit.TabIndex = 2;
+			this.tabPageGit.Text = "Git";
+			this.tabPageGit.UseVisualStyleBackColor = true;
+			// 
+			// groupBoxGitExe
+			// 
+			this.groupBoxGitExe.Controls.Add(this.textBoxGitExePath);
+			this.groupBoxGitExe.Controls.Add(this.buttonBrowseGitExePath);
+			this.groupBoxGitExe.Controls.Add(this.labelGitExePath);
+			this.groupBoxGitExe.Location = new System.Drawing.Point(9, 9);
+			this.groupBoxGitExe.Name = "groupBoxGitExe";
+			this.groupBoxGitExe.Size = new System.Drawing.Size(662, 59);
+			this.groupBoxGitExe.TabIndex = 4;
+			this.groupBoxGitExe.TabStop = false;
+			this.groupBoxGitExe.Text = "Executable";
+			// 
+			// textBoxGitExePath
+			// 
+			this.textBoxGitExePath.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+			this.textBoxGitExePath.Location = new System.Drawing.Point(45, 21);
+			this.textBoxGitExePath.Name = "textBoxGitExePath";
+			this.textBoxGitExePath.Size = new System.Drawing.Size(573, 22);
+			this.textBoxGitExePath.TabIndex = 1;
+			// 
+			// buttonBrowseGitExePath
+			// 
+			this.buttonBrowseGitExePath.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+			this.buttonBrowseGitExePath.Location = new System.Drawing.Point(624, 20);
+			this.buttonBrowseGitExePath.Name = "buttonBrowseGitExePath";
+			this.buttonBrowseGitExePath.Size = new System.Drawing.Size(32, 24);
+			this.buttonBrowseGitExePath.TabIndex = 2;
+			this.buttonBrowseGitExePath.Text = "...";
+			this.buttonBrowseGitExePath.UseVisualStyleBackColor = true;
+			this.buttonBrowseGitExePath.Click += new System.EventHandler(this.ButtonBrowseGitExePath_Click);
+			// 
+			// labelGitExePath
+			// 
+			this.labelGitExePath.AutoSize = true;
+			this.labelGitExePath.Location = new System.Drawing.Point(6, 24);
+			this.labelGitExePath.Name = "labelGitExePath";
+			this.labelGitExePath.Size = new System.Drawing.Size(33, 13);
+			this.labelGitExePath.TabIndex = 0;
+			this.labelGitExePath.Text = "Path:";
+			// 
+			// groupBoxGitContextMenuCommands
+			// 
+			this.groupBoxGitContextMenuCommands.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+			this.groupBoxGitContextMenuCommands.Location = new System.Drawing.Point(9, 74);
+			this.groupBoxGitContextMenuCommands.Name = "groupBoxGitContextMenuCommands";
+			this.groupBoxGitContextMenuCommands.Size = new System.Drawing.Size(662, 251);
+			this.groupBoxGitContextMenuCommands.TabIndex = 5;
+			this.groupBoxGitContextMenuCommands.TabStop = false;
+			this.groupBoxGitContextMenuCommands.Text = "Context Menu Commands";
+			// 
+			// checkBoxGitEnableRemoteBranchLookup
+			// 
+			this.checkBoxGitEnableRemoteBranchLookup.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+			this.checkBoxGitEnableRemoteBranchLookup.AutoSize = true;
+			this.checkBoxGitEnableRemoteBranchLookup.Location = new System.Drawing.Point(9, 340);
+			this.checkBoxGitEnableRemoteBranchLookup.Name = "checkBoxGitEnableRemoteBranchLookup";
+			this.checkBoxGitEnableRemoteBranchLookup.Size = new System.Drawing.Size(179, 17);
+			this.checkBoxGitEnableRemoteBranchLookup.TabIndex = 6;
+			this.checkBoxGitEnableRemoteBranchLookup.Text = "Enable remote branch lookup";
+			this.checkBoxGitEnableRemoteBranchLookup.UseVisualStyleBackColor = true;
 			// 
 			// SettingsForm
 			// 
@@ -415,12 +455,14 @@
 			this.tabPageGeneral.PerformLayout();
 			this.groupBoxLinkCommand.ResumeLayout(false);
 			this.groupBoxLinkCommand.PerformLayout();
-			this.groupBoxGitExe.ResumeLayout(false);
-			this.groupBoxGitExe.PerformLayout();
 			this.tabPageRootFolders.ResumeLayout(false);
 			this.groupBoxFilters.ResumeLayout(false);
 			this.panelScroll.ResumeLayout(false);
 			this.tableLayoutPanel.ResumeLayout(false);
+			this.tabPageGit.ResumeLayout(false);
+			this.tabPageGit.PerformLayout();
+			this.groupBoxGitExe.ResumeLayout(false);
+			this.groupBoxGitExe.PerformLayout();
 			this.ResumeLayout(false);
 
 		}
@@ -430,14 +472,10 @@
 		private System.Windows.Forms.TabControl tabControl;
 		private System.Windows.Forms.TabPage tabPageGeneral;
 		private System.Windows.Forms.TabPage tabPageRootFolders;
-		private System.Windows.Forms.Label labelGitExePath;
-		private System.Windows.Forms.TextBox textBoxGitExePath;
-		private System.Windows.Forms.Button buttonBrowseGitExePath;
 		private System.Windows.Forms.GroupBox groupBoxLinkCommand;
 		private System.Windows.Forms.TextBox textBoxLinkCommandPath;
 		private System.Windows.Forms.Button buttonBrowseLinkCommandPath;
 		private System.Windows.Forms.Label labelLinkCommandPath;
-		private System.Windows.Forms.GroupBox groupBoxGitExe;
 		private System.Windows.Forms.TextBox textBoxLinkCommandArgs;
 		private System.Windows.Forms.Label labelLinkCommandArgs;
 		private System.Windows.Forms.Label labelInfo;
@@ -455,5 +493,12 @@
 		private System.Windows.Forms.Panel panelScroll;
 		private System.Windows.Forms.Button buttonApply;
 		private System.Windows.Forms.CheckBox checkBoxEnableLogging;
+		private System.Windows.Forms.TabPage tabPageGit;
+		private System.Windows.Forms.CheckBox checkBoxGitEnableRemoteBranchLookup;
+		private System.Windows.Forms.GroupBox groupBoxGitContextMenuCommands;
+		private System.Windows.Forms.GroupBox groupBoxGitExe;
+		private System.Windows.Forms.TextBox textBoxGitExePath;
+		private System.Windows.Forms.Button buttonBrowseGitExePath;
+		private System.Windows.Forms.Label labelGitExePath;
 	}
 }

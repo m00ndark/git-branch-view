@@ -88,7 +88,9 @@ namespace GitBranchView
 			if (labelBranch.Text != Branch)
 			{
 				labelBranch.Font = WithoutStyle(labelBranch.Font, FontStyle.Strikeout);
-				labelBranch.ForeColor = SystemColors.ControlDark;
+				labelBranch.ForeColor = Settings.Default.EnableRemoteBranchLookup
+					? SystemColors.ControlDark
+					: SystemColors.ControlText;
 			}
 
 			linkLabelFolder.Text = Path.RelativeTo(Root);
@@ -343,6 +345,9 @@ namespace GitBranchView
 		{
 			try
 			{
+				if (!Settings.Default.EnableRemoteBranchLookup)
+					return;
+
 				if (Errors != null)
 					return;
 
