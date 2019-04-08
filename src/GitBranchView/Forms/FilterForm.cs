@@ -2,26 +2,27 @@
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
+using GitBranchView.Model;
 
-namespace GitBranchView
+namespace GitBranchView.Forms
 {
 	public partial class FilterForm : Form
 	{
 		private readonly string _text;
 
-		public FilterForm(Settings.RootPathFilter filter = null)
+		public FilterForm(RootPathFilter filter = null)
 		{
 			InitializeComponent();
-			Filter = filter ?? new Settings.RootPathFilter();
+			Filter = filter ?? new RootPathFilter();
 
-			comboBoxType.Items.AddRange(Enum.GetValues(typeof(Settings.FilterType)).Cast<object>().ToArray());
+			comboBoxType.Items.AddRange(Enum.GetValues(typeof(FilterType)).Cast<object>().ToArray());
 
-			comboBoxType.SelectedItem = filter?.Type ?? Settings.FilterType.Exclude;
+			comboBoxType.SelectedItem = filter?.Type ?? FilterType.Exclude;
 			textBoxFilter.Text = filter?.Filter ?? string.Empty;
 			_text = filter == null ? "New Filter" : "Edit Filter";
 		}
 
-		public Settings.RootPathFilter Filter { get; }
+		public RootPathFilter Filter { get; }
 
 		private void FilterForm_Load(object sender, EventArgs e)
 		{
@@ -31,13 +32,13 @@ namespace GitBranchView
 
 		private void ComboBoxType_SelectedIndexChanged(object sender, EventArgs e)
 		{
-			Settings.FilterType? type = (Settings.FilterType?) comboBoxType.SelectedItem;
+			FilterType? type = (FilterType?) comboBoxType.SelectedItem;
 
-			if (type == Settings.FilterType.Highlight)
+			if (type == FilterType.Highlight)
 				UpdateColor();
 
-			labelColor.Enabled = type == Settings.FilterType.Highlight;
-			buttonColor.Enabled = type == Settings.FilterType.Highlight;
+			labelColor.Enabled = type == FilterType.Highlight;
+			buttonColor.Enabled = type == FilterType.Highlight;
 		}
 
 		private void ButtonColor_Click(object sender, EventArgs e)
@@ -76,7 +77,7 @@ namespace GitBranchView
 				return;
 			}
 
-			Filter.Type = (Settings.FilterType) comboBoxType.SelectedItem;
+			Filter.Type = (FilterType) comboBoxType.SelectedItem;
 			Filter.Filter = textBoxFilter.Text;
 
 			DialogResult = DialogResult.OK;

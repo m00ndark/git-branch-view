@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Windows.Forms;
+using GitBranchView.Forms;
 using GitBranchView.Generated;
 using ToolComponents.Core.Logging;
 

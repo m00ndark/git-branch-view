@@ -5,10 +5,10 @@ using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using GitBranchView.Controls;
 using ToolComponents.Core.Extensions;
-using ToolComponents.Core.Logging;
 
-namespace GitBranchView
+namespace GitBranchView.Forms
 {
 	public partial class MainForm : Form
 	{
@@ -39,9 +39,16 @@ namespace GitBranchView
 					{
 						UpdateRootFolders();
 					}
-					else if (e.RootFoldersHighlightChanged)
+					else
 					{
-						RootFolderHighlightChanged();
+						if (e.RootFoldersHighlightChanged)
+						{
+							RootFolderHighlightChanged();
+						}
+						if (e.GitCommandsChanged)
+						{
+							GitContextMenuCommandsChanged();
+						}
 					}
 				});
 		}
@@ -139,6 +146,14 @@ namespace GitBranchView
 			foreach (RootEntry rootEntry in flowLayoutPanel.Controls.OfType<RootEntry>())
 			{
 				rootEntry.HighlightChanged();
+			}
+		}
+
+		private void GitContextMenuCommandsChanged()
+		{
+			foreach (RootEntry rootEntry in flowLayoutPanel.Controls.OfType<RootEntry>())
+			{
+				rootEntry.GitContextMenuCommandsChanged();
 			}
 		}
 

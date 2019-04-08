@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Windows.Forms;
 
-namespace GitBranchView
+namespace GitBranchView.Forms
 {
 	public partial class ErrorForm : Form
 	{

@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Drawing;
 using System.IO;
-using System.Linq;
 using System.Text;
+using GitBranchView.Model;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 
@@ -12,76 +11,24 @@ namespace GitBranchView
 {
 	public class Settings
 	{
-		public class Root
-		{
-			[JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
-			public Guid Id { get; set; } = Guid.NewGuid();
-
-			public string Path { get; set; }
-			public bool Expanded { get; set; } = true;
-
-			[JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
-			public List<RootPathFilter> Filters { get; set; } = new List<RootPathFilter>();
-
-			public override string ToString() => Path;
-
-			public Root Clone() => new Root { Id = Id, Path = Path, Expanded = Expanded, Filters = Filters.Select(x => x.Clone()).ToList() };
-		}
-
-		public class RootPathFilter
-		{
-			[JsonProperty(DefaultValueHandling = DefaultValueHandling.Include)]
-			public FilterType Type { get; set; }
-
-			public string Filter { get; set; }
-
-			[JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
-			public HighlightColor Color { get; set; } = System.Drawing.Color.White;
-
-			public RootPathFilter Clone() => new RootPathFilter { Type = Type, Filter = Filter, Color = Color };
-		}
-
-		public class HighlightColor
-		{
-			public HighlightColor(Color color)
-			{
-				A = color.A;
-				R = color.R;
-				G = color.G;
-				B = color.B;
-			}
-
-			public byte A { get; set; }
-			public byte R { get; set; }
-			public byte G { get; set; }
-			public byte B { get; set; }
-
-			public static implicit operator Color(HighlightColor color)
-				=> Color.FromArgb(color.A, color.R, color.G, color.B);
-
-			public static implicit operator HighlightColor(Color color)
-				=> new HighlightColor(color);
-		}
-
-		public enum FilterType
-		{
-			Include,
-			Exclude,
-			Highlight
-		}
-
 		public const string PATH_IDENTIFIER = "<path>";
+		public const string BRANCH_IDENTIFIER = "<branch>";
+
 		private const string SETTINGS_FOLDER_NAME = "GitBranchView";
 		private const string SETTINGS_FILE_NAME = "settings.gbv";
-
-		[DefaultValue(@"C:\Program Files\Git\bin\git.exe")]
-		public string GitPath { get; set; }
 
 		[DefaultValue(@"C:\Windows\system32\cmd.exe")]
 		public string CommandPath { get; set; }
 
 		[DefaultValue(@"/k cd <path>")]
 		public string CommandArgs { get; set; }
+
+		[DefaultValue(@"C:\Program Files\Git\bin\git.exe")]
+		public string GitPath { get; set; }
+
+		[DefaultValue(null)]
+		[JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
+		public List<GitContextMenuCommand> GitContextMenuCommands { get; set; }
 
 		[DefaultValue(null)]
 		[JsonProperty("RootPath")]
@@ -150,14 +97,28 @@ namespace GitBranchView
 					json = File.ReadAllText(legacyFilePath, Encoding.UTF8);
 			}
 
-			if (json == null)
+			if (json == null && Exist)
 			{
-				json = Exist
-					? File.ReadAllText(_filePath, Encoding.UTF8)
-					: "{}";
+				json = File.ReadAllText(_filePath, Encoding.UTF8);
 			}
 
-			return Deserialize(json) ?? Deserialize("{}");
+			return Deserialize(string.IsNullOrWhiteSpace(json) ? "{}" : json).PostProcess();
+		}
+
+		private Settings PostProcess()
+		{
+			if (GitContextMenuCommands == null)
+			{
+				GitContextMenuCommands = new List<GitContextMenuCommand>
+					{
+						new GitContextMenuCommand("Checkout Master Branch", "checkout master"),
+						new GitContextMenuCommand("Pull From Remote", "pull"),
+						new GitContextMenuCommand("Reset Hard", "reset --hard"),
+						new GitContextMenuCommand("Clean All", "clean -fdx")
+					};
+			}
+
+			return this;
 		}
 
 		public void Save()

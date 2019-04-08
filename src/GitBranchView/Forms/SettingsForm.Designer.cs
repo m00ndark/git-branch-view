@@ -1,4 +1,4 @@
-﻿namespace GitBranchView
+﻿namespace GitBranchView.Forms
 {
 	partial class SettingsForm
 	{
@@ -40,11 +40,21 @@
 			this.textBoxLinkCommandPath = new System.Windows.Forms.TextBox();
 			this.buttonBrowseLinkCommandPath = new System.Windows.Forms.Button();
 			this.labelLinkCommandPath = new System.Windows.Forms.Label();
+			this.tabPageGit = new System.Windows.Forms.TabPage();
+			this.checkBoxGitEnableRemoteBranchLookup = new System.Windows.Forms.CheckBox();
+			this.groupBoxGitContextMenuCommands = new System.Windows.Forms.GroupBox();
+			this.panelScrollGitContextMenuCommands = new System.Windows.Forms.Panel();
+			this.flowLayoutPanelGitContextMenuCommands = new System.Windows.Forms.FlowLayoutPanel();
+			this.buttonGitContextMenuCommandsAdd = new System.Windows.Forms.Button();
+			this.groupBoxGitExe = new System.Windows.Forms.GroupBox();
+			this.textBoxGitExePath = new System.Windows.Forms.TextBox();
+			this.buttonBrowseGitExePath = new System.Windows.Forms.Button();
+			this.labelGitExePath = new System.Windows.Forms.Label();
 			this.tabPageRootFolders = new System.Windows.Forms.TabPage();
-			this.groupBoxFilters = new System.Windows.Forms.GroupBox();
-			this.panelScroll = new System.Windows.Forms.Panel();
-			this.flowLayoutPanelRootFolderFilters = new System.Windows.Forms.FlowLayoutPanel();
-			this.buttonFilterAdd = new System.Windows.Forms.Button();
+			this.groupBoxRootPathFilters = new System.Windows.Forms.GroupBox();
+			this.panelScrollRootPathFilters = new System.Windows.Forms.Panel();
+			this.flowLayoutPanelRootPathFilters = new System.Windows.Forms.FlowLayoutPanel();
+			this.buttonRootPathFilterAdd = new System.Windows.Forms.Button();
 			this.buttonRootPathRemove = new System.Windows.Forms.Button();
 			this.buttonRootPathAdd = new System.Windows.Forms.Button();
 			this.comboBoxRootPaths = new System.Windows.Forms.ComboBox();
@@ -52,22 +62,17 @@
 			this.buttonCancel = new System.Windows.Forms.Button();
 			this.tableLayoutPanel = new System.Windows.Forms.TableLayoutPanel();
 			this.buttonApply = new System.Windows.Forms.Button();
-			this.tabPageGit = new System.Windows.Forms.TabPage();
-			this.groupBoxGitExe = new System.Windows.Forms.GroupBox();
-			this.textBoxGitExePath = new System.Windows.Forms.TextBox();
-			this.buttonBrowseGitExePath = new System.Windows.Forms.Button();
-			this.labelGitExePath = new System.Windows.Forms.Label();
-			this.groupBoxGitContextMenuCommands = new System.Windows.Forms.GroupBox();
-			this.checkBoxGitEnableRemoteBranchLookup = new System.Windows.Forms.CheckBox();
 			this.tabControl.SuspendLayout();
 			this.tabPageGeneral.SuspendLayout();
 			this.groupBoxLinkCommand.SuspendLayout();
-			this.tabPageRootFolders.SuspendLayout();
-			this.groupBoxFilters.SuspendLayout();
-			this.panelScroll.SuspendLayout();
-			this.tableLayoutPanel.SuspendLayout();
 			this.tabPageGit.SuspendLayout();
+			this.groupBoxGitContextMenuCommands.SuspendLayout();
+			this.panelScrollGitContextMenuCommands.SuspendLayout();
 			this.groupBoxGitExe.SuspendLayout();
+			this.tabPageRootFolders.SuspendLayout();
+			this.groupBoxRootPathFilters.SuspendLayout();
+			this.panelScrollRootPathFilters.SuspendLayout();
+			this.tableLayoutPanel.SuspendLayout();
 			this.SuspendLayout();
 			// 
 			// tabControl
@@ -131,6 +136,8 @@
 			// 
 			// groupBoxLinkCommand
 			// 
+			this.groupBoxLinkCommand.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
 			this.groupBoxLinkCommand.Controls.Add(this.labelInfo);
 			this.groupBoxLinkCommand.Controls.Add(this.textBoxLinkCommandArgs);
 			this.groupBoxLinkCommand.Controls.Add(this.labelLinkCommandArgs);
@@ -200,9 +207,131 @@
 			this.labelLinkCommandPath.TabIndex = 0;
 			this.labelLinkCommandPath.Text = "Path:";
 			// 
+			// tabPageGit
+			// 
+			this.tabPageGit.Controls.Add(this.checkBoxGitEnableRemoteBranchLookup);
+			this.tabPageGit.Controls.Add(this.groupBoxGitContextMenuCommands);
+			this.tabPageGit.Controls.Add(this.groupBoxGitExe);
+			this.tabPageGit.Location = new System.Drawing.Point(4, 22);
+			this.tabPageGit.Name = "tabPageGit";
+			this.tabPageGit.Padding = new System.Windows.Forms.Padding(6);
+			this.tabPageGit.Size = new System.Drawing.Size(680, 366);
+			this.tabPageGit.TabIndex = 2;
+			this.tabPageGit.Text = "Git";
+			this.tabPageGit.UseVisualStyleBackColor = true;
+			// 
+			// checkBoxGitEnableRemoteBranchLookup
+			// 
+			this.checkBoxGitEnableRemoteBranchLookup.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+			this.checkBoxGitEnableRemoteBranchLookup.AutoSize = true;
+			this.checkBoxGitEnableRemoteBranchLookup.Location = new System.Drawing.Point(9, 340);
+			this.checkBoxGitEnableRemoteBranchLookup.Name = "checkBoxGitEnableRemoteBranchLookup";
+			this.checkBoxGitEnableRemoteBranchLookup.Size = new System.Drawing.Size(179, 17);
+			this.checkBoxGitEnableRemoteBranchLookup.TabIndex = 6;
+			this.checkBoxGitEnableRemoteBranchLookup.Text = "Enable remote branch lookup";
+			this.checkBoxGitEnableRemoteBranchLookup.UseVisualStyleBackColor = true;
+			// 
+			// groupBoxGitContextMenuCommands
+			// 
+			this.groupBoxGitContextMenuCommands.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+			this.groupBoxGitContextMenuCommands.Controls.Add(this.panelScrollGitContextMenuCommands);
+			this.groupBoxGitContextMenuCommands.Controls.Add(this.buttonGitContextMenuCommandsAdd);
+			this.groupBoxGitContextMenuCommands.Location = new System.Drawing.Point(9, 74);
+			this.groupBoxGitContextMenuCommands.Name = "groupBoxGitContextMenuCommands";
+			this.groupBoxGitContextMenuCommands.Size = new System.Drawing.Size(662, 251);
+			this.groupBoxGitContextMenuCommands.TabIndex = 5;
+			this.groupBoxGitContextMenuCommands.TabStop = false;
+			this.groupBoxGitContextMenuCommands.Text = "Context Menu Commands";
+			// 
+			// panelScrollGitContextMenuCommands
+			// 
+			this.panelScrollGitContextMenuCommands.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+			this.panelScrollGitContextMenuCommands.AutoScroll = true;
+			this.panelScrollGitContextMenuCommands.BackColor = System.Drawing.Color.Transparent;
+			this.panelScrollGitContextMenuCommands.Controls.Add(this.flowLayoutPanelGitContextMenuCommands);
+			this.panelScrollGitContextMenuCommands.Location = new System.Drawing.Point(6, 21);
+			this.panelScrollGitContextMenuCommands.Name = "panelScrollGitContextMenuCommands";
+			this.panelScrollGitContextMenuCommands.Size = new System.Drawing.Size(615, 224);
+			this.panelScrollGitContextMenuCommands.TabIndex = 9;
+			// 
+			// flowLayoutPanelGitContextMenuCommands
+			// 
+			this.flowLayoutPanelGitContextMenuCommands.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+			this.flowLayoutPanelGitContextMenuCommands.BackColor = System.Drawing.Color.Transparent;
+			this.flowLayoutPanelGitContextMenuCommands.FlowDirection = System.Windows.Forms.FlowDirection.TopDown;
+			this.flowLayoutPanelGitContextMenuCommands.Location = new System.Drawing.Point(0, 0);
+			this.flowLayoutPanelGitContextMenuCommands.Name = "flowLayoutPanelGitContextMenuCommands";
+			this.flowLayoutPanelGitContextMenuCommands.Size = new System.Drawing.Size(615, 224);
+			this.flowLayoutPanelGitContextMenuCommands.TabIndex = 3;
+			this.flowLayoutPanelGitContextMenuCommands.Resize += new System.EventHandler(this.FlowLayoutPanelGitContextMenuCommands_Resize);
+			// 
+			// buttonGitContextMenuCommandsAdd
+			// 
+			this.buttonGitContextMenuCommandsAdd.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+			this.buttonGitContextMenuCommandsAdd.BackColor = System.Drawing.SystemColors.Window;
+			this.buttonGitContextMenuCommandsAdd.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
+			this.buttonGitContextMenuCommandsAdd.FlatAppearance.BorderSize = 0;
+			this.buttonGitContextMenuCommandsAdd.FlatAppearance.MouseOverBackColor = System.Drawing.SystemColors.ButtonFace;
+			this.buttonGitContextMenuCommandsAdd.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+			this.buttonGitContextMenuCommandsAdd.Image = global::GitBranchView.Properties.Resources.add;
+			this.buttonGitContextMenuCommandsAdd.Location = new System.Drawing.Point(630, 25);
+			this.buttonGitContextMenuCommandsAdd.Name = "buttonGitContextMenuCommandsAdd";
+			this.buttonGitContextMenuCommandsAdd.Size = new System.Drawing.Size(21, 21);
+			this.buttonGitContextMenuCommandsAdd.TabIndex = 8;
+			this.buttonGitContextMenuCommandsAdd.UseVisualStyleBackColor = true;
+			this.buttonGitContextMenuCommandsAdd.Click += new System.EventHandler(this.ButtonGitContextMenuCommandsAdd_Click);
+			// 
+			// groupBoxGitExe
+			// 
+			this.groupBoxGitExe.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+			this.groupBoxGitExe.Controls.Add(this.textBoxGitExePath);
+			this.groupBoxGitExe.Controls.Add(this.buttonBrowseGitExePath);
+			this.groupBoxGitExe.Controls.Add(this.labelGitExePath);
+			this.groupBoxGitExe.Location = new System.Drawing.Point(9, 9);
+			this.groupBoxGitExe.Name = "groupBoxGitExe";
+			this.groupBoxGitExe.Size = new System.Drawing.Size(662, 59);
+			this.groupBoxGitExe.TabIndex = 4;
+			this.groupBoxGitExe.TabStop = false;
+			this.groupBoxGitExe.Text = "Executable";
+			// 
+			// textBoxGitExePath
+			// 
+			this.textBoxGitExePath.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+			this.textBoxGitExePath.Location = new System.Drawing.Point(45, 21);
+			this.textBoxGitExePath.Name = "textBoxGitExePath";
+			this.textBoxGitExePath.Size = new System.Drawing.Size(573, 22);
+			this.textBoxGitExePath.TabIndex = 1;
+			// 
+			// buttonBrowseGitExePath
+			// 
+			this.buttonBrowseGitExePath.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+			this.buttonBrowseGitExePath.Location = new System.Drawing.Point(624, 20);
+			this.buttonBrowseGitExePath.Name = "buttonBrowseGitExePath";
+			this.buttonBrowseGitExePath.Size = new System.Drawing.Size(32, 24);
+			this.buttonBrowseGitExePath.TabIndex = 2;
+			this.buttonBrowseGitExePath.Text = "...";
+			this.buttonBrowseGitExePath.UseVisualStyleBackColor = true;
+			this.buttonBrowseGitExePath.Click += new System.EventHandler(this.ButtonBrowseGitExePath_Click);
+			// 
+			// labelGitExePath
+			// 
+			this.labelGitExePath.AutoSize = true;
+			this.labelGitExePath.Location = new System.Drawing.Point(6, 24);
+			this.labelGitExePath.Name = "labelGitExePath";
+			this.labelGitExePath.Size = new System.Drawing.Size(33, 13);
+			this.labelGitExePath.TabIndex = 0;
+			this.labelGitExePath.Text = "Path:";
+			// 
 			// tabPageRootFolders
 			// 
-			this.tabPageRootFolders.Controls.Add(this.groupBoxFilters);
+			this.tabPageRootFolders.Controls.Add(this.groupBoxRootPathFilters);
 			this.tabPageRootFolders.Controls.Add(this.buttonRootPathRemove);
 			this.tabPageRootFolders.Controls.Add(this.buttonRootPathAdd);
 			this.tabPageRootFolders.Controls.Add(this.comboBoxRootPaths);
@@ -214,60 +343,60 @@
 			this.tabPageRootFolders.Text = "Root Folders";
 			this.tabPageRootFolders.UseVisualStyleBackColor = true;
 			// 
-			// groupBoxFilters
+			// groupBoxRootPathFilters
 			// 
-			this.groupBoxFilters.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+			this.groupBoxRootPathFilters.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-			this.groupBoxFilters.Controls.Add(this.panelScroll);
-			this.groupBoxFilters.Controls.Add(this.buttonFilterAdd);
-			this.groupBoxFilters.Location = new System.Drawing.Point(9, 36);
-			this.groupBoxFilters.Name = "groupBoxFilters";
-			this.groupBoxFilters.Size = new System.Drawing.Size(662, 321);
-			this.groupBoxFilters.TabIndex = 4;
-			this.groupBoxFilters.TabStop = false;
-			this.groupBoxFilters.Text = "Filters";
+			this.groupBoxRootPathFilters.Controls.Add(this.panelScrollRootPathFilters);
+			this.groupBoxRootPathFilters.Controls.Add(this.buttonRootPathFilterAdd);
+			this.groupBoxRootPathFilters.Location = new System.Drawing.Point(9, 36);
+			this.groupBoxRootPathFilters.Name = "groupBoxRootPathFilters";
+			this.groupBoxRootPathFilters.Size = new System.Drawing.Size(662, 321);
+			this.groupBoxRootPathFilters.TabIndex = 4;
+			this.groupBoxRootPathFilters.TabStop = false;
+			this.groupBoxRootPathFilters.Text = "Filters";
 			// 
-			// panelScroll
+			// panelScrollRootPathFilters
 			// 
-			this.panelScroll.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+			this.panelScrollRootPathFilters.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-			this.panelScroll.AutoScroll = true;
-			this.panelScroll.BackColor = System.Drawing.Color.Transparent;
-			this.panelScroll.Controls.Add(this.flowLayoutPanelRootFolderFilters);
-			this.panelScroll.Location = new System.Drawing.Point(6, 21);
-			this.panelScroll.Name = "panelScroll";
-			this.panelScroll.Size = new System.Drawing.Size(623, 294);
-			this.panelScroll.TabIndex = 7;
+			this.panelScrollRootPathFilters.AutoScroll = true;
+			this.panelScrollRootPathFilters.BackColor = System.Drawing.Color.Transparent;
+			this.panelScrollRootPathFilters.Controls.Add(this.flowLayoutPanelRootPathFilters);
+			this.panelScrollRootPathFilters.Location = new System.Drawing.Point(6, 21);
+			this.panelScrollRootPathFilters.Name = "panelScrollRootPathFilters";
+			this.panelScrollRootPathFilters.Size = new System.Drawing.Size(623, 294);
+			this.panelScrollRootPathFilters.TabIndex = 7;
 			// 
-			// flowLayoutPanelRootFolderFilters
+			// flowLayoutPanelRootPathFilters
 			// 
-			this.flowLayoutPanelRootFolderFilters.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+			this.flowLayoutPanelRootPathFilters.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-			this.flowLayoutPanelRootFolderFilters.BackColor = System.Drawing.Color.Transparent;
-			this.flowLayoutPanelRootFolderFilters.FlowDirection = System.Windows.Forms.FlowDirection.TopDown;
-			this.flowLayoutPanelRootFolderFilters.Location = new System.Drawing.Point(0, 0);
-			this.flowLayoutPanelRootFolderFilters.Name = "flowLayoutPanelRootFolderFilters";
-			this.flowLayoutPanelRootFolderFilters.Size = new System.Drawing.Size(623, 294);
-			this.flowLayoutPanelRootFolderFilters.TabIndex = 3;
-			this.flowLayoutPanelRootFolderFilters.Resize += new System.EventHandler(this.FlowLayoutPanelRootFolderFilters_Resize);
+			this.flowLayoutPanelRootPathFilters.BackColor = System.Drawing.Color.Transparent;
+			this.flowLayoutPanelRootPathFilters.FlowDirection = System.Windows.Forms.FlowDirection.TopDown;
+			this.flowLayoutPanelRootPathFilters.Location = new System.Drawing.Point(0, 0);
+			this.flowLayoutPanelRootPathFilters.Name = "flowLayoutPanelRootPathFilters";
+			this.flowLayoutPanelRootPathFilters.Size = new System.Drawing.Size(623, 294);
+			this.flowLayoutPanelRootPathFilters.TabIndex = 3;
+			this.flowLayoutPanelRootPathFilters.Resize += new System.EventHandler(this.FlowLayoutPanelRootPathFilters_Resize);
 			// 
-			// buttonFilterAdd
+			// buttonRootPathFilterAdd
 			// 
-			this.buttonFilterAdd.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.buttonFilterAdd.BackColor = System.Drawing.SystemColors.Window;
-			this.buttonFilterAdd.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
-			this.buttonFilterAdd.FlatAppearance.BorderSize = 0;
-			this.buttonFilterAdd.FlatAppearance.MouseOverBackColor = System.Drawing.SystemColors.ButtonFace;
-			this.buttonFilterAdd.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-			this.buttonFilterAdd.Image = global::GitBranchView.Properties.Resources.add;
-			this.buttonFilterAdd.Location = new System.Drawing.Point(635, 21);
-			this.buttonFilterAdd.Name = "buttonFilterAdd";
-			this.buttonFilterAdd.Size = new System.Drawing.Size(21, 21);
-			this.buttonFilterAdd.TabIndex = 6;
-			this.buttonFilterAdd.UseVisualStyleBackColor = true;
-			this.buttonFilterAdd.Click += new System.EventHandler(this.ButtonFilterAdd_Click);
+			this.buttonRootPathFilterAdd.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+			this.buttonRootPathFilterAdd.BackColor = System.Drawing.SystemColors.Window;
+			this.buttonRootPathFilterAdd.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
+			this.buttonRootPathFilterAdd.FlatAppearance.BorderSize = 0;
+			this.buttonRootPathFilterAdd.FlatAppearance.MouseOverBackColor = System.Drawing.SystemColors.ButtonFace;
+			this.buttonRootPathFilterAdd.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+			this.buttonRootPathFilterAdd.Image = global::GitBranchView.Properties.Resources.add;
+			this.buttonRootPathFilterAdd.Location = new System.Drawing.Point(633, 22);
+			this.buttonRootPathFilterAdd.Name = "buttonRootPathFilterAdd";
+			this.buttonRootPathFilterAdd.Size = new System.Drawing.Size(21, 21);
+			this.buttonRootPathFilterAdd.TabIndex = 6;
+			this.buttonRootPathFilterAdd.UseVisualStyleBackColor = true;
+			this.buttonRootPathFilterAdd.Click += new System.EventHandler(this.ButtonRootPathFilterAdd_Click);
 			// 
 			// buttonRootPathRemove
 			// 
@@ -357,83 +486,6 @@
 			this.buttonApply.UseVisualStyleBackColor = true;
 			this.buttonApply.Click += new System.EventHandler(this.ButtonApply_Click);
 			// 
-			// tabPageGit
-			// 
-			this.tabPageGit.Controls.Add(this.checkBoxGitEnableRemoteBranchLookup);
-			this.tabPageGit.Controls.Add(this.groupBoxGitContextMenuCommands);
-			this.tabPageGit.Controls.Add(this.groupBoxGitExe);
-			this.tabPageGit.Location = new System.Drawing.Point(4, 22);
-			this.tabPageGit.Name = "tabPageGit";
-			this.tabPageGit.Padding = new System.Windows.Forms.Padding(6);
-			this.tabPageGit.Size = new System.Drawing.Size(680, 366);
-			this.tabPageGit.TabIndex = 2;
-			this.tabPageGit.Text = "Git";
-			this.tabPageGit.UseVisualStyleBackColor = true;
-			// 
-			// groupBoxGitExe
-			// 
-			this.groupBoxGitExe.Controls.Add(this.textBoxGitExePath);
-			this.groupBoxGitExe.Controls.Add(this.buttonBrowseGitExePath);
-			this.groupBoxGitExe.Controls.Add(this.labelGitExePath);
-			this.groupBoxGitExe.Location = new System.Drawing.Point(9, 9);
-			this.groupBoxGitExe.Name = "groupBoxGitExe";
-			this.groupBoxGitExe.Size = new System.Drawing.Size(662, 59);
-			this.groupBoxGitExe.TabIndex = 4;
-			this.groupBoxGitExe.TabStop = false;
-			this.groupBoxGitExe.Text = "Executable";
-			// 
-			// textBoxGitExePath
-			// 
-			this.textBoxGitExePath.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-			this.textBoxGitExePath.Location = new System.Drawing.Point(45, 21);
-			this.textBoxGitExePath.Name = "textBoxGitExePath";
-			this.textBoxGitExePath.Size = new System.Drawing.Size(573, 22);
-			this.textBoxGitExePath.TabIndex = 1;
-			// 
-			// buttonBrowseGitExePath
-			// 
-			this.buttonBrowseGitExePath.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.buttonBrowseGitExePath.Location = new System.Drawing.Point(624, 20);
-			this.buttonBrowseGitExePath.Name = "buttonBrowseGitExePath";
-			this.buttonBrowseGitExePath.Size = new System.Drawing.Size(32, 24);
-			this.buttonBrowseGitExePath.TabIndex = 2;
-			this.buttonBrowseGitExePath.Text = "...";
-			this.buttonBrowseGitExePath.UseVisualStyleBackColor = true;
-			this.buttonBrowseGitExePath.Click += new System.EventHandler(this.ButtonBrowseGitExePath_Click);
-			// 
-			// labelGitExePath
-			// 
-			this.labelGitExePath.AutoSize = true;
-			this.labelGitExePath.Location = new System.Drawing.Point(6, 24);
-			this.labelGitExePath.Name = "labelGitExePath";
-			this.labelGitExePath.Size = new System.Drawing.Size(33, 13);
-			this.labelGitExePath.TabIndex = 0;
-			this.labelGitExePath.Text = "Path:";
-			// 
-			// groupBoxGitContextMenuCommands
-			// 
-			this.groupBoxGitContextMenuCommands.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-			this.groupBoxGitContextMenuCommands.Location = new System.Drawing.Point(9, 74);
-			this.groupBoxGitContextMenuCommands.Name = "groupBoxGitContextMenuCommands";
-			this.groupBoxGitContextMenuCommands.Size = new System.Drawing.Size(662, 251);
-			this.groupBoxGitContextMenuCommands.TabIndex = 5;
-			this.groupBoxGitContextMenuCommands.TabStop = false;
-			this.groupBoxGitContextMenuCommands.Text = "Context Menu Commands";
-			// 
-			// checkBoxGitEnableRemoteBranchLookup
-			// 
-			this.checkBoxGitEnableRemoteBranchLookup.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-			this.checkBoxGitEnableRemoteBranchLookup.AutoSize = true;
-			this.checkBoxGitEnableRemoteBranchLookup.Location = new System.Drawing.Point(9, 340);
-			this.checkBoxGitEnableRemoteBranchLookup.Name = "checkBoxGitEnableRemoteBranchLookup";
-			this.checkBoxGitEnableRemoteBranchLookup.Size = new System.Drawing.Size(179, 17);
-			this.checkBoxGitEnableRemoteBranchLookup.TabIndex = 6;
-			this.checkBoxGitEnableRemoteBranchLookup.Text = "Enable remote branch lookup";
-			this.checkBoxGitEnableRemoteBranchLookup.UseVisualStyleBackColor = true;
-			// 
 			// SettingsForm
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -455,14 +507,16 @@
 			this.tabPageGeneral.PerformLayout();
 			this.groupBoxLinkCommand.ResumeLayout(false);
 			this.groupBoxLinkCommand.PerformLayout();
-			this.tabPageRootFolders.ResumeLayout(false);
-			this.groupBoxFilters.ResumeLayout(false);
-			this.panelScroll.ResumeLayout(false);
-			this.tableLayoutPanel.ResumeLayout(false);
 			this.tabPageGit.ResumeLayout(false);
 			this.tabPageGit.PerformLayout();
+			this.groupBoxGitContextMenuCommands.ResumeLayout(false);
+			this.panelScrollGitContextMenuCommands.ResumeLayout(false);
 			this.groupBoxGitExe.ResumeLayout(false);
 			this.groupBoxGitExe.PerformLayout();
+			this.tabPageRootFolders.ResumeLayout(false);
+			this.groupBoxRootPathFilters.ResumeLayout(false);
+			this.panelScrollRootPathFilters.ResumeLayout(false);
+			this.tableLayoutPanel.ResumeLayout(false);
 			this.ResumeLayout(false);
 
 		}
@@ -484,13 +538,13 @@
 		private System.Windows.Forms.Button buttonRootPathRemove;
 		private System.Windows.Forms.Button buttonRootPathAdd;
 		private System.Windows.Forms.ComboBox comboBoxRootPaths;
-		private System.Windows.Forms.FlowLayoutPanel flowLayoutPanelRootFolderFilters;
-		private System.Windows.Forms.GroupBox groupBoxFilters;
-		private System.Windows.Forms.Button buttonFilterAdd;
+		private System.Windows.Forms.FlowLayoutPanel flowLayoutPanelRootPathFilters;
+		private System.Windows.Forms.GroupBox groupBoxRootPathFilters;
+		private System.Windows.Forms.Button buttonRootPathFilterAdd;
 		private System.Windows.Forms.Button buttonOK;
 		private System.Windows.Forms.Button buttonCancel;
 		private System.Windows.Forms.TableLayoutPanel tableLayoutPanel;
-		private System.Windows.Forms.Panel panelScroll;
+		private System.Windows.Forms.Panel panelScrollRootPathFilters;
 		private System.Windows.Forms.Button buttonApply;
 		private System.Windows.Forms.CheckBox checkBoxEnableLogging;
 		private System.Windows.Forms.TabPage tabPageGit;
@@ -500,5 +554,8 @@
 		private System.Windows.Forms.TextBox textBoxGitExePath;
 		private System.Windows.Forms.Button buttonBrowseGitExePath;
 		private System.Windows.Forms.Label labelGitExePath;
+		private System.Windows.Forms.Panel panelScrollGitContextMenuCommands;
+		private System.Windows.Forms.FlowLayoutPanel flowLayoutPanelGitContextMenuCommands;
+		private System.Windows.Forms.Button buttonGitContextMenuCommandsAdd;
 	}
 }

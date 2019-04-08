@@ -6,6 +6,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Text;
+using GitBranchView.Model;
 using ToolComponents.Core.Logging;
 
 namespace GitBranchView
@@ -14,7 +15,7 @@ namespace GitBranchView
 	{
 		private const int NO_EXIT_CODE = -1;
 
-		public static bool TryGetBranch(Settings.Root root, string path, out string branch, out int trackedChanges, out int untrackedChanges, out string[] errors)
+		public static bool TryGetBranch(Root root, string path, out string branch, out int trackedChanges, out int untrackedChanges, out string[] errors)
 		{
 			List<string> errorLines = new List<string>();
 
@@ -47,7 +48,7 @@ namespace GitBranchView
 			return success;
 		}
 
-		public static bool BranchExistRemote(Settings.Root root, string path, string branch, out string[] errors)
+		public static bool BranchExistRemote(Root root, string path, string branch, out string[] errors)
 		{
 			(bool Success, string Output, string Error) result = ExecProcess(root, Settings.Default.GitPath, $"ls-remote --heads --tags origin {branch}", path);
 
@@ -55,27 +56,12 @@ namespace GitBranchView
 			return result.Success && result.Output.LineSplit().Any(line => line.Trim().EndsWith(branch));
 		}
 
-		public static bool Checkout(Settings.Root root, string path, string branch)
+		public static bool ExecuteCommand(Root root, string path, string command)
 		{
-			return ExecProcess(root, Settings.Default.GitPath, $"checkout {branch}", path).Success;
+			return ExecProcess(root, Settings.Default.GitPath, command, path).Success;
 		}
 
-		public static bool Pull(Settings.Root root, string path)
-		{
-			return ExecProcess(root, Settings.Default.GitPath, "pull", path).Success;
-		}
-
-		public static bool ResetHard(Settings.Root root, string path)
-		{
-			return ExecProcess(root, Settings.Default.GitPath, "reset --hard", path).Success;
-		}
-
-		public static bool CleanAll(Settings.Root root, string path)
-		{
-			return ExecProcess(root, Settings.Default.GitPath, "clean -fdx", path).Success;
-		}
-
-		private static (bool Success, string Output, string Error) ExecProcess(Settings.Root root, string filePath, string args, string workingDir)
+		private static (bool Success, string Output, string Error) ExecProcess(Root root, string filePath, string args, string workingDir)
 		{
 			Guid execId = Guid.NewGuid();
 			Stopwatch stopwatch = Stopwatch.StartNew();
@@ -132,7 +118,7 @@ namespace GitBranchView
 		}
 
 		[SuppressMessage("ReSharper", "AssignNullToNotNullAttribute")]
-		private static void Dump(Guid execId, Settings.Root root, string filePath, string args, string workingDir, int exitCode, string output, string error, string[] environment)
+		private static void Dump(Guid execId, Root root, string filePath, string args, string workingDir, int exitCode, string output, string error, string[] environment)
 		{
 			string commandName = Path.GetFileNameWithoutExtension(filePath);
 

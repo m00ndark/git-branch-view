@@ -1,4 +1,4 @@
-﻿namespace GitBranchView
+﻿namespace GitBranchView.Forms
 {
 	partial class FilterForm
 	{

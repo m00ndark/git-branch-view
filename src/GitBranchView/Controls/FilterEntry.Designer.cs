@@ -1,4 +1,4 @@
-﻿namespace GitBranchView
+﻿namespace GitBranchView.Controls
 {
 	partial class FilterEntry
 	{

@@ -60,69 +60,82 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Extensions.cs" />
-    <Compile Include="FilterEntry.cs">
+    <Compile Include="Controls\GitCommandEntry.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="FilterEntry.Designer.cs">
+    <Compile Include="Controls\GitCommandEntry.Designer.cs">
+      <DependentUpon>GitCommandEntry.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Extensions.cs" />
+    <Compile Include="Controls\FilterEntry.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Controls\FilterEntry.Designer.cs">
       <DependentUpon>FilterEntry.cs</DependentUpon>
     </Compile>
-    <Compile Include="FilterForm.cs">
+    <Compile Include="Forms\FilterForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="FilterForm.Designer.cs">
+    <Compile Include="Forms\FilterForm.Designer.cs">
       <DependentUpon>FilterForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="FolderEntry.cs">
+    <Compile Include="Controls\FolderEntry.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="FolderEntry.Designer.cs">
+    <Compile Include="Controls\FolderEntry.Designer.cs">
       <DependentUpon>FolderEntry.cs</DependentUpon>
     </Compile>
     <Compile Include="Generated\AssemblyResolver.cs" />
     <Compile Include="Generated\Startup.cs" />
     <Compile Include="Git.cs" />
-    <Compile Include="MainForm.cs">
+    <Compile Include="Forms\MainForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="MainForm.Designer.cs">
+    <Compile Include="Forms\MainForm.Designer.cs">
       <DependentUpon>MainForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="ErrorForm.cs">
+    <Compile Include="Forms\ErrorForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="ErrorForm.Designer.cs">
+    <Compile Include="Forms\ErrorForm.Designer.cs">
       <DependentUpon>ErrorForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="Model\GitContextMenuCommand.cs" />
+    <Compile Include="Model\HighlightColor.cs" />
     <Compile Include="NativeMethods.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="RootEntry.cs">
+    <Compile Include="Controls\RootEntry.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="RootEntry.Designer.cs">
+    <Compile Include="Controls\RootEntry.Designer.cs">
       <DependentUpon>RootEntry.cs</DependentUpon>
     </Compile>
+    <Compile Include="Model\Root.cs" />
+    <Compile Include="Model\RootPathFilter.cs" />
     <Compile Include="Settings.cs" />
-    <Compile Include="SettingsForm.cs">
+    <Compile Include="Forms\SettingsForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="SettingsForm.Designer.cs">
+    <Compile Include="Forms\SettingsForm.Designer.cs">
       <DependentUpon>SettingsForm.cs</DependentUpon>
     </Compile>
-    <EmbeddedResource Include="FilterEntry.resx">
+    <EmbeddedResource Include="Controls\FilterEntry.resx">
       <DependentUpon>FilterEntry.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="FilterForm.resx">
+    <EmbeddedResource Include="Controls\GitCommandEntry.resx">
+      <DependentUpon>GitCommandEntry.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\FilterForm.resx">
       <DependentUpon>FilterForm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="FolderEntry.resx">
+    <EmbeddedResource Include="Controls\FolderEntry.resx">
       <DependentUpon>FolderEntry.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="MainForm.resx">
+    <EmbeddedResource Include="Forms\MainForm.resx">
       <DependentUpon>MainForm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="ErrorForm.resx">
+    <EmbeddedResource Include="Forms\ErrorForm.resx">
       <DependentUpon>ErrorForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
@@ -135,10 +148,10 @@
       <DependentUpon>Resources.resx</DependentUpon>
       <DesignTime>True</DesignTime>
     </Compile>
-    <EmbeddedResource Include="RootEntry.resx">
+    <EmbeddedResource Include="Controls\RootEntry.resx">
       <DependentUpon>RootEntry.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="SettingsForm.resx">
+    <EmbeddedResource Include="Forms\SettingsForm.resx">
       <DependentUpon>SettingsForm.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
@@ -186,6 +199,7 @@
     <Content Include="Resources\expanded.png" />
     <None Include="Resources\title.png" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <UsingTask TaskName="ToolComponents.PreBuild.PreBuildTask" AssemblyFile="$(PreBuildTaskAssemblyPath)" />
   <PropertyGroup>

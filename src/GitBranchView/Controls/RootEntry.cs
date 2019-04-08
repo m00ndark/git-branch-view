@@ -6,10 +6,11 @@ using System.Drawing;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using GitBranchView.Model;
 using GitBranchView.Properties;
 using ToolComponents.Core.Extensions;
 
-namespace GitBranchView
+namespace GitBranchView.Controls
 {
 	public partial class RootEntry : UserControl
 	{
@@ -17,13 +18,13 @@ namespace GitBranchView
 
 		public event EventHandler ExpandedCollapsed;
 
-		public RootEntry(Settings.Root root)
+		public RootEntry(Root root)
 		{
 			Root = root;
 			InitializeComponent();
 		}
 
-		public Settings.Root Root { get; }
+		public Root Root { get; }
 
 		private void RaiseExpandedCollapsed()
 		{
@@ -175,6 +176,14 @@ namespace GitBranchView
 			foreach (FolderEntry folderEntry in flowLayoutPanel.Controls.OfType<FolderEntry>())
 			{
 				folderEntry.HighlightChanged();
+			}
+		}
+
+		public void GitContextMenuCommandsChanged()
+		{
+			foreach (FolderEntry folderEntry in flowLayoutPanel.Controls.OfType<FolderEntry>())
+			{
+				folderEntry.GitContextMenuCommandsChanged();
 			}
 		}
 	}

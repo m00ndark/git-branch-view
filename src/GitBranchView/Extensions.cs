@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
+using GitBranchView.Model;
 
 namespace GitBranchView
 {
@@ -47,7 +48,7 @@ namespace GitBranchView
 			return true;
 		}
 
-		public static bool IsValid(this Settings.Root root, out string error)
+		public static bool IsValid(this Root root, out string error)
 		{
 			if (string.IsNullOrWhiteSpace(root?.Path))
 			{
@@ -65,18 +66,18 @@ namespace GitBranchView
 			return true;
 		}
 
-		public static string RelativeTo(this string path, Settings.Root root)
+		public static string RelativeTo(this string path, Root root)
 		{
 			return root.Path.Length >= path.Length
 				? "/"
 				: path.Substring(root.Path.Length + 1);
 		}
 
-		public static bool ShouldInclude(this Settings.Root root, string path)
+		public static bool ShouldInclude(this Root root, string path)
 		{
 			return root.Filters
-				.Where(filter => filter.Type == Settings.FilterType.Include || filter.Type == Settings.FilterType.Exclude)
-				.Aggregate(true, (include, filter) => Regex.IsMatch(path.RelativeTo(root), filter.Filter) ? filter.Type == Settings.FilterType.Include : include);
+				.Where(filter => filter.Type == FilterType.Include || filter.Type == FilterType.Exclude)
+				.Aggregate(true, (include, filter) => Regex.IsMatch(path.RelativeTo(root), filter.Filter) ? filter.Type == FilterType.Include : include);
 		}
 
 		public static IEnumerable<string> ScanFolder(this string path)
