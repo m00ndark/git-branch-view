@@ -1,5 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using System.Reflection;
+using System.Text.RegularExpressions;
+using GitBranchView.Model;
 
 namespace GitBranchView
 {
@@ -23,6 +28,72 @@ namespace GitBranchView
 		public static string GetBuildVersion(this Assembly assembly)
 		{
 			return $"{assembly.GetVersion()} @ {assembly.GetBuildDate()}";
+		}
+
+		public static bool GitPathIsValid(this string gitPath, out string error)
+		{
+			if (string.IsNullOrEmpty(gitPath))
+			{
+				error = "Path to Git executable not selected.";
+				return false;
+			}
+
+			if (!File.Exists(gitPath))
+			{
+				error = "Path to Git executable does not exist.";
+				return false;
+			}
+
+			error = null;
+			return true;
+		}
+
+		public static bool IsValid(this Root root, out string error)
+		{
+			if (string.IsNullOrWhiteSpace(root?.Path))
+			{
+				error = "No root folder selected.";
+				return false;
+			}
+
+			if (!Directory.Exists(root.Path))
+			{
+				error = $"Root folder '{root.Path}' does not exist.";
+				return false;
+			}
+
+			error = null;
+			return true;
+		}
+
+		public static string RelativeTo(this string path, Root root)
+		{
+			return root.Path.Length >= path.Length
+				? "/"
+				: path.Substring(root.Path.Length + 1);
+		}
+
+		public static bool ShouldInclude(this Root root, string path)
+		{
+			return root.Filters
+				.Where(filter => filter.Type == FilterType.Include || filter.Type == FilterType.Exclude)
+				.Aggregate(true, (include, filter) => Regex.IsMatch(path.RelativeTo(root), filter.Filter) ? filter.Type == FilterType.Include : include);
+		}
+
+		public static IEnumerable<string> ScanFolder(this string path)
+		{
+			if (Directory.Exists(Path.Combine(path, ".git")))
+			{
+				yield return path;
+			}
+			else
+			{
+				foreach (string subPath in Directory.EnumerateDirectories(path, "*", SearchOption.TopDirectoryOnly))
+				{
+					foreach (string validSubPath in ScanFolder(subPath))
+						yield return validSubPath;
+				}
+			}
 		}
 	}
 }

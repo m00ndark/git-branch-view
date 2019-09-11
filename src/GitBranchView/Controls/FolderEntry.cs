@@ -3,55 +3,73 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
+using System.Drawing.Drawing2D;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using GitBranchView.Forms;
+using GitBranchView.Model;
 using ToolComponents.Core.Extensions;
 
-namespace GitBranchView
+namespace GitBranchView.Controls
 {
 	public partial class FolderEntry : UserControl
 	{
 		private const string MENU_ITEM_REFRESH = "Refresh";
-		private const string MENU_ITEM_CHECKOUT_MASTER_BRANCH = "Checkout Master Branch";
-		private const string MENU_ITEM_PULL_FROM_REMOTE = "Pull From Remote";
-		private const string MENU_ITEM_RESET_HARD = "Reset Hard And Clean All";
-
-		private const string MASTER_BRANCH = "master";
 
 		public event EventHandler WidthChanged;
 
-		public FolderEntry(string rootPath, string path, string branch, int trackedChanges, int untrackedChanges)
+		public FolderEntry(Root root, string path, string branch, int trackedChanges, int untrackedChanges, string[] errors)
 		{
 			InitializeComponent();
-			RootPath = rootPath;
+
+			Root = root;
 			Path = path;
 			Branch = branch;
 			TrackedChanges = trackedChanges;
 			UntrackedChanges = untrackedChanges;
-			UpdateInfo();
+			Errors = errors;
+
+			SetHighlightColor();
+			UpdateInfo(resetRemoteStatus: true);
 		}
 
-		public string RootPath { get; }
+		public Root Root { get; }
 		public string Path { get; }
 		public string Branch { get; private set; }
 		public int TrackedChanges { get; private set; }
 		public int UntrackedChanges { get; private set; }
+		public string[] Errors { get; private set; }
+		private Color? HighlightColor { get; set; }
 
 		private void RaiseWidthChanged()
 		{
 			WidthChanged?.Invoke(this, EventArgs.Empty);
 		}
 
-		private void UpdateInfo()
+		private void SetHighlightColor()
+		{
+			HighlightColor = Root.Filters
+				.Where(filter => filter.Type == FilterType.Highlight)
+				.Where(filter => Regex.IsMatch(Path.RelativeTo(Root), filter.Filter))
+				.Select(filter => (Color?) filter.Color)
+				.FirstOrDefault();
+		}
+
+		private void UpdateInfo(bool resetRemoteStatus)
 		{
 			int width = Width;
+
+			labelBranch.Top = Errors == null ? 3 : -20;
+			linkLabelBranchError.Top = Errors != null ? 3 : -20;
 
 			if (TrackedChanges > 0 || UntrackedChanges > 0)
 			{
 				linkLabelFolder.Font = WithStyle(linkLabelFolder.Font, FontStyle.Bold);
 				labelBranch.Font = WithStyle(labelBranch.Font, FontStyle.Bold);
+				linkLabelBranchError.Font = WithStyle(linkLabelBranchError.Font, FontStyle.Bold);
 				labelChanges.Font = WithStyle(labelChanges.Font, FontStyle.Bold);
 				labelChanges.ForeColor = SystemColors.ControlText;
 			}
@@ -59,19 +77,23 @@ namespace GitBranchView
 			{
 				linkLabelFolder.Font = WithoutStyle(linkLabelFolder.Font, FontStyle.Bold);
 				labelBranch.Font = WithoutStyle(labelBranch.Font, FontStyle.Bold);
+				linkLabelBranchError.Font = WithoutStyle(linkLabelBranchError.Font, FontStyle.Bold);
 				labelChanges.Font = WithoutStyle(labelChanges.Font, FontStyle.Bold);
 				labelChanges.ForeColor = SystemColors.ControlDark;
 			}
 
-			if (labelBranch.Text != Branch)
+			if (resetRemoteStatus)
 			{
 				labelBranch.Font = WithoutStyle(labelBranch.Font, FontStyle.Strikeout);
-				labelBranch.ForeColor = SystemColors.ControlDark;
+				labelBranch.ForeColor = Settings.Default.EnableRemoteBranchLookup
+					? SystemColors.ControlDark
+					: SystemColors.ControlText;
 			}
 
-			linkLabelFolder.Text = Path.Substring(RootPath.Length + 1);
-			
+			linkLabelFolder.Text = Path.RelativeTo(Root);
+
 			labelBranch.Text = Branch;
+			linkLabelBranchError.Text = Branch;
 
 			string trackedChanges = TrackedChanges > -1 ? TrackedChanges.ToString() : "?";
 			string untrackedChanges = UntrackedChanges > -1 ? UntrackedChanges.ToString() : "?";
@@ -84,23 +106,34 @@ namespace GitBranchView
 
 			Task.Run(() =>
 				{
-					CreateContextMenu();
+					ResetContextMenu();
 					CheckRemoteBranchExistance();
 				});
 		}
 
-		public void UpdateSize()
+		private void UpdateSize()
 		{
-			labelBranch.Left = linkLabelFolder.Left + linkLabelFolder.Width + linkLabelFolder.Margin.Right;
+			linkLabelBranchError.Left = labelBranch.Left = linkLabelFolder.Left + linkLabelFolder.Width + linkLabelFolder.Margin.Right;
 			labelChanges.Left = labelBranch.Left + labelBranch.Width + labelBranch.Margin.Right;
 
-			labelBranch.Anchor = AnchorStyles.Top | AnchorStyles.Left;
+			linkLabelBranchError.Anchor = labelBranch.Anchor = AnchorStyles.Top | AnchorStyles.Left;
 			labelChanges.Anchor = AnchorStyles.Top | AnchorStyles.Left;
 
 			Width = labelBranch.Left + labelBranch.Width + labelChanges.Width + labelChanges.Margin.Right;
 
-			labelBranch.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+			linkLabelBranchError.Anchor = labelBranch.Anchor = AnchorStyles.Top | AnchorStyles.Right;
 			labelChanges.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+		}
+
+		public void HighlightChanged()
+		{
+			SetHighlightColor();
+			Refresh();
+		}
+
+		public void GitContextMenuCommandsChanged()
+		{
+			ResetContextMenu();
 		}
 
 		private void ButtonMore_Click(object sender, EventArgs e)
@@ -119,13 +152,19 @@ namespace GitBranchView
 			}
 			catch (Exception ex)
 			{
-				MessageBox.Show("Failed to start link command;" + Environment.NewLine + ex.Message + Environment.NewLine
+				MessageBox.Show("Failed to start link command;"
+					+ Environment.NewLine + ex.Message + Environment.NewLine
 					+ Environment.NewLine + $"Path: {commandPath}"
 					+ Environment.NewLine + $"Args: {commandArgs}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
 			}
 		}
 
-		private void SolutionPathMenuItem_Click(object sender, EventArgs e)
+		private void LinkLabelBranchError_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+		{
+			new ErrorForm(Errors.Select((error, i) => i == 0 ? $"{Path}> {error}" : error)).Show(this);
+		}
+
+		private static void SolutionPathMenuItem_Click(object sender, EventArgs e)
 		{
 			if (!(sender is ToolStripMenuItem menuItem))
 				return;
@@ -138,145 +177,42 @@ namespace GitBranchView
 			}
 			catch (Exception ex)
 			{
-				MessageBox.Show("Failed to open solution;" + Environment.NewLine + ex.Message + Environment.NewLine
+				MessageBox.Show("Failed to open solution;"
+					+ Environment.NewLine + ex.Message + Environment.NewLine
 					+ Environment.NewLine + $"File: {solutionPath}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
 			}
 		}
 
 		private async void RefreshMenuItem_Click(object sender, EventArgs e)
 		{
-			await RefreshInfo();
+			await RefreshInfo(resetRemoteStatus: true);
 		}
 
-		private async void CheckoutMasterMenuItem_Click(object sender, EventArgs e)
-		{
-			bool success = await Task.Run(() =>
-				{
-					//if (MessageBox.Show(this, "Check out master branch?" + Environment.NewLine + path, "Confirmation", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.No)
-					//	return;
-
-					try
-					{
-						if (!Git.Checkout(Path, MASTER_BRANCH))
-						{
-							MessageBox.Show($"Failed to checkout {MASTER_BRANCH}. Make sure it is not dirty." + Environment.NewLine
-								+ Environment.NewLine + $"Path: {Path}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-
-							return false;
-						}
-					}
-					catch (Exception ex)
-					{
-						MessageBox.Show($"Failed to checkout {MASTER_BRANCH};" + Environment.NewLine + ex.Message + Environment.NewLine
-							+ Environment.NewLine + $"Path: {Path}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-					}
-
-					return true;
-				});
-
-			if (success)
-				await RefreshInfo();
-		}
-
-		private async void PullFromRemoteMenuItem_Click(object sender, EventArgs e)
-		{
-			bool success = await Task.Run(() =>
-				{
-					try
-					{
-						if (!Git.Pull(Path))
-						{
-							MessageBox.Show("Failed to pull. Make sure branch is not dirty." + Environment.NewLine
-								+ Environment.NewLine + $"Path: {Path}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-
-							return false;
-						}
-					}
-					catch (Exception ex)
-					{
-						MessageBox.Show("Failed to pull;" + Environment.NewLine + ex.Message + Environment.NewLine
-							+ Environment.NewLine + $"Path: {Path}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-					}
-
-					return true;
-				});
-
-			if (success)
-				await RefreshInfo();
-		}
-
-		private async void ResetAndCleanMenuItem_Click(object sender, EventArgs e)
-		{
-			bool success = await Task.Run(() =>
-				{
-					try
-					{
-						if (!Git.ResetHard(Path))
-						{
-							MessageBox.Show("Failed to reset." + Environment.NewLine
-								+ Environment.NewLine + $"Path: {Path}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-
-							return false;
-						}
-					}
-					catch (Exception ex)
-					{
-						MessageBox.Show("Failed to reset;" + Environment.NewLine + ex.Message + Environment.NewLine
-							+ Environment.NewLine + $"Path: {Path}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-					}
-
-					try
-					{
-						if (!Git.CleanAll(Path))
-						{
-							MessageBox.Show("Failed to clean." + Environment.NewLine
-								+ Environment.NewLine + $"Path: {Path}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-
-							return false;
-						}
-					}
-					catch (Exception ex)
-					{
-						MessageBox.Show("Failed to clean;" + Environment.NewLine + ex.Message + Environment.NewLine
-							+ Environment.NewLine + $"Path: {Path}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-					}
-
-					return true;
-				});
-
-			if (success)
-				await RefreshInfo();
-		}
-
-		private async Task RefreshInfo()
+		private async Task RefreshInfo(bool resetRemoteStatus)
 		{
 			try
 			{
 				await Task.Run(() =>
 					{
-						if (!Git.TryGetBranch(Path, out string branch, out int trackedChanges, out int untrackedChanges))
-						{
-							MessageBox.Show("Failed to get branch and status." + Environment.NewLine
-								+ Environment.NewLine + $"Path: {Path}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-
-							return;
-						}
+						Git.TryGetBranch(Root, Path, out string branch, out int trackedChanges, out int untrackedChanges, out string[] errors);
 
 						Branch = branch;
 						TrackedChanges = trackedChanges;
 						UntrackedChanges = untrackedChanges;
+						Errors = errors;
 					});
 
-				UpdateInfo();
+				UpdateInfo(resetRemoteStatus);
 			}
 			catch (Exception ex)
 			{
-				MessageBox.Show("Failed to get branch and status;" + Environment.NewLine + ex.Message + Environment.NewLine
+				MessageBox.Show("Failed to get branch and status;"
+					+ Environment.NewLine + ex.Message + Environment.NewLine
 					+ Environment.NewLine + $"Path: {Path}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
 			}
 		}
 
-		private void CreateContextMenu()
+		private void ResetContextMenu()
 		{
 			contextMenuStrip.InvokeIfRequired(() =>
 				{
@@ -296,47 +232,94 @@ namespace GitBranchView
 					}
 
 					AddMenuItem<ToolStripMenuItem>(MENU_ITEM_REFRESH, RefreshMenuItem_Click);
-					AddMenuItem<ToolStripSeparator>();
-					AddMenuItem<ToolStripMenuItem>(MENU_ITEM_CHECKOUT_MASTER_BRANCH, CheckoutMasterMenuItem_Click, enabled: Branch != MASTER_BRANCH);
-					AddMenuItem<ToolStripMenuItem>(MENU_ITEM_PULL_FROM_REMOTE, PullFromRemoteMenuItem_Click);
-					AddMenuItem<ToolStripMenuItem>(MENU_ITEM_RESET_HARD, ResetAndCleanMenuItem_Click);
+
+					if (Settings.Default.GitContextMenuCommands.Any())
+					{
+						AddMenuItem<ToolStripSeparator>();
+
+						foreach (GitContextMenuCommand gitCommand in Settings.Default.GitContextMenuCommands
+							.Where(x => !string.IsNullOrWhiteSpace(x.Caption) && !string.IsNullOrWhiteSpace(x.Command)))
+						{
+							AddMenuItem<ToolStripMenuItem>(gitCommand.Caption, GitCommand_Click, gitCommand);
+						}
+					}
 				});
+		}
+
+		private async void GitCommand_Click(object sender, EventArgs eventArgs)
+		{
+			if (!((sender as ToolStripMenuItem)?.Tag is GitContextMenuCommand gitCommand))
+				return;
+
+			string command = gitCommand.Command.Replace(Settings.BRANCH_IDENTIFIER, Branch);
+
+			bool success = await Task.Run(() =>
+				{
+					try
+					{
+						if (!Git.ExecuteCommand(Root, Path, command))
+						{
+							MessageBox.Show($"Failed to execute Git command '{command}'." + Environment.NewLine
+								+ Environment.NewLine + $"Path: {Path}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+
+							return false;
+						}
+					}
+					catch (Exception ex)
+					{
+						MessageBox.Show($"Failed to execute Git command '{command}';"
+							+ Environment.NewLine + ex.Message + Environment.NewLine
+							+ Environment.NewLine + $"Path: {Path}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+					}
+
+					return true;
+				});
+
+			if (success)
+				await RefreshInfo(resetRemoteStatus: false);
 		}
 
 		private void CheckRemoteBranchExistance()
 		{
 			try
 			{
-				bool branchExistRemote = Git.BranchExistRemote(Path, Branch);
+				if (!Settings.Default.EnableRemoteBranchLookup)
+					return;
+
+				if (Errors != null)
+					return;
+
+				bool branchExistRemote = Git.BranchExistRemote(Root, Path, Branch, out string[] errors);
+				Errors = errors;
 
 				this.InvokeIfRequired(() =>
 					{
+						labelBranch.Top = Errors == null ? 3 : -20;
+						linkLabelBranchError.Top = Errors != null ? 3 : -20;
+
 						labelBranch.ForeColor = SystemColors.ControlText;
 						labelBranch.Font = branchExistRemote
 							? WithoutStyle(labelBranch.Font, FontStyle.Strikeout)
 							: WithStyle(labelBranch.Font, FontStyle.Strikeout);
-
-						ToolStripItem pullFromRemoteMenuItem = contextMenuStrip.Items
-							.Cast<ToolStripItem>()
-							.FirstOrDefault(x => x.Text == MENU_ITEM_PULL_FROM_REMOTE);
-
-						if (pullFromRemoteMenuItem != null)
-							pullFromRemoteMenuItem.Enabled = branchExistRemote;
 					});
 			}
 			catch (Exception ex)
 			{
-				MessageBox.Show("Failed to check remote branch existance;" + Environment.NewLine + ex.Message + Environment.NewLine
+				MessageBox.Show("Failed to check remote branch existence;"
+					+ Environment.NewLine + ex.Message + Environment.NewLine
 					+ Environment.NewLine + $"Path: {Path}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
 			}
 		}
 
-		private static void DisposeItems(IEnumerable items)
+		private void DisposeItems(IEnumerable items)
 		{
 			foreach (IDisposable disposable in items.OfType<IDisposable>().ToArray())
 			{
 				if (disposable is ToolStripMenuItem item)
+				{
 					DisposeItems(item.DropDownItems);
+					item.Click -= GitCommand_Click;
+				}
 
 				disposable.Dispose();
 			}
@@ -351,5 +334,17 @@ namespace GitBranchView
 
 		public static Font WithStyle(Font font, FontStyle style) => new Font(font, font.Style | style);
 		public static Font WithoutStyle(Font font, FontStyle style) => new Font(font, font.Style & ~style);
+
+		protected override void OnPaint(PaintEventArgs e)
+		{
+			if (HighlightColor == null)
+				return;
+
+			using (Brush brush = new SolidBrush(HighlightColor.Value))
+			{
+				e.Graphics.SmoothingMode = SmoothingMode.HighQuality;
+				e.Graphics.FillRectangle(brush, 1, 1, Width - 2, Height - 3);
+			}
+		}
 	}
 }

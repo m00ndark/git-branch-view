@@ -1,26 +1,45 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using System.Windows.Forms;
+using GitBranchView.Forms;
 using GitBranchView.Generated;
+using ToolComponents.Core.Logging;
 
 namespace GitBranchView
 {
-	static class Program
+	public static class Program
 	{
-		/// <summary>
-		/// The main entry point for the application.
-		/// </summary>
+		public const string GIT_BRANCH_VIEW = "Git Branch View";
+
 		[STAThread]
-		static void Main()
+		public static void Main()
 		{
 			AssemblyResolver.Setup();
 			Startup.EnsureLocallyInstalled();
 
-			Application.EnableVisualStyles();
-			Application.SetCompatibleTextRenderingDefault(false);
-			Application.Run(new MainForm());
+			WrapWithLogging(() =>
+				{
+					Application.EnableVisualStyles();
+					Application.SetCompatibleTextRenderingDefault(false);
+					Application.Run(new MainForm());
+				});
+		}
+
+		private static void WrapWithLogging(Action action)
+		{
+			try
+			{
+				Logger.Initialize(null, nameof(GitBranchView), DefaultLogEntry.Headers);
+
+				action();
+			}
+			catch (Exception ex)
+			{
+				Logger.Add("Fatal error", ex);
+			}
+			finally
+			{
+				Logger.Terminate();
+			}
 		}
 	}
 }
