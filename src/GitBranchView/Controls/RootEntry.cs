@@ -104,10 +104,10 @@ namespace GitBranchView.Controls
 
 				folderEntries.ForEach(folderEntry => folderEntry.WidthChanged += FolderEntry_WidthChanged);
 
+				flowLayoutPanel.Controls.AddRange(folderEntries.ToArray<Control>());
 				UpdateSize(folderEntries);
 				labelInfo.Visible = false;
 				buttonRefresh.Visible = Root.Expanded;
-				flowLayoutPanel.Controls.AddRange(folderEntries.ToArray<Control>());
 				folderEntries.FirstOrDefault()?.Focus();
 
 				Debug.WriteLine($"{Root.Path}\t{stopwatch.Elapsed}");

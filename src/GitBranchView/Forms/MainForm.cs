@@ -198,14 +198,23 @@ namespace GitBranchView.Forms
 
 			if (!_isUpdatingRootFolders)
 			{
-				foreach (RootEntry rootEntry in rootEntries)
+				try
 				{
-					if (rootEntry == changedRootEntry)
-						continue;
+					_isUpdatingRootFolders = true;
 
-					rootEntry.SizeChanged -= RootEntry_SizeChanged;
-					rootEntry.UpdateSize();
-					rootEntry.SizeChanged += RootEntry_SizeChanged;
+					foreach (RootEntry rootEntry in rootEntries)
+					{
+						if (rootEntry == changedRootEntry)
+							continue;
+
+						rootEntry.SizeChanged -= RootEntry_SizeChanged;
+						rootEntry.UpdateSize();
+						rootEntry.SizeChanged += RootEntry_SizeChanged;
+					}
+				}
+				finally
+				{
+					_isUpdatingRootFolders = false;
 				}
 			}
 
