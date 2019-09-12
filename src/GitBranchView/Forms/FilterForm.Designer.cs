@@ -38,13 +38,16 @@
 			this.buttonOK = new System.Windows.Forms.Button();
 			this.buttonCancel = new System.Windows.Forms.Button();
 			this.labelInfo = new System.Windows.Forms.Label();
+			this.checkBoxTargetPath = new System.Windows.Forms.CheckBox();
+			this.labelTarget = new System.Windows.Forms.Label();
+			this.checkBoxTargetBranch = new System.Windows.Forms.CheckBox();
 			this.tableLayoutPanel.SuspendLayout();
 			this.SuspendLayout();
 			// 
 			// labelFilter
 			// 
 			this.labelFilter.AutoSize = true;
-			this.labelFilter.Location = new System.Drawing.Point(12, 43);
+			this.labelFilter.Location = new System.Drawing.Point(12, 66);
 			this.labelFilter.Name = "labelFilter";
 			this.labelFilter.Size = new System.Drawing.Size(36, 13);
 			this.labelFilter.TabIndex = 2;
@@ -54,9 +57,9 @@
 			// 
 			this.textBoxFilter.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-			this.textBoxFilter.Location = new System.Drawing.Point(54, 40);
+			this.textBoxFilter.Location = new System.Drawing.Point(59, 63);
 			this.textBoxFilter.Name = "textBoxFilter";
-			this.textBoxFilter.Size = new System.Drawing.Size(472, 22);
+			this.textBoxFilter.Size = new System.Drawing.Size(467, 22);
 			this.textBoxFilter.TabIndex = 0;
 			// 
 			// labelType
@@ -72,7 +75,7 @@
 			// 
 			this.comboBoxType.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
 			this.comboBoxType.FormattingEnabled = true;
-			this.comboBoxType.Location = new System.Drawing.Point(54, 13);
+			this.comboBoxType.Location = new System.Drawing.Point(59, 13);
 			this.comboBoxType.Name = "comboBoxType";
 			this.comboBoxType.Size = new System.Drawing.Size(93, 21);
 			this.comboBoxType.TabIndex = 2;
@@ -107,7 +110,7 @@
 			this.tableLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
 			this.tableLayoutPanel.Controls.Add(this.buttonOK, 0, 0);
 			this.tableLayoutPanel.Controls.Add(this.buttonCancel, 1, 0);
-			this.tableLayoutPanel.Location = new System.Drawing.Point(11, 93);
+			this.tableLayoutPanel.Location = new System.Drawing.Point(11, 116);
 			this.tableLayoutPanel.Name = "tableLayoutPanel";
 			this.tableLayoutPanel.RowCount = 1;
 			this.tableLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
@@ -141,11 +144,40 @@
 			// labelInfo
 			// 
 			this.labelInfo.AutoSize = true;
-			this.labelInfo.Location = new System.Drawing.Point(51, 65);
+			this.labelInfo.Location = new System.Drawing.Point(56, 88);
 			this.labelInfo.Name = "labelInfo";
 			this.labelInfo.Size = new System.Drawing.Size(246, 13);
 			this.labelInfo.TabIndex = 8;
 			this.labelInfo.Text = "(the filter should be a valid regular expression)";
+			// 
+			// checkBoxTargetPath
+			// 
+			this.checkBoxTargetPath.AutoSize = true;
+			this.checkBoxTargetPath.Location = new System.Drawing.Point(59, 40);
+			this.checkBoxTargetPath.Name = "checkBoxTargetPath";
+			this.checkBoxTargetPath.Size = new System.Drawing.Size(93, 17);
+			this.checkBoxTargetPath.TabIndex = 9;
+			this.checkBoxTargetPath.Text = "Relative path";
+			this.checkBoxTargetPath.UseVisualStyleBackColor = true;
+			// 
+			// labelTarget
+			// 
+			this.labelTarget.AutoSize = true;
+			this.labelTarget.Location = new System.Drawing.Point(12, 41);
+			this.labelTarget.Name = "labelTarget";
+			this.labelTarget.Size = new System.Drawing.Size(41, 13);
+			this.labelTarget.TabIndex = 10;
+			this.labelTarget.Text = "Target:";
+			// 
+			// checkBoxTargetBranch
+			// 
+			this.checkBoxTargetBranch.AutoSize = true;
+			this.checkBoxTargetBranch.Location = new System.Drawing.Point(167, 40);
+			this.checkBoxTargetBranch.Name = "checkBoxTargetBranch";
+			this.checkBoxTargetBranch.Size = new System.Drawing.Size(93, 17);
+			this.checkBoxTargetBranch.TabIndex = 11;
+			this.checkBoxTargetBranch.Text = "Branch name";
+			this.checkBoxTargetBranch.UseVisualStyleBackColor = true;
 			// 
 			// FilterForm
 			// 
@@ -153,7 +185,10 @@
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.CancelButton = this.buttonCancel;
-			this.ClientSize = new System.Drawing.Size(539, 128);
+			this.ClientSize = new System.Drawing.Size(539, 151);
+			this.Controls.Add(this.checkBoxTargetBranch);
+			this.Controls.Add(this.labelTarget);
+			this.Controls.Add(this.checkBoxTargetPath);
 			this.Controls.Add(this.labelInfo);
 			this.Controls.Add(this.tableLayoutPanel);
 			this.Controls.Add(this.buttonColor);
@@ -188,5 +223,8 @@
 		private System.Windows.Forms.Button buttonOK;
 		private System.Windows.Forms.Button buttonCancel;
 		private System.Windows.Forms.Label labelInfo;
+		private System.Windows.Forms.CheckBox checkBoxTargetPath;
+		private System.Windows.Forms.Label labelTarget;
+		private System.Windows.Forms.CheckBox checkBoxTargetBranch;
 	}
 }

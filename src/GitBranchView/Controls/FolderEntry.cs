@@ -53,7 +53,8 @@ namespace GitBranchView.Controls
 		{
 			HighlightColor = Root.Filters
 				.Where(filter => filter.Type == FilterType.Highlight)
-				.Where(filter => Regex.IsMatch(Path.RelativeTo(Root), filter.Filter))
+				.Where(filter => filter.Target.HasFlag(FilterTargets.Path) && Regex.IsMatch(Path.RelativeTo(Root), filter.Filter)
+					|| filter.Target.HasFlag(FilterTargets.Branch) && Regex.IsMatch(Branch, filter.Filter))
 				.Select(filter => (Color?) filter.Color)
 				.FirstOrDefault();
 		}

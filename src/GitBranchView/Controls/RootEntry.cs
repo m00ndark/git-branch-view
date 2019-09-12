@@ -79,10 +79,11 @@ namespace GitBranchView.Controls
 					{
 						Parallel.ForEach(Root.Path.ScanFolder(), folder =>
 							{
-								if (!Root.ShouldInclude(folder))
+								Git.TryGetBranch(Root, folder, out string branch, out int trackedChanges, out int untrackedChanges, out string[] errors);
+
+								if (!Root.ShouldInclude(folder, branch))
 									return;
 
-								Git.TryGetBranch(Root, folder, out string branch, out int trackedChanges, out int untrackedChanges, out string[] errors);
 								gitRepositories.Add((folder, branch, trackedChanges, untrackedChanges, errors));
 
 								this.InvokeIfRequired(() =>

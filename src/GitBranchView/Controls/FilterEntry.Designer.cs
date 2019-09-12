@@ -33,17 +33,19 @@
 			this.buttonDelete = new System.Windows.Forms.Button();
 			this.buttonMoveUp = new System.Windows.Forms.Button();
 			this.buttonMoveDown = new System.Windows.Forms.Button();
-			this.labelType = new System.Windows.Forms.Label();
+			this.labelTypeAndTarget = new System.Windows.Forms.Label();
 			this.SuspendLayout();
 			// 
 			// labelFilter
 			// 
-			this.labelFilter.AutoSize = true;
+			this.labelFilter.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+			this.labelFilter.AutoEllipsis = true;
 			this.labelFilter.BackColor = System.Drawing.Color.Transparent;
 			this.labelFilter.Location = new System.Drawing.Point(139, 4);
-			this.labelFilter.Margin = new System.Windows.Forms.Padding(10, 0, 3, 0);
+			this.labelFilter.Margin = new System.Windows.Forms.Padding(10, 0, 10, 0);
 			this.labelFilter.Name = "labelFilter";
-			this.labelFilter.Size = new System.Drawing.Size(33, 13);
+			this.labelFilter.Size = new System.Drawing.Size(330, 13);
 			this.labelFilter.TabIndex = 9;
 			this.labelFilter.Text = "Filter";
 			// 
@@ -110,24 +112,24 @@
 			this.buttonMoveDown.UseVisualStyleBackColor = true;
 			this.buttonMoveDown.Click += new System.EventHandler(this.ButtonMoveDown_Click);
 			// 
-			// labelType
+			// labelTypeAndTarget
 			// 
-			this.labelType.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.labelType.AutoSize = true;
-			this.labelType.BackColor = System.Drawing.Color.Transparent;
-			this.labelType.Location = new System.Drawing.Point(482, 4);
-			this.labelType.Margin = new System.Windows.Forms.Padding(3, 0, 7, 0);
-			this.labelType.Name = "labelType";
-			this.labelType.Size = new System.Drawing.Size(56, 13);
-			this.labelType.TabIndex = 13;
-			this.labelType.Text = "Highlight";
+			this.labelTypeAndTarget.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+			this.labelTypeAndTarget.AutoSize = true;
+			this.labelTypeAndTarget.BackColor = System.Drawing.Color.Transparent;
+			this.labelTypeAndTarget.Location = new System.Drawing.Point(482, 4);
+			this.labelTypeAndTarget.Margin = new System.Windows.Forms.Padding(3, 0, 7, 0);
+			this.labelTypeAndTarget.Name = "labelTypeAndTarget";
+			this.labelTypeAndTarget.Size = new System.Drawing.Size(56, 13);
+			this.labelTypeAndTarget.TabIndex = 13;
+			this.labelTypeAndTarget.Text = "Highlight";
 			// 
 			// FilterEntry
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.BackColor = System.Drawing.SystemColors.Window;
-			this.Controls.Add(this.labelType);
+			this.Controls.Add(this.labelTypeAndTarget);
 			this.Controls.Add(this.buttonMoveDown);
 			this.Controls.Add(this.buttonMoveUp);
 			this.Controls.Add(this.linkLabelEdit);
@@ -150,6 +152,6 @@
 		private System.Windows.Forms.LinkLabel linkLabelEdit;
 		private System.Windows.Forms.Button buttonMoveUp;
 		private System.Windows.Forms.Button buttonMoveDown;
-		private System.Windows.Forms.Label labelType;
+		private System.Windows.Forms.Label labelTypeAndTarget;
 	}
 }

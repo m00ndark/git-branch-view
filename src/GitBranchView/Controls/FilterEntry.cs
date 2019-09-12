@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Drawing;
 using System.Drawing.Drawing2D;
+using System.Linq;
 using System.Windows.Forms;
 using GitBranchView.Forms;
 using GitBranchView.Model;
@@ -103,9 +104,10 @@ namespace GitBranchView.Controls
 
 		private void UpdateInfo()
 		{
-			labelType.Text = Filter.Type.ToString();
-			labelType.Left = Width - labelType.Width - labelType.Margin.Right;
+			labelTypeAndTarget.Text = string.Join(" | ", Filter.Target.GetFlagValues().Select(x => x.ToString()).Append(Filter.Type.ToString()));
+			labelTypeAndTarget.Left = Width - labelTypeAndTarget.Width - labelTypeAndTarget.Margin.Right;
 			labelFilter.Text = Filter.Filter;
+			labelFilter.Width = labelTypeAndTarget.Left - labelTypeAndTarget.Margin.Left - labelFilter.Margin.Right - labelFilter.Left;
 		}
 
 		private void RaiseActionEvent(EntryAction action)

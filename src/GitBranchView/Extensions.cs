@@ -73,11 +73,12 @@ namespace GitBranchView
 				: path.Substring(root.Path.Length + 1);
 		}
 
-		public static bool ShouldInclude(this Root root, string path)
+		public static bool ShouldInclude(this Root root, string path, string branch)
 		{
 			return root.Filters
 				.Where(filter => filter.Type == FilterType.Include || filter.Type == FilterType.Exclude)
-				.Aggregate(true, (include, filter) => Regex.IsMatch(path.RelativeTo(root), filter.Filter) ? filter.Type == FilterType.Include : include);
+				.Aggregate(true, (include, filter) => filter.Target.HasFlag(FilterTargets.Path) && Regex.IsMatch(path.RelativeTo(root), filter.Filter)
+					|| filter.Target.HasFlag(FilterTargets.Branch) && Regex.IsMatch(branch, filter.Filter) ? filter.Type == FilterType.Include : include);
 		}
 
 		public static IEnumerable<string> ScanFolder(this string path)
@@ -94,6 +95,14 @@ namespace GitBranchView
 						yield return validSubPath;
 				}
 			}
+		}
+
+		public static IEnumerable<T> GetFlagValues<T>(this T target) where T : Enum
+		{
+			return Enum.GetValues(typeof(T))
+				.Cast<T>()
+				.Where(x => Convert.ToInt32(x) > 0)
+				.Where(x => target.HasFlag(x));
 		}
 	}
 }
