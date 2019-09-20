@@ -4,12 +4,15 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
+using System.Windows.Forms;
 using GitBranchView.Model;
 
 namespace GitBranchView
 {
 	public static class Extensions
 	{
+		public const string ROOT_PATH_RELATIVE = "/";
+
 		public static string GetVersion(this Assembly assembly)
 		{
 			return assembly.GetName().Version.ToString();
@@ -66,11 +69,13 @@ namespace GitBranchView
 			return true;
 		}
 
-		public static string RelativeTo(this string path, Root root)
+		public static string RelativeTo(this string path, Root root) => path.RelativeTo(root.Path);
+
+		public static string RelativeTo(this string path, string rootPath)
 		{
-			return root.Path.Length >= path.Length
-				? "/"
-				: path.Substring(root.Path.Length + 1);
+			return rootPath.Length >= path.Length
+				? ROOT_PATH_RELATIVE
+				: path.Substring(rootPath.Length + 1);
 		}
 
 		public static bool ShouldInclude(this Root root, string path, string branch)
@@ -97,12 +102,125 @@ namespace GitBranchView
 			}
 		}
 
+		public static bool IsValidRegex(this string pattern, bool allowEmpty = false)
+		{
+			if (string.IsNullOrWhiteSpace(pattern))
+				return false;
+
+			try
+			{
+				// ReSharper disable once ReturnValueOfPureMethodIsNotUsed
+				Regex.IsMatch(string.Empty, pattern);
+			}
+			catch (ArgumentException)
+			{
+				return false;
+			}
+
+			return true;
+		}
+
 		public static IEnumerable<T> GetFlagValues<T>(this T target) where T : Enum
 		{
 			return Enum.GetValues(typeof(T))
 				.Cast<T>()
 				.Where(x => Convert.ToInt32(x) > 0)
 				.Where(x => target.HasFlag(x));
+		}
+
+		public static T AddItem<T>(this ContextMenuStrip contextMenuStrip, string text = null, EventHandler clickEventHandler = null, object tag = null, bool enabled = true)
+			where T : ToolStripItem, new() => contextMenuStrip.Items.Add<T>(text, clickEventHandler, tag, enabled);
+
+		public static T AddItem<T>(this ToolStripMenuItem toolStripMenuItem, string text = null, EventHandler clickEventHandler = null, object tag = null, bool enabled = true)
+			where T : ToolStripItem, new() => toolStripMenuItem.DropDownItems.Add<T>(text, clickEventHandler, tag, enabled);
+
+		public static T Add<T>(this ToolStripItemCollection items, string text = null, EventHandler clickEventHandler = null, object tag = null, bool enabled = true)
+			where T : ToolStripItem, new()
+		{
+			T menuItem = new T { Text = text, Tag = new ToolStripItemTag(clickEventHandler, tag), Enabled = enabled };
+			if (clickEventHandler != null) menuItem.Click += clickEventHandler;
+			items.Add(menuItem);
+			return menuItem;
+		}
+
+		public static T GetWhere<T>(this ToolStripItemCollection items, Func<T, bool> predicate) where T : ToolStripItem
+		{
+			foreach (ToolStripItem item in items)
+			{
+				if (item is ToolStripMenuItem menuItem)
+				{
+					T foundItem = menuItem.DropDownItems.GetWhere(predicate);
+
+					if (foundItem != null)
+						return foundItem;
+				}
+
+				if (item is T targetItem && predicate(targetItem))
+				{
+					return targetItem;
+				}
+			}
+
+			return null;
+		}
+
+		public static void SetWhere<T>(this ToolStripItemCollection items, Func<T, bool> predicate, Action<T> setter) where T : ToolStripItem
+		{
+			foreach (ToolStripItem item in items)
+			{
+				if (item is ToolStripMenuItem menuItem)
+				{
+					menuItem.DropDownItems.SetWhere(predicate, setter);
+				}
+
+				if (item is T targetItem && predicate(targetItem))
+				{
+					setter(targetItem);
+				}
+			}
+		}
+
+		public static void DisposeItems(this ToolStripItemCollection items)
+		{
+			foreach (IDisposable disposable in items.OfType<IDisposable>().ToArray())
+			{
+				if (disposable is ToolStripMenuItem menuItem)
+				{
+					menuItem.DropDownItems.DisposeItems();
+				}
+
+				if (disposable is ToolStripItem item && item.Tag is ToolStripItemTag tag && tag.ClickEventHandler != null)
+				{
+					item.Click -= tag.ClickEventHandler;
+				}
+
+				disposable.Dispose();
+			}
+		}
+
+		public static T GetItem<T>(this object obj) where T : ToolStripItem
+		{
+			return obj as T;
+		}
+
+		public static ToolStripItemTag GetTag(this object obj)
+		{
+			return (obj as ToolStripItem).GetTag();
+		}
+
+		public static ToolStripItemTag GetTag(this ToolStripItem item)
+		{
+			return item?.Tag as ToolStripItemTag;
+		}
+
+		public static T GetTagValue<T>(this object obj)
+		{
+			return (obj as ToolStripItem).GetTagValue<T>();
+		}
+
+		public static T GetTagValue<T>(this ToolStripItem item)
+		{
+			return item.GetTag()?.Value is T value ? value : default;
 		}
 	}
 }

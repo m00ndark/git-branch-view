@@ -69,19 +69,19 @@ namespace GitBranchView.Forms
 		{
 			if (comboBoxType.SelectedItem == null)
 			{
-				MessageBox.Show("Filter type not selected!", Program.GIT_BRANCH_VIEW, MessageBoxButtons.OK, MessageBoxIcon.Error);
+				Program.ShowError("Filter type not selected!");
 				return;
 			}
 
 			if (!checkBoxTargetPath.Checked && !checkBoxTargetBranch.Checked)
 			{
-				MessageBox.Show("Filter target not selected!", Program.GIT_BRANCH_VIEW, MessageBoxButtons.OK, MessageBoxIcon.Error);
+				Program.ShowError("Filter target not selected!");
 				return;
 			}
 
-			if (!IsValidRegex(textBoxFilter.Text))
+			if (!textBoxFilter.Text.IsValidRegex())
 			{
-				MessageBox.Show("Filter not a valid regular expression!", Program.GIT_BRANCH_VIEW, MessageBoxButtons.OK, MessageBoxIcon.Error);
+				Program.ShowError("Filter not a valid regular expression!");
 				return;
 			}
 
@@ -98,24 +98,6 @@ namespace GitBranchView.Forms
 		{
 			DialogResult = DialogResult.Cancel;
 			Close();
-		}
-
-		private static bool IsValidRegex(string pattern)
-		{
-			if (string.IsNullOrWhiteSpace(pattern))
-				return false;
-
-			try
-			{
-				// ReSharper disable once ReturnValueOfPureMethodIsNotUsed
-				Regex.IsMatch("", pattern);
-			}
-			catch (ArgumentException)
-			{
-				return false;
-			}
-
-			return true;
 		}
 	}
 }

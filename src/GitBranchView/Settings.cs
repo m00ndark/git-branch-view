@@ -9,6 +9,19 @@ using Newtonsoft.Json.Converters;
 
 namespace GitBranchView
 {
+	public enum QuickLaunchFilesGrouping
+	{
+		None,
+		ByExtension,
+		ByPath
+	}
+
+	public enum RepositoryLinkBehavior
+	{
+		ExecuteCustomCommand,
+		LaunchSelectedQuickLaunchFile
+	}
+
 	public class Settings
 	{
 		public const string PATH_IDENTIFIER = "<path>";
@@ -20,8 +33,20 @@ namespace GitBranchView
 		[DefaultValue(@"C:\Windows\system32\cmd.exe")]
 		public string CommandPath { get; set; }
 
-		[DefaultValue(@"/k cd <path>")]
+		[DefaultValue("/k cd <path>")]
 		public string CommandArgs { get; set; }
+
+		[DefaultValue("Open Command Prompt")]
+		public string CommandName { get; set; }
+
+		[DefaultValue(".sln")]
+		public string QuickLaunchFilesFilter { get; set; }
+
+		[DefaultValue(QuickLaunchFilesGrouping.ByExtension)]
+		public QuickLaunchFilesGrouping QuickLaunchFilesGrouping { get; set; }
+
+		[DefaultValue(RepositoryLinkBehavior.ExecuteCustomCommand)]
+		public RepositoryLinkBehavior RepositoryLinkBehavior { get; set; }
 
 		[DefaultValue(@"C:\Program Files\Git\bin\git.exe")]
 		public string GitPath { get; set; }
@@ -51,6 +76,9 @@ namespace GitBranchView
 
 		[DefaultValue(null)]
 		public string SelectedRootPath { get; set; }
+
+		[JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
+		public Dictionary<string, string> SelectedQuickLaunchFiles { get; set; } = new Dictionary<string, string>();
 
 		// ---------------------------------------------------------------------
 

@@ -41,5 +41,20 @@ namespace GitBranchView
 				Logger.Terminate();
 			}
 		}
+
+		public static DialogResult ShowInfo(string message, MessageBoxButtons buttons = MessageBoxButtons.OK)
+		{
+			return MessageBox.Show(message, GIT_BRANCH_VIEW, buttons, MessageBoxIcon.Information);
+		}
+
+		public static DialogResult ShowQuestion(string message, MessageBoxButtons buttons = MessageBoxButtons.YesNo)
+		{
+			return MessageBox.Show(message, GIT_BRANCH_VIEW, buttons, MessageBoxIcon.Question);
+		}
+
+		public static DialogResult ShowError(string message, MessageBoxButtons buttons = MessageBoxButtons.OK)
+		{
+			return MessageBox.Show(message, GIT_BRANCH_VIEW, buttons, MessageBoxIcon.Error);
+		}
 	}
 }

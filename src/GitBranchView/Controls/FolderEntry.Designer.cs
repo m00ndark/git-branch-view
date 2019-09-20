@@ -54,7 +54,7 @@
 			this.linkLabelFolder.TabStop = true;
 			this.linkLabelFolder.Text = "Folder";
 			this.linkLabelFolder.VisitedLinkColor = System.Drawing.SystemColors.HotTrack;
-			this.linkLabelFolder.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.LinkLabelPath_LinkClicked);
+			this.linkLabelFolder.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.LinkLabelFolder_LinkClicked);
 			// 
 			// labelBranch
 			// 

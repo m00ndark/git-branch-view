@@ -180,11 +180,11 @@ namespace GitBranchView.Controls
 			}
 		}
 
-		public void GitContextMenuCommandsChanged()
+		public void ResetContextMenus()
 		{
 			foreach (FolderEntry folderEntry in flowLayoutPanel.Controls.OfType<FolderEntry>())
 			{
-				folderEntry.GitContextMenuCommandsChanged();
+				folderEntry.ResetContextMenu();
 			}
 		}
 	}

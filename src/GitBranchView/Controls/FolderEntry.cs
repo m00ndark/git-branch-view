@@ -44,6 +44,8 @@ namespace GitBranchView.Controls
 		public string[] Errors { get; private set; }
 		private Color? HighlightColor { get; set; }
 
+		public Func<ToolStripMenuItem, bool> IsQuickLaunchPathMenuItem => x => x.GetTag()?.ClickEventHandler == QuickLaunchPathMenuItem_Click;
+
 		private void RaiseWidthChanged()
 		{
 			WidthChanged?.Invoke(this, EventArgs.Empty);
@@ -126,15 +128,86 @@ namespace GitBranchView.Controls
 			labelChanges.Anchor = AnchorStyles.Top | AnchorStyles.Right;
 		}
 
+		public void ResetContextMenu()
+		{
+			contextMenuStrip.InvokeIfRequired(() =>
+				{
+					contextMenuStrip.Items.DisposeItems();
+					contextMenuStrip.Items.Clear();
+
+					if (!string.IsNullOrWhiteSpace(Settings.Default.QuickLaunchFilesFilter))
+					{
+						List<IGrouping<string, string>> groupedQuickLaunchPaths = Directory.EnumerateFiles(Path, "*", SearchOption.AllDirectories)
+							.Where(filePath => Regex.IsMatch(filePath.RelativeTo(Path), Settings.Default.QuickLaunchFilesFilter, RegexOptions.IgnoreCase))
+							.GroupBy(filePath => Settings.Default.QuickLaunchFilesGrouping == QuickLaunchFilesGrouping.ByExtension
+								? System.IO.Path.GetExtension(filePath)
+								: Settings.Default.QuickLaunchFilesGrouping == QuickLaunchFilesGrouping.ByPath
+									? System.IO.Path.GetDirectoryName(filePath)?.RelativeTo(Path) ?? string.Empty
+									: string.Empty)
+							.ToList();
+
+						if (groupedQuickLaunchPaths.Any())
+						{
+							Settings.Default.SelectedQuickLaunchFiles.TryGetValue(Path.ToLower(), out string selectedQuickLaunchPath);
+
+							foreach (IGrouping<string, string> quickLaunchPaths in groupedQuickLaunchPaths)
+							{
+								ToolStripItemCollection menuItems = contextMenuStrip.Items;
+
+								if (groupedQuickLaunchPaths.Count > 1
+									&& Settings.Default.QuickLaunchFilesGrouping != QuickLaunchFilesGrouping.None
+									&& quickLaunchPaths.Key != Extensions.ROOT_PATH_RELATIVE)
+								{
+									menuItems = Settings.Default.QuickLaunchFilesGrouping == QuickLaunchFilesGrouping.ByExtension
+										? contextMenuStrip.AddItem<ToolStripMenuItem>($"Extension: {quickLaunchPaths.Key.Replace(".", string.Empty)}").DropDownItems
+										: contextMenuStrip.AddItem<ToolStripMenuItem>(quickLaunchPaths.Key).DropDownItems;
+								}
+
+								foreach (string quickLaunchPath in quickLaunchPaths)
+								{
+									string menuItemText = groupedQuickLaunchPaths.Count > 1 && Settings.Default.QuickLaunchFilesGrouping == QuickLaunchFilesGrouping.ByPath
+										? System.IO.Path.GetFileName(quickLaunchPath)
+										: quickLaunchPath.RelativeTo(Path);
+
+									ToolStripMenuItem item = menuItems.Add<ToolStripMenuItem>(menuItemText, QuickLaunchPathMenuItem_Click, quickLaunchPath);
+
+									if (Settings.Default.RepositoryLinkBehavior == RepositoryLinkBehavior.LaunchSelectedQuickLaunchFile
+										&& (selectedQuickLaunchPath?.Equals(quickLaunchPath, StringComparison.InvariantCultureIgnoreCase) ?? false))
+									{
+										item.Checked = true;
+									}
+								}
+							}
+
+							contextMenuStrip.AddItem<ToolStripSeparator>();
+						}
+					}
+
+					contextMenuStrip.AddItem<ToolStripMenuItem>(MENU_ITEM_REFRESH, RefreshMenuItem_Click);
+
+					if (Settings.Default.RepositoryLinkBehavior == RepositoryLinkBehavior.LaunchSelectedQuickLaunchFile)
+					{
+						contextMenuStrip.AddItem<ToolStripSeparator>();
+						contextMenuStrip.AddItem<ToolStripMenuItem>(Settings.Default.CommandName, CustomCommandMenuItem_Click);
+					}
+
+					if (Settings.Default.GitContextMenuCommands.Any())
+					{
+						contextMenuStrip.AddItem<ToolStripSeparator>();
+
+						foreach (GitContextMenuCommand gitCommand in Settings.Default.GitContextMenuCommands
+							.Where(x => !string.IsNullOrWhiteSpace(x.Caption) && !string.IsNullOrWhiteSpace(x.Command)))
+						{
+							contextMenuStrip.AddItem<ToolStripMenuItem>(gitCommand.Caption, GitCommand_Click, gitCommand);
+						}
+					}
+				});
+		}
+
 		public void HighlightChanged()
 		{
 			SetHighlightColor();
 			Refresh();
-		}
-
-		public void GitContextMenuCommandsChanged()
-		{
-			ResetContextMenu();
 		}
 
 		private void ButtonMore_Click(object sender, EventArgs e)
@@ -143,20 +216,23 @@ namespace GitBranchView.Controls
 			contextMenuStrip.Show(position);
 		}
 
-		private void LinkLabelPath_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+		private void LinkLabelFolder_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
 		{
-			string commandPath = Settings.Default.CommandPath;
-			string commandArgs = Settings.Default.CommandArgs.Replace(Settings.PATH_IDENTIFIER, Path);
-			try
+			if (Settings.Default.RepositoryLinkBehavior == RepositoryLinkBehavior.LaunchSelectedQuickLaunchFile)
 			{
-				using (Process.Start(new ProcessStartInfo { FileName = commandPath, Arguments = commandArgs })) { }
+				ToolStripMenuItem item = contextMenuStrip.Items.GetWhere<ToolStripMenuItem>(x => IsQuickLaunchPathMenuItem(x) && x.Checked);
+
+				if (item == null)
+				{
+					Program.ShowInfo("Git repository link is configured to execute the selected quick launch file but no file has been selected.");
+					return;
+				}
+
+				ExecuteQuickLaunchFile(item);
 			}
-			catch (Exception ex)
+			else
 			{
-				MessageBox.Show("Failed to start link command;"
-					+ Environment.NewLine + ex.Message + Environment.NewLine
-					+ Environment.NewLine + $"Path: {commandPath}"
-					+ Environment.NewLine + $"Args: {commandArgs}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+				ExecuteCustomCommand();
 			}
 		}
 
@@ -165,28 +241,70 @@ namespace GitBranchView.Controls
 			new ErrorForm(Errors.Select((error, i) => i == 0 ? $"{Path}> {error}" : error)).Show(this);
 		}
 
-		private static void SolutionPathMenuItem_Click(object sender, EventArgs e)
+		private void QuickLaunchPathMenuItem_Click(object sender, EventArgs e)
 		{
-			if (!(sender is ToolStripMenuItem menuItem))
+			ToolStripMenuItem item = sender.GetItem<ToolStripMenuItem>();
+
+			if (item == null)
 				return;
 
-			string solutionPath = menuItem.Tag.ToString();
+			if (Settings.Default.RepositoryLinkBehavior == RepositoryLinkBehavior.LaunchSelectedQuickLaunchFile)
+			{
+				contextMenuStrip.Items.SetWhere(IsQuickLaunchPathMenuItem, x => x.Checked = false);
 
-			try
-			{
-				using (Process.Start(solutionPath)) { }
+				item.Checked = true;
+				Settings.Default.SelectedQuickLaunchFiles[Path.ToLower()] = item.GetTagValue<string>()?.ToLower();
+				Settings.Default.Save();
 			}
-			catch (Exception ex)
+			else
 			{
-				MessageBox.Show("Failed to open solution;"
-					+ Environment.NewLine + ex.Message + Environment.NewLine
-					+ Environment.NewLine + $"File: {solutionPath}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+				ExecuteQuickLaunchFile(item);
 			}
 		}
 
 		private async void RefreshMenuItem_Click(object sender, EventArgs e)
 		{
 			await RefreshInfo(resetRemoteStatus: true);
+		}
+
+		private void CustomCommandMenuItem_Click(object sender, EventArgs e)
+		{
+			ExecuteCustomCommand();
+		}
+
+		private async void GitCommand_Click(object sender, EventArgs eventArgs)
+		{
+			GitContextMenuCommand gitCommand = sender.GetTagValue<GitContextMenuCommand>();
+
+			if (gitCommand == null)
+				return;
+
+			string command = gitCommand.Command.Replace(Settings.BRANCH_IDENTIFIER, Branch);
+
+			bool success = await Task.Run(() =>
+				{
+					try
+					{
+						if (!Git.ExecuteCommand(Root, Path, command))
+						{
+							Program.ShowError($"Failed to execute Git command '{command}'." + Environment.NewLine
+								+ Environment.NewLine + $"Path: {Path}");
+
+							return false;
+						}
+					}
+					catch (Exception ex)
+					{
+						Program.ShowError($"Failed to execute Git command '{command}';"
+							+ Environment.NewLine + ex.Message + Environment.NewLine
+							+ Environment.NewLine + $"Path: {Path}");
+					}
+
+					return true;
+				});
+
+			if (success)
+				await RefreshInfo(resetRemoteStatus: false);
 		}
 
 		private async Task RefreshInfo(bool resetRemoteStatus)
@@ -207,77 +325,46 @@ namespace GitBranchView.Controls
 			}
 			catch (Exception ex)
 			{
-				MessageBox.Show("Failed to get branch and status;"
+				Program.ShowError("Failed to get branch and status;"
 					+ Environment.NewLine + ex.Message + Environment.NewLine
-					+ Environment.NewLine + $"Path: {Path}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+					+ Environment.NewLine + $"Path: {Path}");
 			}
 		}
 
-		private void ResetContextMenu()
+		private static void ExecuteQuickLaunchFile(ToolStripItem item)
 		{
-			contextMenuStrip.InvokeIfRequired(() =>
-				{
-					DisposeItems(contextMenuStrip.Items);
-					contextMenuStrip.Items.Clear();
+			string quickLaunchPath = item.GetTagValue<string>();
 
-					List<string> solutionPaths = Directory.EnumerateFiles(Path, "*.sln", SearchOption.AllDirectories).ToList();
-
-					if (solutionPaths.Count > 0)
-					{
-						foreach (string solutionPath in solutionPaths)
-						{
-							AddMenuItem<ToolStripMenuItem>(solutionPath.Substring(Path.Length + 1), SolutionPathMenuItem_Click, solutionPath);
-						}
-
-						AddMenuItem<ToolStripSeparator>();
-					}
-
-					AddMenuItem<ToolStripMenuItem>(MENU_ITEM_REFRESH, RefreshMenuItem_Click);
-
-					if (Settings.Default.GitContextMenuCommands.Any())
-					{
-						AddMenuItem<ToolStripSeparator>();
-
-						foreach (GitContextMenuCommand gitCommand in Settings.Default.GitContextMenuCommands
-							.Where(x => !string.IsNullOrWhiteSpace(x.Caption) && !string.IsNullOrWhiteSpace(x.Command)))
-						{
-							AddMenuItem<ToolStripMenuItem>(gitCommand.Caption, GitCommand_Click, gitCommand);
-						}
-					}
-				});
-		}
-
-		private async void GitCommand_Click(object sender, EventArgs eventArgs)
-		{
-			if (!((sender as ToolStripMenuItem)?.Tag is GitContextMenuCommand gitCommand))
+			if (quickLaunchPath == null)
 				return;
 
-			string command = gitCommand.Command.Replace(Settings.BRANCH_IDENTIFIER, Branch);
+			try
+			{
+				using (Process.Start(quickLaunchPath)) { }
+			}
+			catch (Exception ex)
+			{
+				Program.ShowError("Failed to open file;"
+					+ Environment.NewLine + ex.Message + Environment.NewLine
+					+ Environment.NewLine + $"File: {quickLaunchPath}");
+			}
+		}
 
-			bool success = await Task.Run(() =>
-				{
-					try
-					{
-						if (!Git.ExecuteCommand(Root, Path, command))
-						{
-							MessageBox.Show($"Failed to execute Git command '{command}'." + Environment.NewLine
-								+ Environment.NewLine + $"Path: {Path}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-
-							return false;
-						}
-					}
-					catch (Exception ex)
-					{
-						MessageBox.Show($"Failed to execute Git command '{command}';"
-							+ Environment.NewLine + ex.Message + Environment.NewLine
-							+ Environment.NewLine + $"Path: {Path}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-					}
-
-					return true;
-				});
-
-			if (success)
-				await RefreshInfo(resetRemoteStatus: false);
+		private void ExecuteCustomCommand()
+		{
+			string commandPath = Settings.Default.CommandPath;
+			string commandArgs = Settings.Default.CommandArgs.Replace(Settings.PATH_IDENTIFIER, Path);
+			try
+			{
+				using (Process.Start(new ProcessStartInfo { FileName = commandPath, Arguments = commandArgs })) { }
+			}
+			catch (Exception ex)
+			{
+				Program.ShowError("Failed to start custom command;"
+					+ Environment.NewLine + ex.Message + Environment.NewLine
+					+ Environment.NewLine + $"Path: {commandPath}"
+					+ Environment.NewLine + $"Args: {commandArgs}");
+			}
 		}
 
 		private void CheckRemoteBranchExistance()
@@ -306,31 +393,10 @@ namespace GitBranchView.Controls
 			}
 			catch (Exception ex)
 			{
-				MessageBox.Show("Failed to check remote branch existence;"
+				Program.ShowError("Failed to check remote branch existence;"
 					+ Environment.NewLine + ex.Message + Environment.NewLine
-					+ Environment.NewLine + $"Path: {Path}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+					+ Environment.NewLine + $"Path: {Path}");
 			}
-		}
-
-		private void DisposeItems(IEnumerable items)
-		{
-			foreach (IDisposable disposable in items.OfType<IDisposable>().ToArray())
-			{
-				if (disposable is ToolStripMenuItem item)
-				{
-					DisposeItems(item.DropDownItems);
-					item.Click -= GitCommand_Click;
-				}
-
-				disposable.Dispose();
-			}
-		}
-
-		private void AddMenuItem<T>(string text = null, EventHandler eventHandler = null, object tag = null, bool enabled = true) where T : ToolStripItem, new()
-		{
-			T checkoutMasterMenuItem = new T { Text = text, Tag = tag, Enabled = enabled };
-			if (eventHandler != null) checkoutMasterMenuItem.Click += eventHandler;
-			contextMenuStrip.Items.Add(checkoutMasterMenuItem);
 		}
 
 		public static Font WithStyle(Font font, FontStyle style) => new Font(font, font.Style | style);

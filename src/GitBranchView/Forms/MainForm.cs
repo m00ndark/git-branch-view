@@ -45,9 +45,9 @@ namespace GitBranchView.Forms
 						{
 							RootFolderHighlightChanged();
 						}
-						if (e.GitCommandsChanged)
+						if (e.QuickLaunchFilesChanged || e.RepositoryLinkBehaviorChanged || e.GitCommandsChanged)
 						{
-							GitContextMenuCommandsChanged();
+							ResetContextMenus();
 						}
 					}
 				});
@@ -149,11 +149,11 @@ namespace GitBranchView.Forms
 			}
 		}
 
-		private void GitContextMenuCommandsChanged()
+		private void ResetContextMenus()
 		{
 			foreach (RootEntry rootEntry in flowLayoutPanel.Controls.OfType<RootEntry>())
 			{
-				rootEntry.GitContextMenuCommandsChanged();
+				rootEntry.ResetContextMenus();
 			}
 		}
 
