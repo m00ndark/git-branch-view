@@ -74,6 +74,9 @@ namespace GitBranchView
 		[DefaultValue(true)]
 		public bool EnableRemoteBranchLookup { get; set; }
 
+		[DefaultValue(true)]
+		public bool ShowGitCommandOutput { get; set; }
+
 		[DefaultValue(null)]
 		public string SelectedRootPath { get; set; }
 

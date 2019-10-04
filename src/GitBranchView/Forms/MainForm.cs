@@ -92,9 +92,7 @@ namespace GitBranchView.Forms
 			if ((int) Opacity == 0 && _formClosedAt.AddMilliseconds(500) < DateTime.Now)
 			{
 				_lastShowPosition = MousePosition;
-				SetLocation();
-				Opacity = 1;
-				Show();
+				ShowForm();
 			}
 
 			try { NativeMethods.SetForegroundWindow(Handle); } catch { ; }
@@ -108,6 +106,10 @@ namespace GitBranchView.Forms
 		private void ToolStripMenuItemExit_Click(object sender, EventArgs e)
 		{
 			_settingsForm.TerminateForm();
+
+			foreach (RootEntry rootEntry in flowLayoutPanel.Controls.OfType<RootEntry>())
+				rootEntry.Terminate();
+
 			Application.Exit();
 		}
 
@@ -120,6 +122,16 @@ namespace GitBranchView.Forms
 			}
 
 			HideForm();
+		}
+
+		private void ShowForm()
+		{
+			if ((int) Opacity != 0)
+				return;
+
+			SetLocation();
+			Opacity = 1;
+			Show();
 		}
 
 		private void HideForm()
@@ -164,7 +176,11 @@ namespace GitBranchView.Forms
 				_isUpdatingRootFolders = true;
 
 				foreach (RootEntry rootEntry in flowLayoutPanel.Controls.OfType<RootEntry>())
+				{
 					rootEntry.SizeChanged -= RootEntry_SizeChanged;
+					rootEntry.ClonedSuccessfully -= RootEntry_ClonedSuccessfully;
+					rootEntry.Dispose();
+				}
 
 				flowLayoutPanel.Controls.Clear();
 				labelInfo.Visible = !Settings.Default.Roots.Any();
@@ -179,7 +195,11 @@ namespace GitBranchView.Forms
 				flowLayoutPanel.Controls.AddRange(rootEntries.ToArray<Control>());
 				rootEntries.FirstOrDefault()?.Focus();
 
-				rootEntries.ForEach(rootEntry => rootEntry.SizeChanged += RootEntry_SizeChanged);
+				foreach (RootEntry rootEntry in rootEntries)
+				{
+					rootEntry.SizeChanged += RootEntry_SizeChanged;
+					rootEntry.ClonedSuccessfully += RootEntry_ClonedSuccessfully;
+				}
 
 				await Task.WhenAll(rootEntries.Select(rootEntry => rootEntry.UpdateFolders()));
 			}
@@ -219,6 +239,11 @@ namespace GitBranchView.Forms
 			}
 
 			UpdateSize(rootEntries);
+		}
+
+		private void RootEntry_ClonedSuccessfully(object sender, EventArgs e)
+		{
+			this.InvokeIfRequired(ShowForm);
 		}
 
 		private void UpdateSize(List<RootEntry> rootEntries)

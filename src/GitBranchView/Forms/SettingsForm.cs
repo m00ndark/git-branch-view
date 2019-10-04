@@ -100,7 +100,7 @@ namespace GitBranchView.Forms
 				return;
 
 			e.Cancel = true;
-			Hide();
+			HideForm();
 		}
 
 		private void ButtonCustomCommandPathBrowse_Click(object sender, EventArgs e)
@@ -486,6 +486,7 @@ namespace GitBranchView.Forms
 			checkBoxStartWithWindows.Checked = _lastStartWithWindows = Settings.Default.StartWithWindows;
 			checkBoxEnableLogging.Checked = Settings.Default.EnableLogging;
 			textBoxGitExePath.Text = Settings.Default.GitPath;
+			checkBoxGitShowCommandOutput.Checked = Settings.Default.ShowGitCommandOutput;
 			checkBoxGitEnableRemoteBranchLookup.Checked = Settings.Default.EnableRemoteBranchLookup;
 
 			_gitCommands.ForEach(DisposeGitCommandEntry);
@@ -533,6 +534,7 @@ namespace GitBranchView.Forms
 			Settings.Default.StartWithWindows = checkBoxStartWithWindows.Checked;
 			Settings.Default.EnableLogging = checkBoxEnableLogging.Checked;
 			Settings.Default.GitPath = textBoxGitExePath.Text;
+			Settings.Default.ShowGitCommandOutput = checkBoxGitShowCommandOutput.Checked;
 			Settings.Default.EnableRemoteBranchLookup = checkBoxGitEnableRemoteBranchLookup.Checked;
 
 			Settings.Default.GitContextMenuCommands = _gitCommands

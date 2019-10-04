@@ -238,7 +238,7 @@ namespace GitBranchView.Controls
 
 		private void LinkLabelBranchError_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
 		{
-			new ErrorForm(Errors.Select((error, i) => i == 0 ? $"{Path}> {error}" : error)).Show(this);
+			new OutputForm(Errors, showInTaskbar: true).Show(this);
 		}
 
 		private void QuickLaunchPathMenuItem_Click(object sender, EventArgs e)
@@ -279,32 +279,57 @@ namespace GitBranchView.Controls
 			if (gitCommand == null)
 				return;
 
-			string command = gitCommand.Command.Replace(Settings.BRANCH_IDENTIFIER, Branch);
+			BeginExecutingGitCommand();
 
-			bool success = await Task.Run(() =>
+			(bool Success, string[] ErrorOutput) result;
+
+			try
+			{
+				string command = gitCommand.Command.Replace(Settings.BRANCH_IDENTIFIER, Branch);
+
+				if (Settings.Default.ShowGitCommandOutput)
 				{
-					try
+					using (OutputForm errorForm = new OutputForm(outputHandler =>
+						Root.SafeGitExecuteAsync(Path, command, outputHandler.AddLine),
+						showInTaskbar: true))
 					{
-						if (!Git.ExecuteCommand(Root, Path, command))
-						{
-							Program.ShowError($"Failed to execute Git command '{command}'." + Environment.NewLine
-								+ Environment.NewLine + $"Path: {Path}");
-
-							return false;
-						}
+						errorForm.ShowDialog(this);
+						result = errorForm.OperationResult;
 					}
-					catch (Exception ex)
-					{
-						Program.ShowError($"Failed to execute Git command '{command}';"
-							+ Environment.NewLine + ex.Message + Environment.NewLine
-							+ Environment.NewLine + $"Path: {Path}");
-					}
+				}
+				else
+				{
+					result = await Root.SafeGitExecuteAsync(Path, command);
+				}
+			}
+			finally
+			{
+				DoneExecutingGitCommand();
+			}
 
-					return true;
-				});
-
-			if (success)
+			if (result.Success)
+			{
 				await RefreshInfo(resetRemoteStatus: false);
+			}
+			else if (!Settings.Default.ShowGitCommandOutput)
+			{
+				using (OutputForm errorForm = new OutputForm(result.ErrorOutput, showInTaskbar: true))
+				{
+					errorForm.ShowDialog(this);
+				}
+			}
+		}
+
+		private void BeginExecutingGitCommand()
+		{
+			buttonMore.Visible = false;
+			pictureBoxProgress.Visible = true;
+		}
+
+		private void DoneExecutingGitCommand()
+		{
+			buttonMore.Visible = true;
+			pictureBoxProgress.Visible = false;
 		}
 
 		private async Task RefreshInfo(bool resetRemoteStatus)

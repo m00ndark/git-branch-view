@@ -55,7 +55,6 @@
 			this.buttonCustomCommandPathBrowse = new System.Windows.Forms.Button();
 			this.labelCustomCommandPath = new System.Windows.Forms.Label();
 			this.tabPageGit = new System.Windows.Forms.TabPage();
-			this.checkBoxGitShowCommandOutput = new System.Windows.Forms.CheckBox();
 			this.checkBoxGitEnableRemoteBranchLookup = new System.Windows.Forms.CheckBox();
 			this.groupBoxGitContextMenuCommands = new System.Windows.Forms.GroupBox();
 			this.panelScrollGitContextMenuCommands = new System.Windows.Forms.Panel();
@@ -77,6 +76,7 @@
 			this.buttonCancel = new System.Windows.Forms.Button();
 			this.tableLayoutPanelButtons = new System.Windows.Forms.TableLayoutPanel();
 			this.buttonApply = new System.Windows.Forms.Button();
+			this.checkBoxGitShowCommandOutput = new System.Windows.Forms.CheckBox();
 			this.tabControl.SuspendLayout();
 			this.tabPageGeneral.SuspendLayout();
 			this.tableLayoutPanelGeneral.SuspendLayout();
@@ -105,7 +105,7 @@
 			this.tabControl.Margin = new System.Windows.Forms.Padding(0);
 			this.tabControl.Name = "tabControl";
 			this.tabControl.SelectedIndex = 0;
-			this.tabControl.Size = new System.Drawing.Size(688, 392);
+			this.tabControl.Size = new System.Drawing.Size(688, 415);
 			this.tabControl.TabIndex = 0;
 			// 
 			// tabPageGeneral
@@ -397,13 +397,14 @@
 			// 
 			// tabPageGit
 			// 
+			this.tabPageGit.Controls.Add(this.checkBoxGitShowCommandOutput);
 			this.tabPageGit.Controls.Add(this.checkBoxGitEnableRemoteBranchLookup);
 			this.tabPageGit.Controls.Add(this.groupBoxGitContextMenuCommands);
 			this.tabPageGit.Controls.Add(this.groupBoxGitExe);
 			this.tabPageGit.Location = new System.Drawing.Point(4, 22);
 			this.tabPageGit.Name = "tabPageGit";
 			this.tabPageGit.Padding = new System.Windows.Forms.Padding(6);
-			this.tabPageGit.Size = new System.Drawing.Size(680, 366);
+			this.tabPageGit.Size = new System.Drawing.Size(680, 389);
 			this.tabPageGit.TabIndex = 2;
 			this.tabPageGit.Text = "Git";
 			this.tabPageGit.UseVisualStyleBackColor = true;
@@ -423,7 +424,7 @@
 			// 
 			this.checkBoxGitEnableRemoteBranchLookup.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
 			this.checkBoxGitEnableRemoteBranchLookup.AutoSize = true;
-			this.checkBoxGitEnableRemoteBranchLookup.Location = new System.Drawing.Point(9, 340);
+			this.checkBoxGitEnableRemoteBranchLookup.Location = new System.Drawing.Point(9, 363);
 			this.checkBoxGitEnableRemoteBranchLookup.Name = "checkBoxGitEnableRemoteBranchLookup";
 			this.checkBoxGitEnableRemoteBranchLookup.Size = new System.Drawing.Size(179, 17);
 			this.checkBoxGitEnableRemoteBranchLookup.TabIndex = 6;
@@ -537,7 +538,7 @@
 			this.tabPageRootFolders.Location = new System.Drawing.Point(4, 22);
 			this.tabPageRootFolders.Name = "tabPageRootFolders";
 			this.tabPageRootFolders.Padding = new System.Windows.Forms.Padding(6);
-			this.tabPageRootFolders.Size = new System.Drawing.Size(680, 366);
+			this.tabPageRootFolders.Size = new System.Drawing.Size(680, 389);
 			this.tabPageRootFolders.TabIndex = 1;
 			this.tabPageRootFolders.Text = "Root Folders";
 			this.tabPageRootFolders.UseVisualStyleBackColor = true;
@@ -551,7 +552,7 @@
 			this.groupBoxRootPathFilters.Controls.Add(this.buttonRootPathFilterAdd);
 			this.groupBoxRootPathFilters.Location = new System.Drawing.Point(9, 36);
 			this.groupBoxRootPathFilters.Name = "groupBoxRootPathFilters";
-			this.groupBoxRootPathFilters.Size = new System.Drawing.Size(662, 321);
+			this.groupBoxRootPathFilters.Size = new System.Drawing.Size(662, 344);
 			this.groupBoxRootPathFilters.TabIndex = 4;
 			this.groupBoxRootPathFilters.TabStop = false;
 			this.groupBoxRootPathFilters.Text = "Filters";
@@ -566,7 +567,7 @@
 			this.panelScrollRootPathFilters.Controls.Add(this.flowLayoutPanelRootPathFilters);
 			this.panelScrollRootPathFilters.Location = new System.Drawing.Point(6, 21);
 			this.panelScrollRootPathFilters.Name = "panelScrollRootPathFilters";
-			this.panelScrollRootPathFilters.Size = new System.Drawing.Size(623, 294);
+			this.panelScrollRootPathFilters.Size = new System.Drawing.Size(623, 317);
 			this.panelScrollRootPathFilters.TabIndex = 7;
 			// 
 			// flowLayoutPanelRootPathFilters
@@ -577,7 +578,7 @@
 			this.flowLayoutPanelRootPathFilters.FlowDirection = System.Windows.Forms.FlowDirection.TopDown;
 			this.flowLayoutPanelRootPathFilters.Location = new System.Drawing.Point(0, 0);
 			this.flowLayoutPanelRootPathFilters.Name = "flowLayoutPanelRootPathFilters";
-			this.flowLayoutPanelRootPathFilters.Size = new System.Drawing.Size(623, 294);
+			this.flowLayoutPanelRootPathFilters.Size = new System.Drawing.Size(623, 317);
 			this.flowLayoutPanelRootPathFilters.TabIndex = 3;
 			this.flowLayoutPanelRootPathFilters.Resize += new System.EventHandler(this.FlowLayoutPanelRootPathFilters_Resize);
 			// 
@@ -667,7 +668,7 @@
 			this.tableLayoutPanelButtons.Controls.Add(this.buttonOK, 0, 0);
 			this.tableLayoutPanelButtons.Controls.Add(this.buttonCancel, 1, 0);
 			this.tableLayoutPanelButtons.Controls.Add(this.buttonApply, 2, 0);
-			this.tableLayoutPanelButtons.Location = new System.Drawing.Point(9, 410);
+			this.tableLayoutPanelButtons.Location = new System.Drawing.Point(9, 433);
 			this.tableLayoutPanelButtons.Name = "tableLayoutPanelButtons";
 			this.tableLayoutPanelButtons.RowCount = 1;
 			this.tableLayoutPanelButtons.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
@@ -685,11 +686,22 @@
 			this.buttonApply.UseVisualStyleBackColor = true;
 			this.buttonApply.Click += new System.EventHandler(this.ButtonApply_Click);
 			// 
+			// checkBoxGitShowCommandOutput
+			// 
+			this.checkBoxGitShowCommandOutput.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+			this.checkBoxGitShowCommandOutput.AutoSize = true;
+			this.checkBoxGitShowCommandOutput.Location = new System.Drawing.Point(9, 340);
+			this.checkBoxGitShowCommandOutput.Name = "checkBoxGitShowCommandOutput";
+			this.checkBoxGitShowCommandOutput.Size = new System.Drawing.Size(258, 17);
+			this.checkBoxGitShowCommandOutput.TabIndex = 7;
+			this.checkBoxGitShowCommandOutput.Text = "Show output for user initiated git commands";
+			this.checkBoxGitShowCommandOutput.UseVisualStyleBackColor = true;
+			// 
 			// SettingsForm
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-			this.ClientSize = new System.Drawing.Size(706, 445);
+			this.ClientSize = new System.Drawing.Size(706, 468);
 			this.Controls.Add(this.tableLayoutPanelButtons);
 			this.Controls.Add(this.tabControl);
 			this.Font = new System.Drawing.Font("Segoe UI", 8.25F);
@@ -775,5 +787,6 @@
 		private System.Windows.Forms.Label labelQuickLaunchFilesGroupBy;
 		private System.Windows.Forms.RadioButton radioButtonQuickLaunchFilesGroupByExtension;
 		private System.Windows.Forms.RadioButton radioButtonQuickLaunchFilesDoNotGroup;
+		private System.Windows.Forms.CheckBox checkBoxGitShowCommandOutput;
 	}
 }

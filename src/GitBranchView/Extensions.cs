@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 using GitBranchView.Model;
 
@@ -221,6 +222,55 @@ namespace GitBranchView
 		public static T GetTagValue<T>(this ToolStripItem item)
 		{
 			return item.GetTag()?.Value is T value ? value : default;
+		}
+
+		public static Task<(bool Success, string[] Errors)> SafeGitExecuteAsync(
+			this Root root,
+			string path,
+			string command,
+			Action<string> outputLineHandler = null)
+		{
+			try
+			{
+				return Git.ExecuteCommandAsync(root, path, command, outputLineHandler);
+			}
+			catch (Exception ex)
+			{
+				Program.ShowError($"Failed to execute Git command '{command}';"
+					+ Environment.NewLine + ex.Message + Environment.NewLine
+					+ Environment.NewLine + $"Path: {path}");
+
+				return Task.FromResult((false, null as string[]));
+			}
+		}
+
+		public static bool IsEmpty(this IEnumerable<string> items)
+		{
+			return items?.All(string.IsNullOrWhiteSpace) ?? true;
+		}
+
+		public static string[] NullIfEmpty(this IReadOnlyList<string> items)
+		{
+			return items.IsEmpty() ? null : items.ToArray();
+		}
+
+		public static void AddIfNotEmpty(this List<string> list, IReadOnlyList<string> items, params string[] additionalItems)
+		{
+			if (items?.NullIfEmpty() == null)
+				return;
+
+			list.AddRange(items);
+			list.AddRange(additionalItems);
+		}
+
+		public static string[] PrependIfNotEmpty(this IReadOnlyList<string> items, params string[] additionalItems)
+		{
+			return items.IsEmpty() ? null : additionalItems.Reverse().Aggregate(items.AsEnumerable(), Enumerable.Prepend).ToArray();
+		}
+
+		public static string[] WithoutEmpty(this IEnumerable<string> items)
+		{
+			return items.Where(item => !string.IsNullOrWhiteSpace(item)).ToArray();
 		}
 	}
 }

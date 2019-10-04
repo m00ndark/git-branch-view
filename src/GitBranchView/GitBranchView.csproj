@@ -73,6 +73,12 @@
     <Compile Include="Controls\FilterEntry.Designer.cs">
       <DependentUpon>FilterEntry.cs</DependentUpon>
     </Compile>
+    <Compile Include="Forms\CloneForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\CloneForm.Designer.cs">
+      <DependentUpon>CloneForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="Forms\FilterForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -94,11 +100,11 @@
     <Compile Include="Forms\MainForm.Designer.cs">
       <DependentUpon>MainForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="Forms\ErrorForm.cs">
+    <Compile Include="Forms\OutputForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Forms\ErrorForm.Designer.cs">
-      <DependentUpon>ErrorForm.cs</DependentUpon>
+    <Compile Include="Forms\OutputForm.Designer.cs">
+      <DependentUpon>OutputForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Model\GitContextMenuCommand.cs" />
     <Compile Include="Model\HighlightColor.cs" />
@@ -127,6 +133,9 @@
     <EmbeddedResource Include="Controls\GitCommandEntry.resx">
       <DependentUpon>GitCommandEntry.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Forms\CloneForm.resx">
+      <DependentUpon>CloneForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Forms\FilterForm.resx">
       <DependentUpon>FilterForm.cs</DependentUpon>
     </EmbeddedResource>
@@ -136,8 +145,8 @@
     <EmbeddedResource Include="Forms\MainForm.resx">
       <DependentUpon>MainForm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Forms\ErrorForm.resx">
-      <DependentUpon>ErrorForm.cs</DependentUpon>
+    <EmbeddedResource Include="Forms\OutputForm.resx">
+      <DependentUpon>OutputForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
@@ -194,8 +203,11 @@
     <None Include="Resources\up.png" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Resources\progress-small.gif" />
+    <None Include="Resources\progress-large.gif" />
     <None Include="External\ToolComponents.PreBuild.dll" />
     <Content Include="Resources\app.png" />
+    <None Include="Resources\clone.png" />
     <Content Include="Resources\collapsed.png" />
     <Content Include="Resources\expanded.png" />
     <None Include="Resources\title.png" />
