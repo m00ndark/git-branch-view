@@ -23,13 +23,17 @@ namespace GitBranchView.Forms
 	{
 		public class ChangedEventArgs : EventArgs
 		{
-			public ChangedEventArgs(bool gitCommandsChanged, bool rootFoldersChanged, bool rootFoldersHighlightChanged)
+			public ChangedEventArgs(bool quickLaunchFilesChanged, bool repositoryLinkBehaviorChanged, bool gitCommandsChanged, bool rootFoldersChanged, bool rootFoldersHighlightChanged)
 			{
+				QuickLaunchFilesChanged = quickLaunchFilesChanged;
+				RepositoryLinkBehaviorChanged = repositoryLinkBehaviorChanged;
 				GitCommandsChanged = gitCommandsChanged;
 				RootFoldersChanged = rootFoldersChanged;
 				RootFoldersHighlightChanged = rootFoldersHighlightChanged;
 			}
 
+			public bool QuickLaunchFilesChanged { get; }
+			public bool RepositoryLinkBehaviorChanged { get; }
 			public bool GitCommandsChanged { get; }
 			public bool RootFoldersChanged { get; }
 			public bool RootFoldersHighlightChanged { get; }
@@ -43,6 +47,8 @@ namespace GitBranchView.Forms
 		private readonly IDictionary<Root, List<FilterEntry>> _rootFilters;
 		private bool _lastStartWithWindows;
 		private bool _isTerminating;
+		private bool _quickLaunchFilesChanged;
+		private bool _repositoryLinkBehaviorChanged;
 		private bool _gitCommandsChanged;
 		private bool _rootFoldersChanged;
 		private bool _rootFoldersHighlightChanged;
@@ -78,9 +84,9 @@ namespace GitBranchView.Forms
 			Opacity = 0;
 		}
 
-		private void RaiseSettingsChangedEvent(bool gitCommandsChanged, bool rootFoldersChanged, bool rootFoldersHighlightChanged)
+		private void RaiseSettingsChangedEvent(bool quickLaunchFilesChanged, bool repositoryLinkBehaviorChanged, bool gitCommandsChanged, bool rootFoldersChanged, bool rootFoldersHighlightChanged)
 		{
-			Task.Run(() => SettingsChanged?.Invoke(this, new ChangedEventArgs(gitCommandsChanged, rootFoldersChanged, rootFoldersHighlightChanged)));
+			Task.Run(() => SettingsChanged?.Invoke(this, new ChangedEventArgs(quickLaunchFilesChanged, repositoryLinkBehaviorChanged, gitCommandsChanged, rootFoldersChanged, rootFoldersHighlightChanged)));
 		}
 
 		private void SettingsForm_Load(object sender, EventArgs e)
@@ -94,10 +100,10 @@ namespace GitBranchView.Forms
 				return;
 
 			e.Cancel = true;
-			Hide();
+			HideForm();
 		}
 
-		private void ButtonBrowseLinkCommandPath_Click(object sender, EventArgs e)
+		private void ButtonCustomCommandPathBrowse_Click(object sender, EventArgs e)
 		{
 			OpenFileDialog fileDialog = new OpenFileDialog
 				{
@@ -105,14 +111,51 @@ namespace GitBranchView.Forms
 					CheckFileExists = true,
 					Filter = "Executable Files (*.exe)|*.exe",
 					Multiselect = false,
-					InitialDirectory = Path.GetDirectoryName(textBoxLinkCommandPath.Text),
-					FileName = textBoxLinkCommandPath.Text
+					InitialDirectory = Path.GetDirectoryName(textBoxCustomCommandPath.Text),
+					FileName = textBoxCustomCommandPath.Text
 				};
 
 			if (fileDialog.ShowDialog() != DialogResult.OK)
 				return;
 
-			textBoxLinkCommandPath.Text = fileDialog.FileName;
+			textBoxCustomCommandPath.Text = fileDialog.FileName;
+		}
+
+		private void TextBoxQuickLaunchFilesFilter_TextChanged(object sender, EventArgs e)
+		{
+			_quickLaunchFilesChanged = true;
+		}
+
+		private void RadioButtonQuickLaunchFilesDoNotGroup_CheckedChanged(object sender, EventArgs e)
+		{
+			_quickLaunchFilesChanged = true;
+		}
+
+		private void RadioButtonQuickLaunchFilesGroupByExtension_CheckedChanged(object sender, EventArgs e)
+		{
+			_quickLaunchFilesChanged = true;
+		}
+
+		private void RadioButtonQuickLaunchFilesGroupByPath_CheckedChanged(object sender, EventArgs e)
+		{
+			_quickLaunchFilesChanged = true;
+		}
+
+		private void RadioButtonGitRepositoryLinkExecuteCustomCommand_CheckedChanged(object sender, EventArgs e)
+		{
+			_repositoryLinkBehaviorChanged = true;
+			EnableControls();
+		}
+
+		private void RadioButtonGitRepositoryLinkLaunchSelectedQuickLaunchFile_CheckedChanged(object sender, EventArgs e)
+		{
+			_repositoryLinkBehaviorChanged = true;
+			EnableControls();
+		}
+
+		private void TextBoxCustomCommandName_TextChanged(object sender, EventArgs e)
+		{
+			_repositoryLinkBehaviorChanged = true;
 		}
 
 		private void ButtonBrowseGitExePath_Click(object sender, EventArgs e)
@@ -186,7 +229,7 @@ namespace GitBranchView.Forms
 
 			Root selectedRoot = (Root) comboBoxRootPaths.SelectedItem;
 
-			if (MessageBox.Show("Are you sure you want to remove the selected root folder?", "Git Branch View", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
+			if (Program.ShowQuestion("Are you sure you want to remove the selected root folder?") == DialogResult.Yes)
 			{
 				ResetFlowLayoutPanel(flowLayoutPanelRootPathFilters, _widthHolder2);
 				comboBoxRootPaths.Items.Remove(selectedRoot);
@@ -217,13 +260,16 @@ namespace GitBranchView.Forms
 				_rootFilters[selectedRoot].Add(filterEntry);
 				flowLayoutPanelRootPathFilters.Controls.Add(filterEntry);
 				UpdateFlowLayoutPanelSize(flowLayoutPanelRootPathFilters);
-				_rootFoldersChanged = _rootFoldersChanged | filterEntry.Filter.Type != FilterType.Highlight;
-				_rootFoldersHighlightChanged = _rootFoldersHighlightChanged | filterEntry.Filter.Type == FilterType.Highlight;
+				_rootFoldersChanged |= filterEntry.Filter.Type != FilterType.Highlight;
+				_rootFoldersHighlightChanged |= filterEntry.Filter.Type == FilterType.Highlight;
 			}
 		}
 
 		private void ButtonOK_Click(object sender, EventArgs e)
 		{
+			if (!SettingsAreValid())
+				return;
+
 			SaveSettings();
 			HideForm();
 		}
@@ -235,6 +281,9 @@ namespace GitBranchView.Forms
 
 		private void ButtonApply_Click(object sender, EventArgs e)
 		{
+			if (!SettingsAreValid())
+				return;
+
 			SaveSettings();
 			LoadSettings();
 		}
@@ -278,8 +327,8 @@ namespace GitBranchView.Forms
 			if (!(sender is FilterEntry filterEntry))
 				return;
 
-			_rootFoldersChanged = _rootFoldersChanged | filterEntry.Filter.Type != FilterType.Highlight;
-			_rootFoldersHighlightChanged = _rootFoldersHighlightChanged | filterEntry.Filter.Type == FilterType.Highlight;
+			_rootFoldersChanged |= filterEntry.Filter.Type != FilterType.Highlight;
+			_rootFoldersHighlightChanged |= filterEntry.Filter.Type == FilterType.Highlight;
 
 			this.InvokeIfRequired(() =>
 				{
@@ -399,15 +448,47 @@ namespace GitBranchView.Forms
 			_rootFilters[root].Insert(newIndex, filterEntry);
 		}
 
+		private void EnableControls(bool enable = true)
+		{
+			labelCustomCommandName.Enabled = enable && radioButtonGitRepositoryLinkLaunchSelectedQuickLaunchFile.Checked;
+			textBoxCustomCommandName.Enabled = enable && radioButtonGitRepositoryLinkLaunchSelectedQuickLaunchFile.Checked;
+		}
+
+		private bool SettingsAreValid()
+		{
+			if (!textBoxQuickLaunchFilesFilter.Text.IsValidRegex(allowEmpty: true))
+			{
+				Program.ShowError("Quick launch files filter not a valid regular expression!");
+				return false;
+			}
+
+			if (string.IsNullOrWhiteSpace(textBoxCustomCommandName.Text))
+			{
+				Program.ShowError("Custom command name cannot be empty!");
+				return false;
+			}
+
+			return true;
+		}
+
 		private void LoadSettings()
 		{
-			textBoxLinkCommandPath.Text = Settings.Default.CommandPath;
-			textBoxLinkCommandArgs.Text = Settings.Default.CommandArgs;
+			textBoxCustomCommandPath.Text = Settings.Default.CommandPath;
+			textBoxCustomCommandArgs.Text = Settings.Default.CommandArgs;
+			textBoxCustomCommandName.Text = Settings.Default.CommandName;
+			textBoxQuickLaunchFilesFilter.Text = Settings.Default.QuickLaunchFilesFilter;
+			radioButtonQuickLaunchFilesDoNotGroup.Checked = Settings.Default.QuickLaunchFilesGrouping == QuickLaunchFilesGrouping.None;
+			radioButtonQuickLaunchFilesGroupByExtension.Checked = Settings.Default.QuickLaunchFilesGrouping == QuickLaunchFilesGrouping.ByExtension;
+			radioButtonQuickLaunchFilesGroupByPath.Checked = Settings.Default.QuickLaunchFilesGrouping == QuickLaunchFilesGrouping.ByPath;
+			radioButtonGitRepositoryLinkExecuteCustomCommand.Checked = Settings.Default.RepositoryLinkBehavior == RepositoryLinkBehavior.ExecuteCustomCommand;
+			radioButtonGitRepositoryLinkLaunchSelectedQuickLaunchFile.Checked = Settings.Default.RepositoryLinkBehavior == RepositoryLinkBehavior.LaunchSelectedQuickLaunchFile;
 			checkBoxCloseOnLostFocus.Checked = Settings.Default.CloseOnLostFocus;
 			checkBoxStartWithWindows.Checked = _lastStartWithWindows = Settings.Default.StartWithWindows;
 			checkBoxEnableLogging.Checked = Settings.Default.EnableLogging;
 			textBoxGitExePath.Text = Settings.Default.GitPath;
+			checkBoxGitShowCommandOutput.Checked = Settings.Default.ShowGitCommandOutput;
 			checkBoxGitEnableRemoteBranchLookup.Checked = Settings.Default.EnableRemoteBranchLookup;
+			checkBoxGitExcludeLfsRepositories.Checked = Settings.Default.ExcludeLfsRepositories;
 
 			_gitCommands.ForEach(DisposeGitCommandEntry);
 			_gitCommands.Clear();
@@ -438,13 +519,25 @@ namespace GitBranchView.Forms
 		{
 			_rootFoldersChanged |= Settings.Default.EnableRemoteBranchLookup != checkBoxGitEnableRemoteBranchLookup.Checked;
 
-			Settings.Default.CommandPath = textBoxLinkCommandPath.Text;
-			Settings.Default.CommandArgs = textBoxLinkCommandArgs.Text;
+			Settings.Default.CommandPath = textBoxCustomCommandPath.Text;
+			Settings.Default.CommandArgs = textBoxCustomCommandArgs.Text;
+			Settings.Default.CommandName = textBoxCustomCommandName.Text;
+			Settings.Default.QuickLaunchFilesFilter = textBoxQuickLaunchFilesFilter.Text;
+			Settings.Default.QuickLaunchFilesGrouping = radioButtonQuickLaunchFilesGroupByExtension.Checked
+				? QuickLaunchFilesGrouping.ByExtension
+				: radioButtonQuickLaunchFilesGroupByPath.Checked
+					? QuickLaunchFilesGrouping.ByPath
+					: QuickLaunchFilesGrouping.None;
+			Settings.Default.RepositoryLinkBehavior = radioButtonGitRepositoryLinkLaunchSelectedQuickLaunchFile.Checked
+				? RepositoryLinkBehavior.LaunchSelectedQuickLaunchFile
+				: RepositoryLinkBehavior.ExecuteCustomCommand;
 			Settings.Default.CloseOnLostFocus = checkBoxCloseOnLostFocus.Checked;
 			Settings.Default.StartWithWindows = checkBoxStartWithWindows.Checked;
 			Settings.Default.EnableLogging = checkBoxEnableLogging.Checked;
 			Settings.Default.GitPath = textBoxGitExePath.Text;
+			Settings.Default.ShowGitCommandOutput = checkBoxGitShowCommandOutput.Checked;
 			Settings.Default.EnableRemoteBranchLookup = checkBoxGitEnableRemoteBranchLookup.Checked;
+			Settings.Default.ExcludeLfsRepositories = checkBoxGitExcludeLfsRepositories.Checked;
 
 			Settings.Default.GitContextMenuCommands = _gitCommands
 				.Select(gitCommandEntry => gitCommandEntry.GitCommand)
@@ -476,8 +569,8 @@ namespace GitBranchView.Forms
 				_lastStartWithWindows = Settings.Default.StartWithWindows;
 			}
 
-			RaiseSettingsChangedEvent(_gitCommandsChanged, _rootFoldersChanged, _rootFoldersHighlightChanged);
-			_gitCommandsChanged = _rootFoldersChanged = _rootFoldersHighlightChanged = false;
+			RaiseSettingsChangedEvent(_quickLaunchFilesChanged, _repositoryLinkBehaviorChanged, _gitCommandsChanged, _rootFoldersChanged, _rootFoldersHighlightChanged);
+			_quickLaunchFilesChanged = _repositoryLinkBehaviorChanged = _gitCommandsChanged = _rootFoldersChanged = _rootFoldersHighlightChanged = false;
 		}
 
 		public static void SetWindowsStartupTrigger(string executablePath)

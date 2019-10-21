@@ -3,9 +3,11 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using GitBranchView.Forms;
 using GitBranchView.Model;
 using GitBranchView.Properties;
 using ToolComponents.Core.Extensions;
@@ -14,21 +16,30 @@ namespace GitBranchView.Controls
 {
 	public partial class RootEntry : UserControl
 	{
-		private bool _isUpdatingFolders = false;
+		private readonly CloneForm _cloneForm;
+		private bool _isUpdatingFolders;
 
-		public event EventHandler ExpandedCollapsed;
+		public event EventHandler ClonedSuccessfully;
 
 		public RootEntry(Root root)
 		{
 			Root = root;
 			InitializeComponent();
+			_cloneForm = new CloneForm(Root);
+			_cloneForm.ClonedSuccessfully += CloneForm_ClonedSuccessfully;
 		}
 
 		public Root Root { get; }
 
-		private void RaiseExpandedCollapsed()
+		private void RaiseClonedSuccessfullyEvent()
 		{
-			ExpandedCollapsed?.Invoke(this, EventArgs.Empty);
+			ClonedSuccessfully?.Invoke(this, EventArgs.Empty);
+		}
+
+		private async void CloneForm_ClonedSuccessfully(object sender, EventArgs e)
+		{
+			RaiseClonedSuccessfullyEvent();
+			await this.InvokeIfRequired(async () => await UpdateFolders());
 		}
 
 		private void PictureBoxExpandCollapse_MouseDown(object sender, MouseEventArgs e)
@@ -38,14 +49,24 @@ namespace GitBranchView.Controls
 
 			Root.Expanded = !Root.Expanded;
 			pictureBoxExpandCollapse.Image = Root.Expanded ? Resources.expanded : Resources.collapsed;
+			buttonClone.Visible = Root.Expanded;
 			buttonRefresh.Visible = Root.Expanded;
 			UpdateSize();
-			RaiseExpandedCollapsed();
+		}
+
+		private void ButtonClone_Click(object sender, EventArgs e)
+		{
+			_cloneForm.ShowForm();
 		}
 
 		private async void ButtonRefresh_Click(object sender, EventArgs e)
 		{
 			await UpdateFolders();
+		}
+
+		public void Terminate()
+		{
+			_cloneForm.TerminateForm();
 		}
 
 		public async Task UpdateFolders()
@@ -60,6 +81,7 @@ namespace GitBranchView.Controls
 				flowLayoutPanel.Controls.Clear();
 				labelInfo.Text = "Scanning...";
 				labelInfo.Visible = true;
+				buttonClone.Visible = false;
 				buttonRefresh.Visible = false;
 
 				if (!Settings.Default.GitPath.GitPathIsValid(out string error) || !Root.IsValid(out error))
@@ -79,10 +101,14 @@ namespace GitBranchView.Controls
 					{
 						Parallel.ForEach(Root.Path.ScanFolder(), folder =>
 							{
-								if (!Root.ShouldInclude(folder))
+								Git.TryGetBranch(Root, folder, out string branch, out int trackedChanges, out int untrackedChanges, out string[] errors);
+
+								if (!Root.ShouldInclude(folder, branch))
 									return;
 
-								Git.TryGetBranch(Root, folder, out string branch, out int trackedChanges, out int untrackedChanges, out string[] errors);
+								if (Settings.Default.ExcludeLfsRepositories && File.Exists(Path.Combine(folder, ".lfsconfig")))
+									return;
+
 								gitRepositories.Add((folder, branch, trackedChanges, untrackedChanges, errors));
 
 								this.InvokeIfRequired(() =>
@@ -106,14 +132,15 @@ namespace GitBranchView.Controls
 
 				flowLayoutPanel.Controls.AddRange(folderEntries.ToArray<Control>());
 				UpdateSize(folderEntries);
-				labelInfo.Visible = false;
-				buttonRefresh.Visible = Root.Expanded;
 				folderEntries.FirstOrDefault()?.Focus();
 
 				Debug.WriteLine($"{Root.Path}\t{stopwatch.Elapsed}");
 			}
 			finally
 			{
+				labelInfo.Visible = false;
+				buttonClone.Visible = Root.Expanded;
+				buttonRefresh.Visible = Root.Expanded;
 				_isUpdatingFolders = false;
 			}
 		}
@@ -179,11 +206,11 @@ namespace GitBranchView.Controls
 			}
 		}
 
-		public void GitContextMenuCommandsChanged()
+		public void ResetContextMenus()
 		{
 			foreach (FolderEntry folderEntry in flowLayoutPanel.Controls.OfType<FolderEntry>())
 			{
-				folderEntry.GitContextMenuCommandsChanged();
+				folderEntry.ResetContextMenu();
 			}
 		}
 	}

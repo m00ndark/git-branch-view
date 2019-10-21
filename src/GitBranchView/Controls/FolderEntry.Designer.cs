@@ -36,6 +36,8 @@
 			this.buttonMore = new System.Windows.Forms.Button();
 			this.linkLabelBranchError = new System.Windows.Forms.LinkLabel();
 			this.toolTip = new System.Windows.Forms.ToolTip(this.components);
+			this.pictureBoxProgress = new System.Windows.Forms.PictureBox();
+			((System.ComponentModel.ISupportInitialize)(this.pictureBoxProgress)).BeginInit();
 			this.SuspendLayout();
 			// 
 			// linkLabelFolder
@@ -54,7 +56,7 @@
 			this.linkLabelFolder.TabStop = true;
 			this.linkLabelFolder.Text = "Folder";
 			this.linkLabelFolder.VisitedLinkColor = System.Drawing.SystemColors.HotTrack;
-			this.linkLabelFolder.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.LinkLabelPath_LinkClicked);
+			this.linkLabelFolder.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.LinkLabelFolder_LinkClicked);
 			// 
 			// labelBranch
 			// 
@@ -118,12 +120,23 @@
 			this.linkLabelBranchError.VisitedLinkColor = System.Drawing.Color.Tomato;
 			this.linkLabelBranchError.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.LinkLabelBranchError_LinkClicked);
 			// 
+			// pictureBoxProgress
+			// 
+			this.pictureBoxProgress.Image = global::GitBranchView.Properties.Resources.progress_small;
+			this.pictureBoxProgress.Location = new System.Drawing.Point(3, 2);
+			this.pictureBoxProgress.Name = "pictureBoxProgress";
+			this.pictureBoxProgress.Size = new System.Drawing.Size(16, 16);
+			this.pictureBoxProgress.TabIndex = 11;
+			this.pictureBoxProgress.TabStop = false;
+			this.pictureBoxProgress.Visible = false;
+			// 
 			// FolderEntry
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.AutoScrollMargin = new System.Drawing.Size(16, 0);
 			this.BackColor = System.Drawing.SystemColors.Window;
+			this.Controls.Add(this.pictureBoxProgress);
 			this.Controls.Add(this.linkLabelBranchError);
 			this.Controls.Add(this.labelChanges);
 			this.Controls.Add(this.buttonMore);
@@ -133,6 +146,7 @@
 			this.Margin = new System.Windows.Forms.Padding(0);
 			this.Name = "FolderEntry";
 			this.Size = new System.Drawing.Size(366, 21);
+			((System.ComponentModel.ISupportInitialize)(this.pictureBoxProgress)).EndInit();
 			this.ResumeLayout(false);
 			this.PerformLayout();
 
@@ -147,5 +161,6 @@
 		private System.Windows.Forms.Button buttonMore;
 		private System.Windows.Forms.LinkLabel linkLabelBranchError;
 		private System.Windows.Forms.ToolTip toolTip;
+		private System.Windows.Forms.PictureBox pictureBoxProgress;
 	}
 }

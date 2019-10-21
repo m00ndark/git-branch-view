@@ -6,6 +6,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 using GitBranchView.Model;
 using ToolComponents.Core.Logging;
 
@@ -19,63 +20,116 @@ namespace GitBranchView
 		{
 			List<string> errorLines = new List<string>();
 
+			void AddErrors(string cmdLine, string[] cmdErrors)
+			{
+				cmdErrors = cmdErrors.PrependIfNotEmpty(cmdLine, string.Empty);
+				errorLines.AddIfNotEmpty(cmdErrors, string.Empty);
+			}
+
 			// try get branch
-			(bool Success, string Output, string Error) result = ExecProcess(root, Settings.Default.GitPath, "symbolic-ref --short HEAD", path);
+			(bool Success, string CmdLine, string[] Output, string[] Error) result
+				= ExecProcess(root, Settings.Default.GitPath, "symbolic-ref --short HEAD", path);
 
 			if (!result.Success)
 			{
+				AddErrors(result.CmdLine, result.Error);
+
 				// try get tag
 				result = ExecProcess(root, Settings.Default.GitPath, "describe --tags --exact-match", path);
 			}
 
 			if (!result.Success)
 			{
+				AddErrors(result.CmdLine, result.Error);
+
 				// try get hash
 				result = ExecProcess(root, Settings.Default.GitPath, "rev-parse --short HEAD", path);
 			}
 
-			bool success = result.Success;
-			branch = success ? result.Output.Trim() : "<unknown>";
-			errorLines.AddRange(result.Error.LineSplit());
+			if (!result.Success)
+			{
+				AddErrors(result.CmdLine, result.Error);
+			}
 
+			bool success = result.Success;
+			branch = success && result.Output.Any() ? result.Output.First().Trim() : "<unknown>";
+
+			// try get changes
 			result = ExecProcess(root, Settings.Default.GitPath, "status --short", path);
-			string[] changes = result.Success ? result.Output.LineSplit(StringSplitOptions.RemoveEmptyEntries) : null;
+			string[] changes = result.Success ? result.Output.WithoutEmpty() : null;
 			trackedChanges = changes?.Count(x => !x.StartsWith("??")) ?? -1;
 			untrackedChanges = changes?.Count(x => x.StartsWith("??")) ?? -1;
-			errorLines.AddRange(Enumerable.Repeat(string.Empty, 2).Concat(result.Error.LineSplit()));
 
-			errors = errorLines.All(string.IsNullOrWhiteSpace) ? null : errorLines.ToArray();
+			if (!result.Success)
+			{
+				AddErrors(result.CmdLine, result.Error);
+			}
+
+			errors = errorLines.NullIfEmpty();
 			return success;
 		}
 
 		public static bool BranchExistRemote(Root root, string path, string branch, out string[] errors)
 		{
-			(bool Success, string Output, string Error) result = ExecProcess(root, Settings.Default.GitPath, $"ls-remote --heads --tags origin {branch}", path);
+			(bool success, string cmdLine, string[] output, string[] error)
+				= ExecProcess(root, Settings.Default.GitPath, $"ls-remote --heads --tags origin {branch}", path);
 
-			errors = result.Error?.LineSplit();
-			return result.Success && result.Output.LineSplit().Any(line => line.Trim().EndsWith(branch));
+			errors = success ? null : error.PrependIfNotEmpty(cmdLine, string.Empty);
+			return success && output.Any(line => line.Trim().EndsWith(branch));
 		}
 
-		public static bool ExecuteCommand(Root root, string path, string command)
+		public static Task<(bool Success, string[] Errors)> ExecuteCommandAsync(
+			Root root,
+			string path,
+			string command,
+			Action<string> outputLineHandler = null)
 		{
-			return ExecProcess(root, Settings.Default.GitPath, command, path).Success;
+			return Task.Run(() =>
+				{
+					(bool success, string cmdLine, string[] _, string[] error)
+						= ExecProcess(root, Settings.Default.GitPath, command, path, outputLineHandler);
+
+					return (success, error.PrependIfNotEmpty(cmdLine, string.Empty));
+				});
 		}
 
-		private static (bool Success, string Output, string Error) ExecProcess(Root root, string filePath, string args, string workingDir)
+		private static (bool Success, string CommandLine, string[] Output, string[] Error) ExecProcess(
+			Root root,
+			string filePath,
+			string args,
+			string workingDir,
+			Action<string> outputLineHandler = null)
 		{
 			Guid execId = Guid.NewGuid();
 			Stopwatch stopwatch = Stopwatch.StartNew();
 
 			int exitCode = int.MinValue;
-			string output = null, error = null;
+			List<string> output = new List<string>();
+			List<string> error = new List<string>();
 			string[] environment = null;
+
+			void OnOutput(string data)
+			{
+				if (data == null) return;
+				output.Add(data);
+				outputLineHandler?.Invoke(data);
+			}
+
+			void OnError(string data)
+			{
+				if (data == null) return;
+				error.Add(data);
+				outputLineHandler?.Invoke(data);
+			}
 
 			try
 			{
-				string command = $"{Path.GetFileNameWithoutExtension(filePath)} {args}";
+				string commandLine = $"{workingDir}> {Path.GetFileNameWithoutExtension(filePath)} {args}";
 
 				if (Settings.Default.EnableLogging)
-					Logger.Add($"Executing command {execId}: {workingDir} > {command}");
+					Logger.Add($"Executing command {execId}: {commandLine}");
+
+				outputLineHandler?.Invoke(commandLine + Environment.NewLine);
 
 				using (Process process = new Process
 					{
@@ -89,14 +143,17 @@ namespace GitBranchView
 								RedirectStandardOutput = true,
 								RedirectStandardError = true
 							}
-				})
+					})
 				{
+					process.OutputDataReceived += (sender, e) => OnOutput(e.Data);
+					process.ErrorDataReceived += (sender, e) => OnError(e.Data);
+
 					process.Start();
+					process.BeginOutputReadLine();
+					process.BeginErrorReadLine();
 					process.WaitForExit();
 
 					exitCode = process.ExitCode;
-					output = process.StandardOutput.ReadToEnd();
-					error = process.StandardError.ReadToEnd();
 					environment = process.StartInfo.EnvironmentVariables
 						.Cast<DictionaryEntry>()
 						.Select(x => $"{x.Key}={x.Value}")
@@ -104,7 +161,7 @@ namespace GitBranchView
 						.ToArray();
 
 					bool success = exitCode == 0;
-					return (success, success ? output : null, !success ? $"{command}\n\n{error}" : null);
+					return (success, commandLine, output.ToArray(), error.ToArray());
 				}
 			}
 			finally
@@ -118,7 +175,15 @@ namespace GitBranchView
 		}
 
 		[SuppressMessage("ReSharper", "AssignNullToNotNullAttribute")]
-		private static void Dump(Guid execId, Root root, string filePath, string args, string workingDir, int exitCode, string output, string error, string[] environment)
+		private static void Dump(Guid execId,
+			Root root,
+			string filePath,
+			string args,
+			string workingDir,
+			int exitCode,
+			IEnumerable<string> output,
+			IEnumerable<string> error,
+			string[] environment)
 		{
 			string commandName = Path.GetFileNameWithoutExtension(filePath);
 
@@ -129,8 +194,8 @@ namespace GitBranchView
 
 			Logger.Add($"Writing command output for {execId} to {dumpFilePath}");
 
-			string[] outputLines = output.LineSplit().Where(x => !string.IsNullOrEmpty(x)).ToArray();
-			string[] errorLines = error.LineSplit().Where(x => !string.IsNullOrEmpty(x)).ToArray();
+			string[] outputLines = output.WithoutEmpty();
+			string[] errorLines = error.WithoutEmpty();
 
 			File.WriteAllLines(dumpFilePath, FormatDump(new[]
 				{

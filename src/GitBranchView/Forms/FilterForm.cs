@@ -18,6 +18,8 @@ namespace GitBranchView.Forms
 			comboBoxType.Items.AddRange(Enum.GetValues(typeof(FilterType)).Cast<object>().ToArray());
 
 			comboBoxType.SelectedItem = filter?.Type ?? FilterType.Exclude;
+			checkBoxTargetPath.Checked = filter?.Target.HasFlag(FilterTargets.Path) ?? false;
+			checkBoxTargetBranch.Checked = filter?.Target.HasFlag(FilterTargets.Branch) ?? false;
 			textBoxFilter.Text = filter?.Filter ?? string.Empty;
 			_text = filter == null ? "New Filter" : "Edit Filter";
 		}
@@ -67,17 +69,25 @@ namespace GitBranchView.Forms
 		{
 			if (comboBoxType.SelectedItem == null)
 			{
-				MessageBox.Show("Filter type not selected!", Program.GIT_BRANCH_VIEW, MessageBoxButtons.OK, MessageBoxIcon.Error);
+				Program.ShowError("Filter type not selected!");
 				return;
 			}
 
-			if (!IsValidRegex(textBoxFilter.Text))
+			if (!checkBoxTargetPath.Checked && !checkBoxTargetBranch.Checked)
 			{
-				MessageBox.Show("Filter not a valid regular expression!", Program.GIT_BRANCH_VIEW, MessageBoxButtons.OK, MessageBoxIcon.Error);
+				Program.ShowError("Filter target not selected!");
+				return;
+			}
+
+			if (!textBoxFilter.Text.IsValidRegex())
+			{
+				Program.ShowError("Filter not a valid regular expression!");
 				return;
 			}
 
 			Filter.Type = (FilterType) comboBoxType.SelectedItem;
+			Filter.Target = (checkBoxTargetPath.Checked ? FilterTargets.Path : FilterTargets.None)
+				| (checkBoxTargetBranch.Checked ? FilterTargets.Branch : FilterTargets.None);
 			Filter.Filter = textBoxFilter.Text;
 
 			DialogResult = DialogResult.OK;
@@ -88,24 +98,6 @@ namespace GitBranchView.Forms
 		{
 			DialogResult = DialogResult.Cancel;
 			Close();
-		}
-
-		private static bool IsValidRegex(string pattern)
-		{
-			if (string.IsNullOrWhiteSpace(pattern))
-				return false;
-
-			try
-			{
-				// ReSharper disable once ReturnValueOfPureMethodIsNotUsed
-				Regex.IsMatch("", pattern);
-			}
-			catch (ArgumentException)
-			{
-				return false;
-			}
-
-			return true;
 		}
 	}
 }
