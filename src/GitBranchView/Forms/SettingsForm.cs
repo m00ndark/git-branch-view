@@ -488,6 +488,7 @@ namespace GitBranchView.Forms
 			textBoxGitExePath.Text = Settings.Default.GitPath;
 			checkBoxGitShowCommandOutput.Checked = Settings.Default.ShowGitCommandOutput;
 			checkBoxGitEnableRemoteBranchLookup.Checked = Settings.Default.EnableRemoteBranchLookup;
+			checkBoxGitExcludeLfsRepositories.Checked = Settings.Default.ExcludeLfsRepositories;
 
 			_gitCommands.ForEach(DisposeGitCommandEntry);
 			_gitCommands.Clear();
@@ -536,6 +537,7 @@ namespace GitBranchView.Forms
 			Settings.Default.GitPath = textBoxGitExePath.Text;
 			Settings.Default.ShowGitCommandOutput = checkBoxGitShowCommandOutput.Checked;
 			Settings.Default.EnableRemoteBranchLookup = checkBoxGitEnableRemoteBranchLookup.Checked;
+			Settings.Default.ExcludeLfsRepositories = checkBoxGitExcludeLfsRepositories.Checked;
 
 			Settings.Default.GitContextMenuCommands = _gitCommands
 				.Select(gitCommandEntry => gitCommandEntry.GitCommand)

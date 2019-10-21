@@ -55,6 +55,11 @@
 			this.buttonCustomCommandPathBrowse = new System.Windows.Forms.Button();
 			this.labelCustomCommandPath = new System.Windows.Forms.Label();
 			this.tabPageGit = new System.Windows.Forms.TabPage();
+			this.tableLayoutPanelGit = new System.Windows.Forms.TableLayoutPanel();
+			this.panelGit2 = new System.Windows.Forms.Panel();
+			this.checkBoxGitExcludeLfsRepositories = new System.Windows.Forms.CheckBox();
+			this.panelGit1 = new System.Windows.Forms.Panel();
+			this.checkBoxGitShowCommandOutput = new System.Windows.Forms.CheckBox();
 			this.checkBoxGitEnableRemoteBranchLookup = new System.Windows.Forms.CheckBox();
 			this.groupBoxGitContextMenuCommands = new System.Windows.Forms.GroupBox();
 			this.panelScrollGitContextMenuCommands = new System.Windows.Forms.Panel();
@@ -76,7 +81,6 @@
 			this.buttonCancel = new System.Windows.Forms.Button();
 			this.tableLayoutPanelButtons = new System.Windows.Forms.TableLayoutPanel();
 			this.buttonApply = new System.Windows.Forms.Button();
-			this.checkBoxGitShowCommandOutput = new System.Windows.Forms.CheckBox();
 			this.tabControl.SuspendLayout();
 			this.tabPageGeneral.SuspendLayout();
 			this.tableLayoutPanelGeneral.SuspendLayout();
@@ -84,6 +88,9 @@
 			this.groupBoxQuickLaunchFiles.SuspendLayout();
 			this.groupBoxCustomCommand.SuspendLayout();
 			this.tabPageGit.SuspendLayout();
+			this.tableLayoutPanelGit.SuspendLayout();
+			this.panelGit2.SuspendLayout();
+			this.panelGit1.SuspendLayout();
 			this.groupBoxGitContextMenuCommands.SuspendLayout();
 			this.panelScrollGitContextMenuCommands.SuspendLayout();
 			this.groupBoxGitExe.SuspendLayout();
@@ -397,8 +404,7 @@
 			// 
 			// tabPageGit
 			// 
-			this.tabPageGit.Controls.Add(this.checkBoxGitShowCommandOutput);
-			this.tabPageGit.Controls.Add(this.checkBoxGitEnableRemoteBranchLookup);
+			this.tabPageGit.Controls.Add(this.tableLayoutPanelGit);
 			this.tabPageGit.Controls.Add(this.groupBoxGitContextMenuCommands);
 			this.tabPageGit.Controls.Add(this.groupBoxGitExe);
 			this.tabPageGit.Location = new System.Drawing.Point(4, 22);
@@ -409,11 +415,63 @@
 			this.tabPageGit.Text = "Git";
 			this.tabPageGit.UseVisualStyleBackColor = true;
 			// 
+			// tableLayoutPanelGit
+			// 
+			this.tableLayoutPanelGit.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+			this.tableLayoutPanelGit.ColumnCount = 2;
+			this.tableLayoutPanelGit.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
+			this.tableLayoutPanelGit.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
+			this.tableLayoutPanelGit.Controls.Add(this.panelGit2, 1, 0);
+			this.tableLayoutPanelGit.Controls.Add(this.panelGit1, 0, 0);
+			this.tableLayoutPanelGit.Location = new System.Drawing.Point(9, 340);
+			this.tableLayoutPanelGit.Name = "tableLayoutPanelGit";
+			this.tableLayoutPanelGit.RowCount = 1;
+			this.tableLayoutPanelGit.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
+			this.tableLayoutPanelGit.Size = new System.Drawing.Size(661, 40);
+			this.tableLayoutPanelGit.TabIndex = 8;
+			// 
+			// panelGit2
+			// 
+			this.panelGit2.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+			this.panelGit2.Controls.Add(this.checkBoxGitExcludeLfsRepositories);
+			this.panelGit2.Location = new System.Drawing.Point(330, 0);
+			this.panelGit2.Margin = new System.Windows.Forms.Padding(0);
+			this.panelGit2.Name = "panelGit2";
+			this.panelGit2.Size = new System.Drawing.Size(331, 40);
+			this.panelGit2.TabIndex = 1;
+			// 
+			// checkBoxGitExcludeLfsRepositories
+			// 
+			this.checkBoxGitExcludeLfsRepositories.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+			this.checkBoxGitExcludeLfsRepositories.AutoSize = true;
+			this.checkBoxGitExcludeLfsRepositories.Location = new System.Drawing.Point(0, 0);
+			this.checkBoxGitExcludeLfsRepositories.Name = "checkBoxGitExcludeLfsRepositories";
+			this.checkBoxGitExcludeLfsRepositories.Size = new System.Drawing.Size(286, 17);
+			this.checkBoxGitExcludeLfsRepositories.TabIndex = 8;
+			this.checkBoxGitExcludeLfsRepositories.Text = "Exclude repositories using Git LFS from folder scan";
+			this.checkBoxGitExcludeLfsRepositories.UseVisualStyleBackColor = true;
+			// 
+			// panelGit1
+			// 
+			this.panelGit1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+			this.panelGit1.Controls.Add(this.checkBoxGitShowCommandOutput);
+			this.panelGit1.Controls.Add(this.checkBoxGitEnableRemoteBranchLookup);
+			this.panelGit1.Location = new System.Drawing.Point(0, 0);
+			this.panelGit1.Margin = new System.Windows.Forms.Padding(0);
+			this.panelGit1.Name = "panelGit1";
+			this.panelGit1.Size = new System.Drawing.Size(330, 40);
+			this.panelGit1.TabIndex = 0;
+			// 
 			// checkBoxGitShowCommandOutput
 			// 
 			this.checkBoxGitShowCommandOutput.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
 			this.checkBoxGitShowCommandOutput.AutoSize = true;
-			this.checkBoxGitShowCommandOutput.Location = new System.Drawing.Point(9, 340);
+			this.checkBoxGitShowCommandOutput.Location = new System.Drawing.Point(0, 0);
 			this.checkBoxGitShowCommandOutput.Name = "checkBoxGitShowCommandOutput";
 			this.checkBoxGitShowCommandOutput.Size = new System.Drawing.Size(258, 17);
 			this.checkBoxGitShowCommandOutput.TabIndex = 7;
@@ -424,7 +482,7 @@
 			// 
 			this.checkBoxGitEnableRemoteBranchLookup.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
 			this.checkBoxGitEnableRemoteBranchLookup.AutoSize = true;
-			this.checkBoxGitEnableRemoteBranchLookup.Location = new System.Drawing.Point(9, 363);
+			this.checkBoxGitEnableRemoteBranchLookup.Location = new System.Drawing.Point(0, 23);
 			this.checkBoxGitEnableRemoteBranchLookup.Name = "checkBoxGitEnableRemoteBranchLookup";
 			this.checkBoxGitEnableRemoteBranchLookup.Size = new System.Drawing.Size(179, 17);
 			this.checkBoxGitEnableRemoteBranchLookup.TabIndex = 6;
@@ -686,17 +744,6 @@
 			this.buttonApply.UseVisualStyleBackColor = true;
 			this.buttonApply.Click += new System.EventHandler(this.ButtonApply_Click);
 			// 
-			// checkBoxGitShowCommandOutput
-			// 
-			this.checkBoxGitShowCommandOutput.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-			this.checkBoxGitShowCommandOutput.AutoSize = true;
-			this.checkBoxGitShowCommandOutput.Location = new System.Drawing.Point(9, 340);
-			this.checkBoxGitShowCommandOutput.Name = "checkBoxGitShowCommandOutput";
-			this.checkBoxGitShowCommandOutput.Size = new System.Drawing.Size(258, 17);
-			this.checkBoxGitShowCommandOutput.TabIndex = 7;
-			this.checkBoxGitShowCommandOutput.Text = "Show output for user initiated git commands";
-			this.checkBoxGitShowCommandOutput.UseVisualStyleBackColor = true;
-			// 
 			// SettingsForm
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -724,7 +771,11 @@
 			this.groupBoxCustomCommand.ResumeLayout(false);
 			this.groupBoxCustomCommand.PerformLayout();
 			this.tabPageGit.ResumeLayout(false);
-			this.tabPageGit.PerformLayout();
+			this.tableLayoutPanelGit.ResumeLayout(false);
+			this.panelGit2.ResumeLayout(false);
+			this.panelGit2.PerformLayout();
+			this.panelGit1.ResumeLayout(false);
+			this.panelGit1.PerformLayout();
 			this.groupBoxGitContextMenuCommands.ResumeLayout(false);
 			this.panelScrollGitContextMenuCommands.ResumeLayout(false);
 			this.groupBoxGitExe.ResumeLayout(false);
@@ -788,5 +839,9 @@
 		private System.Windows.Forms.RadioButton radioButtonQuickLaunchFilesGroupByExtension;
 		private System.Windows.Forms.RadioButton radioButtonQuickLaunchFilesDoNotGroup;
 		private System.Windows.Forms.CheckBox checkBoxGitShowCommandOutput;
+		private System.Windows.Forms.TableLayoutPanel tableLayoutPanelGit;
+		private System.Windows.Forms.Panel panelGit2;
+		private System.Windows.Forms.Panel panelGit1;
+		private System.Windows.Forms.CheckBox checkBoxGitExcludeLfsRepositories;
 	}
 }

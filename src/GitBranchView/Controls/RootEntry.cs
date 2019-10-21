@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -103,6 +104,9 @@ namespace GitBranchView.Controls
 								Git.TryGetBranch(Root, folder, out string branch, out int trackedChanges, out int untrackedChanges, out string[] errors);
 
 								if (!Root.ShouldInclude(folder, branch))
+									return;
+
+								if (Settings.Default.ExcludeLfsRepositories && File.Exists(Path.Combine(folder, ".lfsconfig")))
 									return;
 
 								gitRepositories.Add((folder, branch, trackedChanges, untrackedChanges, errors));

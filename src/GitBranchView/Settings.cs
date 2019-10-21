@@ -77,6 +77,9 @@ namespace GitBranchView
 		[DefaultValue(true)]
 		public bool ShowGitCommandOutput { get; set; }
 
+		[DefaultValue(true)]
+		public bool ExcludeLfsRepositories { get; set; }
+
 		[DefaultValue(null)]
 		public string SelectedRootPath { get; set; }
 
