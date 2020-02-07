@@ -189,17 +189,17 @@ namespace GitBranchView.Forms
 					.OrderBy(root => root.Path)
 					.Select(root => new RootEntry(root))
 					.ToList();
-
-				rootEntries.ForEach(rootEntry => rootEntry.UpdateSize());
-				UpdateSize(rootEntries);
-				flowLayoutPanel.Controls.AddRange(rootEntries.ToArray<Control>());
-				rootEntries.FirstOrDefault()?.Focus();
-
+				
 				foreach (RootEntry rootEntry in rootEntries)
 				{
 					rootEntry.SizeChanged += RootEntry_SizeChanged;
 					rootEntry.ClonedSuccessfully += RootEntry_ClonedSuccessfully;
 				}
+
+				rootEntries.ForEach(rootEntry => rootEntry.UpdateSize());
+				UpdateSize(rootEntries);
+				flowLayoutPanel.Controls.AddRange(rootEntries.ToArray<Control>());
+				rootEntries.FirstOrDefault()?.Focus();
 
 				await Task.WhenAll(rootEntries.Select(rootEntry => rootEntry.UpdateFolders()));
 			}
@@ -256,8 +256,10 @@ namespace GitBranchView.Forms
 				if (rootEntry.Width == flowLayoutPanel.Width)
 					continue;
 
+				rootEntry.SizeChanged -= RootEntry_SizeChanged;
 				rootEntry.Width = flowLayoutPanel.Width;
 				rootEntry.UpdateWidth();
+				rootEntry.SizeChanged += RootEntry_SizeChanged;
 			}
 		}
 
