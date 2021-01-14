@@ -12,11 +12,13 @@ using System.Windows.Forms;
 using GitBranchView.Forms;
 using GitBranchView.Model;
 using ToolComponents.Core.Extensions;
+using ToolComponents.Core.Logging;
 
 namespace GitBranchView.Controls
 {
 	public partial class FolderEntry : UserControl
 	{
+		private const int MAX_QUICK_LAUNCH_ITEMS = 50;
 		private const string MENU_ITEM_REFRESH = "Refresh";
 
 		public event EventHandler WidthChanged;
@@ -137,48 +139,65 @@ namespace GitBranchView.Controls
 
 					if (!string.IsNullOrWhiteSpace(Settings.Default.QuickLaunchFilesFilter))
 					{
-						List<IGrouping<string, string>> groupedQuickLaunchPaths = Directory.EnumerateFiles(Path, "*", SearchOption.AllDirectories)
-							.Where(filePath => Regex.IsMatch(filePath.RelativeTo(Path), Settings.Default.QuickLaunchFilesFilter, RegexOptions.IgnoreCase))
-							.GroupBy(filePath => Settings.Default.QuickLaunchFilesGrouping == QuickLaunchFilesGrouping.ByExtension
-								? System.IO.Path.GetExtension(filePath)
-								: Settings.Default.QuickLaunchFilesGrouping == QuickLaunchFilesGrouping.ByPath
-									? System.IO.Path.GetDirectoryName(filePath)?.RelativeTo(Path) ?? string.Empty
-									: string.Empty)
-							.ToList();
-
-						if (groupedQuickLaunchPaths.Any())
+						try
 						{
-							Settings.Default.SelectedQuickLaunchFiles.TryGetValue(Path.ToLower(), out string selectedQuickLaunchPath);
+							List<IGrouping<string, string>> groupedQuickLaunchPaths = Directory.EnumerateFiles(Path, "*", SearchOption.AllDirectories)
+								.Where(filePath => Regex.IsMatch(filePath.RelativeTo(Path), Settings.Default.QuickLaunchFilesFilter, RegexOptions.IgnoreCase))
+								.GroupBy(filePath => Settings.Default.QuickLaunchFilesGrouping == QuickLaunchFilesGrouping.ByExtension
+									? System.IO.Path.GetExtension(filePath)
+									: Settings.Default.QuickLaunchFilesGrouping == QuickLaunchFilesGrouping.ByPath
+										? System.IO.Path.GetDirectoryName(filePath)?.RelativeTo(Path) ?? string.Empty
+										: string.Empty)
+								.ToList();
 
-							foreach (IGrouping<string, string> quickLaunchPaths in groupedQuickLaunchPaths)
+							if (groupedQuickLaunchPaths.Any())
 							{
-								ToolStripItemCollection menuItems = contextMenuStrip.Items;
+								Settings.Default.SelectedQuickLaunchFiles.TryGetValue(Path.ToLower(), out string selectedQuickLaunchPath);
 
-								if (groupedQuickLaunchPaths.Count > 1
-									&& Settings.Default.QuickLaunchFilesGrouping != QuickLaunchFilesGrouping.None
-									&& quickLaunchPaths.Key != Extensions.ROOT_PATH_RELATIVE)
+								foreach (IGrouping<string, string> quickLaunchPaths in groupedQuickLaunchPaths)
 								{
-									menuItems = Settings.Default.QuickLaunchFilesGrouping == QuickLaunchFilesGrouping.ByExtension
-										? contextMenuStrip.AddItem<ToolStripMenuItem>($"Extension: {quickLaunchPaths.Key.Replace(".", string.Empty)}").DropDownItems
-										: contextMenuStrip.AddItem<ToolStripMenuItem>(quickLaunchPaths.Key).DropDownItems;
-								}
+									ToolStripItemCollection menuItems = contextMenuStrip.Items;
 
-								foreach (string quickLaunchPath in quickLaunchPaths)
-								{
-									string menuItemText = groupedQuickLaunchPaths.Count > 1 && Settings.Default.QuickLaunchFilesGrouping == QuickLaunchFilesGrouping.ByPath
-										? System.IO.Path.GetFileName(quickLaunchPath)
-										: quickLaunchPath.RelativeTo(Path);
-
-									ToolStripMenuItem item = menuItems.Add<ToolStripMenuItem>(menuItemText, QuickLaunchPathMenuItem_Click, quickLaunchPath);
-
-									if (Settings.Default.RepositoryLinkBehavior == RepositoryLinkBehavior.LaunchSelectedQuickLaunchFile
-										&& (selectedQuickLaunchPath?.Equals(quickLaunchPath, StringComparison.InvariantCultureIgnoreCase) ?? false))
+									if (groupedQuickLaunchPaths.Count > 1
+										&& Settings.Default.QuickLaunchFilesGrouping != QuickLaunchFilesGrouping.None
+										&& quickLaunchPaths.Key != Extensions.ROOT_PATH_RELATIVE)
 									{
-										item.Checked = true;
+										menuItems = Settings.Default.QuickLaunchFilesGrouping == QuickLaunchFilesGrouping.ByExtension
+											? contextMenuStrip.AddItem<ToolStripMenuItem>($"Extension: {quickLaunchPaths.Key.Replace(".", string.Empty)}").DropDownItems
+											: contextMenuStrip.AddItem<ToolStripMenuItem>(quickLaunchPaths.Key).DropDownItems;
+									}
+
+									foreach (string quickLaunchPath in quickLaunchPaths.Take(MAX_QUICK_LAUNCH_ITEMS))
+									{
+										string menuItemText = groupedQuickLaunchPaths.Count > 1 && Settings.Default.QuickLaunchFilesGrouping == QuickLaunchFilesGrouping.ByPath
+											? System.IO.Path.GetFileName(quickLaunchPath)
+											: quickLaunchPath.RelativeTo(Path);
+
+										ToolStripMenuItem item = menuItems.Add<ToolStripMenuItem>(menuItemText, QuickLaunchPathMenuItem_Click, quickLaunchPath);
+
+										if (Settings.Default.RepositoryLinkBehavior == RepositoryLinkBehavior.LaunchSelectedQuickLaunchFile
+											&& (selectedQuickLaunchPath?.Equals(quickLaunchPath, StringComparison.InvariantCultureIgnoreCase) ?? false))
+										{
+											item.Checked = true;
+										}
+									}
+
+									int itemCount = quickLaunchPaths.Count();
+									if (itemCount > MAX_QUICK_LAUNCH_ITEMS)
+									{
+										contextMenuStrip.AddItem<ToolStripMenuItem>(
+											$"-- Found {itemCount} matching quick launch files, limiting to first {MAX_QUICK_LAUNCH_ITEMS} --").Enabled = false;
 									}
 								}
+
+								contextMenuStrip.AddItem<ToolStripSeparator>();
 							}
 
+						}
+						catch (Exception ex)
+						{
+							Logger.Add("Error while building quick launch files context menu", ex);
+							contextMenuStrip.AddItem<ToolStripMenuItem>($"Error: {ex.Message}").Enabled = false;
 							contextMenuStrip.AddItem<ToolStripSeparator>();
 						}
 					}
