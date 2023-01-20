@@ -1,18 +1,17 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.IO;
 using System.Linq;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using GitBranchView.Forms;
 using GitBranchView.Model;
 using ToolComponents.Core.Extensions;
 using ToolComponents.Core.Logging;
+using IOPath = System.IO.Path;
 
 namespace GitBranchView.Controls
 {
@@ -57,8 +56,8 @@ namespace GitBranchView.Controls
 		{
 			HighlightColor = Root.Filters
 				.Where(filter => filter.Type == FilterType.Highlight)
-				.Where(filter => filter.Target.HasFlag(FilterTargets.Path) && Regex.IsMatch(Path.RelativeTo(Root), filter.Filter)
-					|| filter.Target.HasFlag(FilterTargets.Branch) && Regex.IsMatch(Branch, filter.Filter))
+				.Where(filter => filter.Target.HasFlag(FilterTargets.Path) && filter.CachedFilterRegex.IsMatch(Path.RelativeTo(Root))
+					|| filter.Target.HasFlag(FilterTargets.Branch) && filter.CachedFilterRegex.IsMatch(Branch))
 				.Select(filter => (Color?) filter.Color)
 				.FirstOrDefault();
 		}
@@ -132,26 +131,45 @@ namespace GitBranchView.Controls
 
 		public void ResetContextMenu()
 		{
+			// executing this on non-UI thread if possible, since it's a bit heavy
+			List<IGrouping<string, string>> groupedQuickLaunchPaths = !string.IsNullOrWhiteSpace(Settings.Default.QuickLaunchFilesFilter)
+				? Directory.EnumerateFiles(Path, "*", SearchOption.AllDirectories)
+					.Where(filePath => Settings.Default.CachedQuickLaunchFilesFilterRegex.IsMatch(filePath.RelativeTo(Path)))
+					.GroupBy(filePath => Settings.Default.QuickLaunchFilesGrouping == QuickLaunchFilesGrouping.ByExtension
+						? IOPath.GetExtension(filePath)
+						: Settings.Default.QuickLaunchFilesGrouping == QuickLaunchFilesGrouping.ByPath
+							? IOPath.GetDirectoryName(filePath)?.RelativeTo(Path) ?? string.Empty
+							: string.Empty)
+					.ToList()
+				: null;
+
 			contextMenuStrip.InvokeIfRequired(() =>
 				{
 					contextMenuStrip.Items.DisposeItems();
 					contextMenuStrip.Items.Clear();
 
-					if (!string.IsNullOrWhiteSpace(Settings.Default.QuickLaunchFilesFilter))
+					if (groupedQuickLaunchPaths != null)
 					{
 						try
 						{
-							List<IGrouping<string, string>> groupedQuickLaunchPaths = Directory.EnumerateFiles(Path, "*", SearchOption.AllDirectories)
-								.Where(filePath => Regex.IsMatch(filePath.RelativeTo(Path), Settings.Default.QuickLaunchFilesFilter, RegexOptions.IgnoreCase))
-								.GroupBy(filePath => Settings.Default.QuickLaunchFilesGrouping == QuickLaunchFilesGrouping.ByExtension
-									? System.IO.Path.GetExtension(filePath)
-									: Settings.Default.QuickLaunchFilesGrouping == QuickLaunchFilesGrouping.ByPath
-										? System.IO.Path.GetDirectoryName(filePath)?.RelativeTo(Path) ?? string.Empty
-										: string.Empty)
-								.ToList();
-
 							if (groupedQuickLaunchPaths.Any())
 							{
+								if (Settings.Default.ShowFrequentQuickLaunchFiles
+									&& Settings.Default.RepositoryLinkBehavior != RepositoryLinkBehavior.LaunchSelectedQuickLaunchFile
+									&& QuickLaunchHistory.Default.TryGet(Path, out List<QuickLaunchItem> quickLaunchItems)
+									&& quickLaunchItems.Any())
+								{
+									foreach (string quickLaunchPath in quickLaunchItems
+										.OrderByDescending(item => item.LaunchCount)
+										.Take(Settings.Default.FrequentQuickLaunchFilesCount)
+										.Select(item => item.FilePath))
+									{
+										contextMenuStrip.Items.Add<ToolStripMenuItem>(quickLaunchPath.RelativeTo(Path), QuickLaunchPathMenuItem_Click, quickLaunchPath);
+									}
+
+									contextMenuStrip.AddItem<ToolStripSeparator>();
+								}
+
 								Settings.Default.SelectedQuickLaunchFiles.TryGetValue(Path.ToLower(), out string selectedQuickLaunchPath);
 
 								foreach (IGrouping<string, string> quickLaunchPaths in groupedQuickLaunchPaths)
@@ -170,7 +188,7 @@ namespace GitBranchView.Controls
 									foreach (string quickLaunchPath in quickLaunchPaths.Take(MAX_QUICK_LAUNCH_ITEMS))
 									{
 										string menuItemText = groupedQuickLaunchPaths.Count > 1 && Settings.Default.QuickLaunchFilesGrouping == QuickLaunchFilesGrouping.ByPath
-											? System.IO.Path.GetFileName(quickLaunchPath)
+											? IOPath.GetFileName(quickLaunchPath)
 											: quickLaunchPath.RelativeTo(Path);
 
 										ToolStripMenuItem item = menuItems.Add<ToolStripMenuItem>(menuItemText, QuickLaunchPathMenuItem_Click, quickLaunchPath);
@@ -185,8 +203,9 @@ namespace GitBranchView.Controls
 									int itemCount = quickLaunchPaths.Count();
 									if (itemCount > MAX_QUICK_LAUNCH_ITEMS)
 									{
-										contextMenuStrip.AddItem<ToolStripMenuItem>(
-											$"-- Found {itemCount} matching quick launch files, limiting to first {MAX_QUICK_LAUNCH_ITEMS} --").Enabled = false;
+										contextMenuStrip
+											.AddItem<ToolStripMenuItem>($"-- Found {itemCount} matching quick launch files, limiting to first {MAX_QUICK_LAUNCH_ITEMS} --")
+											.Enabled = false;
 									}
 								}
 
@@ -375,7 +394,7 @@ namespace GitBranchView.Controls
 			}
 		}
 
-		private static void ExecuteQuickLaunchFile(ToolStripItem item)
+		private void ExecuteQuickLaunchFile(ToolStripItem item)
 		{
 			string quickLaunchPath = item.GetTagValue<string>();
 
@@ -385,6 +404,12 @@ namespace GitBranchView.Controls
 			try
 			{
 				using (Process.Start(quickLaunchPath)) { }
+				bool changed = QuickLaunchHistory.Default.Add(Path, quickLaunchPath);
+
+				if (changed)
+				{
+					Task.Run(ResetContextMenu);
+				}
 			}
 			catch (Exception ex)
 			{

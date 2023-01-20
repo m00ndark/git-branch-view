@@ -3,9 +3,10 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Text;
+using System.Text.RegularExpressions;
 using GitBranchView.Model;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
+using IOPath = System.IO.Path;
 
 namespace GitBranchView
 {
@@ -22,13 +23,14 @@ namespace GitBranchView
 		LaunchSelectedQuickLaunchFile
 	}
 
-	public class Settings
+	public class Settings : Store
 	{
 		public const string PATH_IDENTIFIER = "<path>";
 		public const string BRANCH_IDENTIFIER = "<branch>";
 
-		private const string SETTINGS_FOLDER_NAME = "GitBranchView";
 		private const string SETTINGS_FILE_NAME = "settings.gbv";
+
+		#region Settings
 
 		[DefaultValue(@"C:\Windows\system32\cmd.exe")]
 		public string CommandPath { get; set; }
@@ -42,8 +44,17 @@ namespace GitBranchView
 		[DefaultValue(".sln")]
 		public string QuickLaunchFilesFilter { get; set; }
 
+		[JsonIgnore]
+		public Regex CachedQuickLaunchFilesFilterRegex => QuickLaunchFilesFilter.GetCachedRegex(RegexOptions.IgnoreCase);
+
 		[DefaultValue(QuickLaunchFilesGrouping.ByExtension)]
 		public QuickLaunchFilesGrouping QuickLaunchFilesGrouping { get; set; }
+
+		[DefaultValue(false)]
+		public bool ShowFrequentQuickLaunchFiles { get; set; }
+
+		[DefaultValue(3)]
+		public int FrequentQuickLaunchFilesCount { get; set; }
 
 		[DefaultValue(RepositoryLinkBehavior.ExecuteCustomCommand)]
 		public RepositoryLinkBehavior RepositoryLinkBehavior { get; set; }
@@ -86,18 +97,15 @@ namespace GitBranchView
 		[JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
 		public Dictionary<string, string> SelectedQuickLaunchFiles { get; set; } = new Dictionary<string, string>();
 
+		#endregion
+
 		// ---------------------------------------------------------------------
 
 		private static Settings _settings = null;
 		private static readonly object _lock = new object();
-		private static readonly string _path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), SETTINGS_FOLDER_NAME);
-		private static readonly string _filePath = Path.Combine(_path, SETTINGS_FILE_NAME);
+		private static readonly string _filePath = IOPath.Combine(Path, SETTINGS_FILE_NAME);
 
-		private static readonly JsonSerializerSettings _serializerSettings = new JsonSerializerSettings
-			{
-				DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate,
-				Converters = new JsonConverter[] { new StringEnumConverter() }
-			};
+		protected override string FilePath => _filePath;
 
 		public static Settings Default
 		{
@@ -109,34 +117,27 @@ namespace GitBranchView
 					{
 						if (_settings == null)
 						{
-							_settings = Load();
+							bool loadedLegacySettings = false;
+
+							if (!Exist(_filePath))
+							{
+								string legacyFilePath = IOPath.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Qlik", APPLICATION_FOLDER_NAME, SETTINGS_FILE_NAME);
+
+								if (File.Exists(legacyFilePath))
+								{
+									string json = File.ReadAllText(legacyFilePath, Encoding.UTF8);
+									_settings = Deserialize<Settings>(json).PostProcess();
+									loadedLegacySettings = true;
+								}
+							}
+
+							if (!loadedLegacySettings)
+								_settings = Load<Settings>(_filePath).PostProcess();
 						}
 					}
 				}
 				return _settings;
 			}
-		}
-
-		public static bool Exist => File.Exists(_filePath);
-
-		private static Settings Load()
-		{
-			string json = null;
-
-			if (!Exist)
-			{
-				string legacyFilePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Qlik", SETTINGS_FOLDER_NAME, SETTINGS_FILE_NAME);
-
-				if (File.Exists(legacyFilePath))
-					json = File.ReadAllText(legacyFilePath, Encoding.UTF8);
-			}
-
-			if (json == null && Exist)
-			{
-				json = File.ReadAllText(_filePath, Encoding.UTF8);
-			}
-
-			return Deserialize(string.IsNullOrWhiteSpace(json) ? "{}" : json).PostProcess();
 		}
 
 		private Settings PostProcess()
@@ -154,51 +155,5 @@ namespace GitBranchView
 
 			return this;
 		}
-
-		public void Save()
-		{
-			Directory.CreateDirectory(_path);
-
-			if (Exist && !Backup()) return;
-
-			try
-			{
-				File.WriteAllText(_filePath, Serialize(this), Encoding.UTF8);
-			}
-			catch
-			{
-				Restore();
-			}
-		}
-
-		private static bool Backup()
-		{
-			try
-			{
-				File.Copy(_filePath, _filePath + ".bak", true);
-				return true;
-			}
-			catch
-			{
-				return false;
-			}
-		}
-
-		private static bool Restore()
-		{
-			try
-			{
-				File.Copy(_filePath + ".bak", _filePath, true);
-				return true;
-			}
-			catch
-			{
-				return false;
-			}
-		}
-
-		private static Settings Deserialize(string json) => JsonConvert.DeserializeObject<Settings>(json, _serializerSettings);
-
-		private static string Serialize(Settings settings) => JsonConvert.SerializeObject(settings, Formatting.Indented, _serializerSettings);
 	}
 }

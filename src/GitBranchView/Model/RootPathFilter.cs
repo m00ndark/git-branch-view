@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text.RegularExpressions;
 using Newtonsoft.Json;
 
 namespace GitBranchView.Model
@@ -27,6 +28,9 @@ namespace GitBranchView.Model
 		public FilterTargets Target { get; set; } = FilterTargets.Path;
 
 		public string Filter { get; set; }
+
+		[JsonIgnore]
+		public Regex CachedFilterRegex => Filter.GetCachedRegex();
 
 		[JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
 		public HighlightColor Color { get; set; } = System.Drawing.Color.White;

@@ -9,6 +9,8 @@ namespace GitBranchView.Forms
 	public partial class CloneForm : Form
 	{
 		private const string REPOSITORY_URL_PATTERN = @"^[^:]+://(?:([^/]+)/)*(.+)\.git$";
+
+		private static readonly Regex _repositoryUrlRegex = REPOSITORY_URL_PATTERN.GetCachedRegex(RegexOptions.IgnoreCase);
 		private bool _isTerminating;
 
 		public event EventHandler ClonedSuccessfully;
@@ -69,7 +71,7 @@ namespace GitBranchView.Forms
 			if (!string.IsNullOrWhiteSpace(textBoxFolderName.Text))
 				return;
 
-			Match match = Regex.Match(textBoxRepositoryUrl.Text, REPOSITORY_URL_PATTERN, RegexOptions.IgnoreCase);
+			Match match = _repositoryUrlRegex.Match(textBoxRepositoryUrl.Text);
 
 			if (!match.Success)
 				return;
@@ -115,7 +117,7 @@ namespace GitBranchView.Forms
 				return false;
 			}
 
-			if (!Regex.IsMatch(textBoxRepositoryUrl.Text, REPOSITORY_URL_PATTERN, RegexOptions.IgnoreCase))
+			if (!_repositoryUrlRegex.IsMatch(textBoxRepositoryUrl.Text))
 			{
 				Program.ShowError("Repository URL is not a valid git URL!");
 				return false;
