@@ -119,6 +119,8 @@
     </Compile>
     <Compile Include="Model\Root.cs" />
     <Compile Include="Model\RootPathFilter.cs" />
+    <Compile Include="QuickLaunchHistory.cs" />
+    <Compile Include="RegexCache.cs" />
     <Compile Include="Settings.cs" />
     <Compile Include="Forms\SettingsForm.cs">
       <SubType>Form</SubType>
@@ -126,6 +128,7 @@
     <Compile Include="Forms\SettingsForm.Designer.cs">
       <DependentUpon>SettingsForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="Store.cs" />
     <Compile Include="ToolStripItemTag.cs" />
     <EmbeddedResource Include="Controls\FilterEntry.resx">
       <DependentUpon>FilterEntry.cs</DependentUpon>

@@ -208,10 +208,13 @@ namespace GitBranchView.Controls
 
 		public void ResetContextMenus()
 		{
-			foreach (FolderEntry folderEntry in flowLayoutPanel.Controls.OfType<FolderEntry>())
-			{
-				folderEntry.ResetContextMenu();
-			}
+			Task.Run(() =>
+				{
+					foreach (FolderEntry folderEntry in flowLayoutPanel.Controls.OfType<FolderEntry>())
+					{
+						folderEntry.ResetContextMenu();
+					}
+				});
 		}
 	}
 }

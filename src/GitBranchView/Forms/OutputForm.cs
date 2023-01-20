@@ -68,9 +68,10 @@ namespace GitBranchView.Forms
 						return;
 
 					line = line.StartsWith("\u001b[K") ? line.Substring(3) : line;
-					string initialText = Regex.Match(line, @"^([^\d]*)").Value;
-					string similarLine = Regex
-						.Matches(textBoxDetails.Text, @"^(.*)\r{1}$", RegexOptions.Multiline)
+					string initialText = @"^([^\d]*)".GetCachedRegex().Match(line).Value;
+					string similarLine = @"^(.*)\r{1}$"
+						.GetCachedRegex(RegexOptions.Multiline)
+						.Matches(textBoxDetails.Text)
 						.Cast<Match>()
 						.Select(match => match.Groups[1].Value)
 						.LastOrDefault(x => x.StartsWith(initialText));

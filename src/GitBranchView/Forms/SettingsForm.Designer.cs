@@ -38,6 +38,8 @@
 			this.radioButtonGitRepositoryLinkLaunchSelectedQuickLaunchFile = new System.Windows.Forms.RadioButton();
 			this.radioButtonGitRepositoryLinkExecuteCustomCommand = new System.Windows.Forms.RadioButton();
 			this.groupBoxQuickLaunchFiles = new System.Windows.Forms.GroupBox();
+			this.numericUpDownQuickLaunchFilesFrequentCount = new System.Windows.Forms.NumericUpDown();
+			this.checkBoxQuickLaunchFilesShowFrequent = new System.Windows.Forms.CheckBox();
 			this.radioButtonQuickLaunchFilesGroupByPath = new System.Windows.Forms.RadioButton();
 			this.labelQuickLaunchFilesGroupBy = new System.Windows.Forms.Label();
 			this.radioButtonQuickLaunchFilesGroupByExtension = new System.Windows.Forms.RadioButton();
@@ -86,6 +88,7 @@
 			this.tableLayoutPanelGeneral.SuspendLayout();
 			this.groupBoxGitRepositoryLink.SuspendLayout();
 			this.groupBoxQuickLaunchFiles.SuspendLayout();
+			((System.ComponentModel.ISupportInitialize)(this.numericUpDownQuickLaunchFilesFrequentCount)).BeginInit();
 			this.groupBoxCustomCommand.SuspendLayout();
 			this.tabPageGit.SuspendLayout();
 			this.tableLayoutPanelGit.SuspendLayout();
@@ -140,10 +143,11 @@
 			this.tableLayoutPanelGeneral.Controls.Add(this.groupBoxGitRepositoryLink, 1, 0);
 			this.tableLayoutPanelGeneral.Controls.Add(this.groupBoxQuickLaunchFiles, 0, 0);
 			this.tableLayoutPanelGeneral.Location = new System.Drawing.Point(9, 115);
+			this.tableLayoutPanelGeneral.Margin = new System.Windows.Forms.Padding(3, 3, 3, 13);
 			this.tableLayoutPanelGeneral.Name = "tableLayoutPanelGeneral";
 			this.tableLayoutPanelGeneral.RowCount = 1;
 			this.tableLayoutPanelGeneral.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
-			this.tableLayoutPanelGeneral.Size = new System.Drawing.Size(662, 133);
+			this.tableLayoutPanelGeneral.Size = new System.Drawing.Size(662, 164);
 			this.tableLayoutPanelGeneral.TabIndex = 13;
 			// 
 			// groupBoxGitRepositoryLink
@@ -159,7 +163,7 @@
 			this.groupBoxGitRepositoryLink.Location = new System.Drawing.Point(337, 0);
 			this.groupBoxGitRepositoryLink.Margin = new System.Windows.Forms.Padding(6, 0, 0, 0);
 			this.groupBoxGitRepositoryLink.Name = "groupBoxGitRepositoryLink";
-			this.groupBoxGitRepositoryLink.Size = new System.Drawing.Size(325, 133);
+			this.groupBoxGitRepositoryLink.Size = new System.Drawing.Size(325, 164);
 			this.groupBoxGitRepositoryLink.TabIndex = 12;
 			this.groupBoxGitRepositoryLink.TabStop = false;
 			this.groupBoxGitRepositoryLink.Text = "Git Repository Link";
@@ -221,6 +225,8 @@
 			this.groupBoxQuickLaunchFiles.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+			this.groupBoxQuickLaunchFiles.Controls.Add(this.numericUpDownQuickLaunchFilesFrequentCount);
+			this.groupBoxQuickLaunchFiles.Controls.Add(this.checkBoxQuickLaunchFilesShowFrequent);
 			this.groupBoxQuickLaunchFiles.Controls.Add(this.radioButtonQuickLaunchFilesGroupByPath);
 			this.groupBoxQuickLaunchFiles.Controls.Add(this.labelQuickLaunchFilesGroupBy);
 			this.groupBoxQuickLaunchFiles.Controls.Add(this.radioButtonQuickLaunchFilesGroupByExtension);
@@ -230,10 +236,44 @@
 			this.groupBoxQuickLaunchFiles.Location = new System.Drawing.Point(0, 0);
 			this.groupBoxQuickLaunchFiles.Margin = new System.Windows.Forms.Padding(0, 0, 6, 0);
 			this.groupBoxQuickLaunchFiles.Name = "groupBoxQuickLaunchFiles";
-			this.groupBoxQuickLaunchFiles.Size = new System.Drawing.Size(325, 133);
+			this.groupBoxQuickLaunchFiles.Size = new System.Drawing.Size(325, 164);
 			this.groupBoxQuickLaunchFiles.TabIndex = 8;
 			this.groupBoxQuickLaunchFiles.TabStop = false;
 			this.groupBoxQuickLaunchFiles.Text = "Quick Launch Files";
+			// 
+			// numericUpDownQuickLaunchFilesFrequentCount
+			// 
+			this.numericUpDownQuickLaunchFilesFrequentCount.Location = new System.Drawing.Point(181, 132);
+			this.numericUpDownQuickLaunchFilesFrequentCount.Maximum = new decimal(new int[] {
+            20,
+            0,
+            0,
+            0});
+			this.numericUpDownQuickLaunchFilesFrequentCount.Minimum = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+			this.numericUpDownQuickLaunchFilesFrequentCount.Name = "numericUpDownQuickLaunchFilesFrequentCount";
+			this.numericUpDownQuickLaunchFilesFrequentCount.Size = new System.Drawing.Size(47, 22);
+			this.numericUpDownQuickLaunchFilesFrequentCount.TabIndex = 17;
+			this.numericUpDownQuickLaunchFilesFrequentCount.Value = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+			this.numericUpDownQuickLaunchFilesFrequentCount.ValueChanged += new System.EventHandler(this.NumericUpDownQuickLaunchFilesFrequentCount_ValueChanged);
+			// 
+			// checkBoxQuickLaunchFilesShowFrequent
+			// 
+			this.checkBoxQuickLaunchFilesShowFrequent.AutoSize = true;
+			this.checkBoxQuickLaunchFilesShowFrequent.Location = new System.Drawing.Point(9, 134);
+			this.checkBoxQuickLaunchFilesShowFrequent.Name = "checkBoxQuickLaunchFilesShowFrequent";
+			this.checkBoxQuickLaunchFilesShowFrequent.Size = new System.Drawing.Size(166, 17);
+			this.checkBoxQuickLaunchFilesShowFrequent.TabIndex = 16;
+			this.checkBoxQuickLaunchFilesShowFrequent.Text = "Show frequently used files:";
+			this.checkBoxQuickLaunchFilesShowFrequent.UseVisualStyleBackColor = true;
+			this.checkBoxQuickLaunchFilesShowFrequent.CheckedChanged += new System.EventHandler(this.CheckBoxQuickLaunchFilesShowFrequent_CheckedChanged);
 			// 
 			// radioButtonQuickLaunchFilesGroupByPath
 			// 
@@ -302,7 +342,7 @@
 			// checkBoxEnableLogging
 			// 
 			this.checkBoxEnableLogging.AutoSize = true;
-			this.checkBoxEnableLogging.Location = new System.Drawing.Point(9, 310);
+			this.checkBoxEnableLogging.Location = new System.Drawing.Point(9, 341);
 			this.checkBoxEnableLogging.Name = "checkBoxEnableLogging";
 			this.checkBoxEnableLogging.Size = new System.Drawing.Size(105, 17);
 			this.checkBoxEnableLogging.TabIndex = 7;
@@ -312,7 +352,7 @@
 			// checkBoxStartWithWindows
 			// 
 			this.checkBoxStartWithWindows.AutoSize = true;
-			this.checkBoxStartWithWindows.Location = new System.Drawing.Point(9, 287);
+			this.checkBoxStartWithWindows.Location = new System.Drawing.Point(9, 318);
 			this.checkBoxStartWithWindows.Name = "checkBoxStartWithWindows";
 			this.checkBoxStartWithWindows.Size = new System.Drawing.Size(211, 17);
 			this.checkBoxStartWithWindows.TabIndex = 6;
@@ -322,7 +362,7 @@
 			// checkBoxCloseOnLostFocus
 			// 
 			this.checkBoxCloseOnLostFocus.AutoSize = true;
-			this.checkBoxCloseOnLostFocus.Location = new System.Drawing.Point(9, 264);
+			this.checkBoxCloseOnLostFocus.Location = new System.Drawing.Point(9, 295);
 			this.checkBoxCloseOnLostFocus.Name = "checkBoxCloseOnLostFocus";
 			this.checkBoxCloseOnLostFocus.Size = new System.Drawing.Size(418, 17);
 			this.checkBoxCloseOnLostFocus.TabIndex = 5;
@@ -768,6 +808,7 @@
 			this.groupBoxGitRepositoryLink.PerformLayout();
 			this.groupBoxQuickLaunchFiles.ResumeLayout(false);
 			this.groupBoxQuickLaunchFiles.PerformLayout();
+			((System.ComponentModel.ISupportInitialize)(this.numericUpDownQuickLaunchFilesFrequentCount)).EndInit();
 			this.groupBoxCustomCommand.ResumeLayout(false);
 			this.groupBoxCustomCommand.PerformLayout();
 			this.tabPageGit.ResumeLayout(false);
@@ -843,5 +884,7 @@
 		private System.Windows.Forms.Panel panelGit2;
 		private System.Windows.Forms.Panel panelGit1;
 		private System.Windows.Forms.CheckBox checkBoxGitExcludeLfsRepositories;
+		private System.Windows.Forms.NumericUpDown numericUpDownQuickLaunchFilesFrequentCount;
+		private System.Windows.Forms.CheckBox checkBoxQuickLaunchFilesShowFrequent;
 	}
 }

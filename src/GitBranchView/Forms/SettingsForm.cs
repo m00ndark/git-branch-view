@@ -141,6 +141,17 @@ namespace GitBranchView.Forms
 			_quickLaunchFilesChanged = true;
 		}
 
+		private void CheckBoxQuickLaunchFilesShowFrequent_CheckedChanged(object sender, EventArgs e)
+		{
+			_quickLaunchFilesChanged = true;
+			EnableControls();
+		}
+
+		private void NumericUpDownQuickLaunchFilesFrequentCount_ValueChanged(object sender, EventArgs e)
+		{
+			_quickLaunchFilesChanged = true;
+		}
+
 		private void RadioButtonGitRepositoryLinkExecuteCustomCommand_CheckedChanged(object sender, EventArgs e)
 		{
 			_repositoryLinkBehaviorChanged = true;
@@ -450,6 +461,7 @@ namespace GitBranchView.Forms
 
 		private void EnableControls(bool enable = true)
 		{
+			numericUpDownQuickLaunchFilesFrequentCount.Enabled = enable && checkBoxQuickLaunchFilesShowFrequent.Checked;
 			labelCustomCommandName.Enabled = enable && radioButtonGitRepositoryLinkLaunchSelectedQuickLaunchFile.Checked;
 			textBoxCustomCommandName.Enabled = enable && radioButtonGitRepositoryLinkLaunchSelectedQuickLaunchFile.Checked;
 		}
@@ -480,6 +492,8 @@ namespace GitBranchView.Forms
 			radioButtonQuickLaunchFilesDoNotGroup.Checked = Settings.Default.QuickLaunchFilesGrouping == QuickLaunchFilesGrouping.None;
 			radioButtonQuickLaunchFilesGroupByExtension.Checked = Settings.Default.QuickLaunchFilesGrouping == QuickLaunchFilesGrouping.ByExtension;
 			radioButtonQuickLaunchFilesGroupByPath.Checked = Settings.Default.QuickLaunchFilesGrouping == QuickLaunchFilesGrouping.ByPath;
+			checkBoxQuickLaunchFilesShowFrequent.Checked = Settings.Default.ShowFrequentQuickLaunchFiles;
+			numericUpDownQuickLaunchFilesFrequentCount.Value = Settings.Default.FrequentQuickLaunchFilesCount;
 			radioButtonGitRepositoryLinkExecuteCustomCommand.Checked = Settings.Default.RepositoryLinkBehavior == RepositoryLinkBehavior.ExecuteCustomCommand;
 			radioButtonGitRepositoryLinkLaunchSelectedQuickLaunchFile.Checked = Settings.Default.RepositoryLinkBehavior == RepositoryLinkBehavior.LaunchSelectedQuickLaunchFile;
 			checkBoxCloseOnLostFocus.Checked = Settings.Default.CloseOnLostFocus;
@@ -528,6 +542,8 @@ namespace GitBranchView.Forms
 				: radioButtonQuickLaunchFilesGroupByPath.Checked
 					? QuickLaunchFilesGrouping.ByPath
 					: QuickLaunchFilesGrouping.None;
+			Settings.Default.ShowFrequentQuickLaunchFiles = checkBoxQuickLaunchFilesShowFrequent.Checked;
+			Settings.Default.FrequentQuickLaunchFilesCount = (int)numericUpDownQuickLaunchFilesFrequentCount.Value;
 			Settings.Default.RepositoryLinkBehavior = radioButtonGitRepositoryLinkLaunchSelectedQuickLaunchFile.Checked
 				? RepositoryLinkBehavior.LaunchSelectedQuickLaunchFile
 				: RepositoryLinkBehavior.ExecuteCustomCommand;

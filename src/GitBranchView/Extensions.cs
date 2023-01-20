@@ -83,8 +83,8 @@ namespace GitBranchView
 		{
 			return root.Filters
 				.Where(filter => filter.Type == FilterType.Include || filter.Type == FilterType.Exclude)
-				.Aggregate(true, (include, filter) => filter.Target.HasFlag(FilterTargets.Path) && Regex.IsMatch(path.RelativeTo(root), filter.Filter)
-					|| filter.Target.HasFlag(FilterTargets.Branch) && Regex.IsMatch(branch, filter.Filter) ? filter.Type == FilterType.Include : include);
+				.Aggregate(true, (include, filter) => filter.Target.HasFlag(FilterTargets.Path) && filter.CachedFilterRegex.IsMatch(path.RelativeTo(root))
+					|| filter.Target.HasFlag(FilterTargets.Branch) && filter.CachedFilterRegex.IsMatch(branch) ? filter.Type == FilterType.Include : include);
 		}
 
 		public static IEnumerable<string> ScanFolder(this string path)
@@ -105,6 +105,9 @@ namespace GitBranchView
 
 		public static bool IsValidRegex(this string pattern, bool allowEmpty = false)
 		{
+			if (allowEmpty && pattern == string.Empty)
+				return true;
+
 			if (string.IsNullOrWhiteSpace(pattern))
 				return false;
 
